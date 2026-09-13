@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<robot name="limo_four_diff" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:include filename="$(find limo_car)/gazebo/four_diff.xacro" />
+    <xacro:limo_four_diff />
+    <xacro:include filename="$(find limo_car)/gazebo/sensor.xacro" />
+
+    <xacro:gazebo_laser frame_prefix="laser" />
+    <joint name="laser_joint" type="fixed">
+        <origin xyz="0.1236 0 -0.01" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="laser_link"/>
+    </joint>
+
+    <xacro:gazebo_depth_camera frame_prefix="depth_camera" />
+    <joint name="depth_camera_joint" type="fixed">
+        <origin xyz="0.1 0 0.065" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="depth_camera_link"/>
+    </joint>
+
+    <xacro:gazebo_imu frame_prefix="imu" />
+    <joint name="imu_joint" type="fixed">
+        <origin xyz="0.0 0 -0.1" rpy="0 0 0"/>
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+    </joint>
+</robot>
