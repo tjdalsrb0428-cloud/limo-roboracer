@@ -1,0 +1,63 @@
+[0.008s] Invoking command in '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/src/limo_ros2/limo_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description
+[0.056s] -- The C compiler identification is GNU 11.4.0
+[0.107s] -- The CXX compiler identification is GNU 11.4.0
+[0.111s] -- Detecting C compiler ABI info
+[0.173s] -- Detecting C compiler ABI info - done
+[0.181s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.181s] -- Detecting C compile features
+[0.181s] -- Detecting C compile features - done
+[0.184s] -- Detecting CXX compiler ABI info
+[0.251s] -- Detecting CXX compiler ABI info - done
+[0.254s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.254s] -- Detecting CXX compile features
+[0.254s] -- Detecting CXX compile features - done
+[0.257s] -- Found ament_cmake: 1.3.14 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.389s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.430s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.446s] -- Found ament_lint_auto: 0.12.15 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.488s] -- Added test 'copyright' to check source files copyright and LICENSE
+[0.490s] -- Added test 'flake8' to check Python code syntax and style conventions
+[0.490s] -- Added test 'lint_cmake' to check CMake code style
+[0.490s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[0.491s] -- Added test 'xmllint' to check XML markup files
+[0.492s] -- Configuring done
+[0.493s] -- Generating done
+[0.494s] -- Build files have been written to: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description
+[0.499s] Invoked command in '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/src/limo_ros2/limo_description -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description
+[0.500s] Invoking command in '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description -- -j14 -l14
+[0.535s] Invoked command in '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description -- -j14 -l14
+[0.542s] Invoking command in '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description
+[0.547s] -- Install configuration: ""
+[0.547s] -- Execute custom install script
+[0.547s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/launch/display_models_diff.launch.py
+[0.553s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/launch/gazebo_models_diff.launch.py
+[0.562s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/meshes/limo_base.dae
+[0.567s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/meshes/limo_base.stl
+[0.574s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/meshes/limo_wheel.dae
+[0.581s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/meshes/limo_wheel.stl
+[0.587s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/rviz/model_display.rviz
+[0.605s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/rviz/urdf.rviz
+[0.607s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_ackerman.gazebo
+[0.612s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_ackerman.xacro
+[0.618s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_four_diff.gazebo
+[0.624s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_four_diff.xacro
+[0.633s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_four_diff_2.gazebo
+[0.640s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_gazebo.gazebo
+[0.648s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_steering_hinge.xacro
+[0.654s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/urdf/limo_xacro.xacro
+[0.660s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/ament_index/resource_index/package_run_dependencies/limo_description
+[0.665s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/ament_index/resource_index/parent_prefix_path/limo_description
+[0.670s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/environment/ament_prefix_path.sh
+[0.679s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/environment/ament_prefix_path.dsv
+[0.687s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/environment/path.sh
+[0.695s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/environment/path.dsv
+[0.704s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/local_setup.bash
+[0.715s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/local_setup.sh
+[0.722s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/local_setup.zsh
+[0.728s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/local_setup.dsv
+[0.734s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/package.dsv
+[0.744s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/ament_index/resource_index/packages/limo_description
+[0.751s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/cmake/limo_descriptionConfig.cmake
+[0.758s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/cmake/limo_descriptionConfig-version.cmake
+[0.768s] -- Symlinking: /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/install/limo_description/share/limo_description/package.xml
+[0.780s] Invoked command in '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/build/limo_description

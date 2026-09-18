@@ -17,6 +17,9 @@
   <depend>joint_state_publisher</depend>
   <depend>joint_state_publisher_gui</depend>
   <depend>xacro</depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>gazebo_plugins</exec_depend>
   <depend>rviz</depend>
   <depend>gazebo</depend>
   <depend>libgazebo_ros</depend>

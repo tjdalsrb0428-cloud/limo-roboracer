@@ -28,4 +28,8 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(PROGRAMS scripts/ackermann_twist_adapter.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()

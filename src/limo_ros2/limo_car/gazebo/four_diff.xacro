@@ -21,8 +21,9 @@ Es würde einfach in andere Datei angerufen werden. -->
     <xacro:property name="base_y_size" value="0.31" />
     <xacro:property name="base_z_size" value="0.12" />
 
-    <xacro:property name="wheelbase" value="0.24"/>
-    <xacro:property name="track" value="0.168"/>
+    <!-- ROS1 limo_base/include/limo_driver.h: wheelbase_ and track_. -->
+    <xacro:property name="wheelbase" value="0.20"/>
+    <xacro:property name="track" value="0.172"/>
     <xacro:property name="wheel_vertical_offset" value="-0.10" />
 
     <xacro:property name="wheel_mass" value="0.5" />
@@ -107,7 +108,7 @@ Es würde einfach in andere Datei angerufen werden. -->
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
+                    <mesh filename="file://$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
                 </geometry>
             </visual>
             <collision>
@@ -186,7 +187,7 @@ Es würde einfach in andere Datei angerufen werden. -->
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2" />
+                    <mesh filename="file://$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2" />
                 </geometry>
             </visual>
             <collision>
@@ -241,7 +242,7 @@ Es würde einfach in andere Datei angerufen werden. -->
                 <origin xyz="0 0 -0.15" rpy="0 0 ${M_PI/2}" />
                 <geometry>
                     <!-- Modell von Hersteller, aber es ist kleiner als realen Produkt, da die Skale vergrößert wird -->
-                    <mesh filename="$(find limo_car)/meshes/limo_base.dae" scale="1.2 1.2 1.2" />
+                    <mesh filename="file://$(find limo_car)/meshes/limo_base.dae" scale="1.2 1.2 1.2" />
                 </geometry>
             </visual>
             <!-- Modell für physikalische Kollision zu modellieren. -->
@@ -265,7 +266,7 @@ Es würde einfach in andere Datei angerufen werden. -->
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
+                    <mesh filename="file://$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
                 </geometry>
             </visual>
             <collision>
@@ -299,7 +300,7 @@ Es würde einfach in andere Datei angerufen werden. -->
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0" />
                 <geometry>
-                    <mesh filename="$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
+                    <mesh filename="file://$(find limo_car)/meshes/limo_wheel.dae" scale="1.2 1.2 1.2"/>
                 </geometry>
             </visual>
             <collision>
