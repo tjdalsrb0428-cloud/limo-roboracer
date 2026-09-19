@@ -3,7 +3,7 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    map_yaml_path = '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/maps/my_map.yaml'
+    map_yaml_path = '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/maps/current_map.yaml'
     amcl_params_path = '/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/nav2_config/amcl_params.yaml'
 
     return LaunchDescription([
