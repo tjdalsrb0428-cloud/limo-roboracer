@@ -185,7 +185,7 @@ controller_server:
       weight_viapoint: 1.0
       weight_adapt_factor: 2.0
       # Homotopy
-      enable_homotopy_class_planning: true
+      enable_homotopy_class_planning: false
       enable_multithreading: true
       max_number_classes: 4
       selection_cost_hysteresis: 1.0
@@ -202,8 +202,8 @@ controller_server:
     general_goal_checker:
       plugin: nav2_controller::SimpleGoalChecker
       stateful: true
-      xy_goal_tolerance: 0.25
-      yaw_goal_tolerance: 0.25
+      xy_goal_tolerance: 0.5
+      yaw_goal_tolerance: 1.57
     goal_checker_plugins:
     - general_goal_checker
     min_theta_velocity_threshold: 0.001
