@@ -35,7 +35,6 @@ def main():
         yaw = math.atan2(ny - y, nx - x)
         goals.append(make_pose(nav, x, y, yaw))
 
-    # nav2가 이미 켜진 상태라 active 체크 생략, 바로 전송
     nav.goThroughPoses(goals)
 
     while not nav.isTaskComplete():
