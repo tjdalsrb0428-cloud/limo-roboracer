@@ -29,9 +29,9 @@ def main():
             pts.append((float(row[0]), float(row[1])))
 
     goals = []
-    for i in range(1, len(pts)):
+    for i in range(0, len(pts)):
         x, y = pts[i]
-        nx, ny = pts[i + 1] if i + 1 < len(pts) else pts[1]
+        nx, ny = pts[i + 1] if i + 1 < len(pts) else pts[0]
         yaw = math.atan2(ny - y, nx - x)
         goals.append(make_pose(nav, x, y, yaw))
 
