@@ -139,6 +139,7 @@ controller_server:
       transform_tolerance: 0.5
       # Robot configuration (Ackermann-like, non-holonomic)
       max_vel_x: 0.9
+      switching_blocking_period: 0.0
       max_vel_x_backwards: 0.4
       max_vel_theta: 1.0
       acc_lim_x: 2.5
@@ -184,7 +185,7 @@ controller_server:
       weight_viapoint: 1.0
       weight_adapt_factor: 2.0
       # Homotopy
-      enable_homotopy_class_planning: false
+      enable_homotopy_class_planning: true
       enable_multithreading: true
       max_number_classes: 4
       selection_cost_hysteresis: 1.0
@@ -233,9 +234,9 @@ global_costmap:
           data_type: LaserScan
           marking: true
           max_obstacle_height: 2.0
-          obstacle_max_range: 2.5
+          obstacle_max_range: 5.0
           obstacle_min_range: 0.0
-          raytrace_max_range: 3.0
+          raytrace_max_range: 6.0
           raytrace_min_range: 0.0
           topic: /scan
       plugins:
@@ -265,14 +266,14 @@ local_costmap:
       plugins:
       - voxel_layer
       - inflation_layer
-      publish_frequency: 2.0
+      publish_frequency: 20.0
       resolution: 0.05
       robot_base_frame: base_link
       rolling_window: true
       static_layer:
         map_subscribe_transient_local: true
         plugin: nav2_costmap_2d::StaticLayer
-      update_frequency: 5.0
+      update_frequency: 20.0
       use_sim_time: true
       voxel_layer:
         enabled: true
