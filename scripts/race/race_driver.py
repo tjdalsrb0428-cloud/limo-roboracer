@@ -801,7 +801,8 @@ class Race(Node):
         if self.idx is None:
             return
         if self.last_idx_for_lap is not None:
-            if self.last_idx_for_lap > self.n * 0.9 and self.idx < self.n * 0.1:
+            # 출발 직후(출발점이 레이스라인 시작점 살짝 뒤) 통과는 랩으로 세지 않음: 랩1 시간은 엔터 시점부터
+            if self.last_idx_for_lap > self.n * 0.9 and self.idx < self.n * 0.1 and tnow - self.lap_t0 > 5.0:
                 self.laps += 1
                 lt = tnow - self.lap_t0
                 self.lap_t0 = tnow

@@ -23,6 +23,10 @@ WS = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG = os.path.join(WS, 'logs', 'exam')
 OUT = os.path.join(WS, 'maps', 'exam')
 PROCS = []
+# 시험장 Wi-Fi 없음/끊김 대비: ROS2(DDS)와 Gazebo 통신을 이 PC 내부(localhost)로 한정.
+# 하위 프로세스(Gazebo, 매퍼, 드라이버)는 이 환경을 그대로 물려받는다.
+os.environ['ROS_LOCALHOST_ONLY'] = '1'
+os.environ['GAZEBO_IP'] = '127.0.0.1'
 
 
 def run_bg(name, cmd):
@@ -137,6 +141,26 @@ def teleop_until_enter():
     print(flush=True)
 
 
+def odom_pose(timeout=5.0):
+    """/odom 1개를 받아 현재 pose 반환 (Gazebo Ctrl+R 리셋 후에도 정확: 플러그인 odom = 월드 좌표)"""
+    import rclpy
+    from nav_msgs.msg import Odometry
+    rclpy.init()
+    n = rclpy.create_node('exam_odom')
+    got = {}
+    n.create_subscription(Odometry, '/odom', lambda m: got.__setitem__('m', m), 10)
+    t0 = time.time()
+    while 'm' not in got and time.time() - t0 < timeout:
+        rclpy.spin_once(n, timeout_sec=0.1)
+    n.destroy_node()
+    rclpy.shutdown()
+    if 'm' not in got:
+        return None
+    p = got['m'].pose.pose
+    q = p.orientation
+    return (p.position.x, p.position.y, math.atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z)))
+
+
 def _unused_get_pose(timeout=10.0):
     import rclpy
     from rclpy.time import Time
@@ -192,8 +216,9 @@ def main():
             os.makedirs(OUT, exist_ok=True)
             base = os.path.join(OUT, 'map_' + time.strftime('%m%d_%H%M%S'))
             run_bg('mapper', f'{sys.executable} -u {WS}/scripts/race/odom_mapper.py {base}')
-            say('   키보드로 한 바퀴 돌고, 출발 위치/방향에 세운 뒤 엔터 (외부 teleop 써도 됨)')
+            say('   키보드로 한 바퀴 돈 뒤, 출발 위치/방향에 세우고 엔터')
             teleop_until_enter()
+            pose_now = odom_pose()
             t_save = time.time()
             kill('mapper')
             map_yaml = base + '.yaml'
@@ -201,8 +226,11 @@ def main():
             if not os.path.exists(map_yaml):
                 say('지도 저장 실패: logs/exam/mapper.log 확인')
                 return
-            rows = [l.strip().split(',') for l in open(traj).readlines()[1:] if l.count(',') == 2]
-            pose = tuple(float(v) for v in rows[-1])
+            if pose_now is not None:
+                pose = pose_now
+            else:
+                rows = [l.strip().split(',') for l in open(traj).readlines()[1:] if l.count(',') == 2]
+                pose = tuple(float(v) for v in rows[-1])
             say(f'3) 지도 저장 {map_yaml} ({time.time() - t_save:.1f}s), 현재 pose=({pose[0]:.2f},{pose[1]:.2f},{pose[2]:.2f})')
         else:
             say('2) 매핑 시작 (cartographer)')
@@ -246,7 +274,7 @@ def main():
         t_rl = time.time()
         targ = ['--traj', traj] if traj else []
         r = subprocess.run([sys.executable, os.path.join(WS, 'scripts/race/raceline.py'), map_yaml, line,
-                            str(pose[0]), str(pose[1]), str(pose[2])] + targ, cwd=WS)
+                            f"{pose[0]:.4f}", f"{pose[1]:.4f}", f"{pose[2]:.4f}"] + targ, cwd=WS)
         if r.returncode != 0 or not os.path.exists(line):
             say('레이스라인 생성 실패')
             return
@@ -255,7 +283,7 @@ def main():
         sys.stdout.flush()
         os.execvp(sys.executable, [sys.executable, '-u', os.path.join(WS, 'scripts/race/race_driver.py'),
                                    '--map', map_yaml, '--line', line] + targ +
-                  (['--init', str(pose[0]), str(pose[1]), str(pose[2])] if use_amcl else ['--odom']))
+                  (['--init', f"{pose[0]:.4f}", f"{pose[1]:.4f}", f"{pose[2]:.4f}"] if use_amcl else ['--odom']))
     except KeyboardInterrupt:
         say('중단 - 백그라운드 프로세스 정리')
         for n, p in PROCS:
