@@ -377,7 +377,7 @@ Es würde einfach in andere Datei angerufen werden. -->
                 <linear_velocity_i_range>-1 1</linear_velocity_i_range>
                 <!-- Center angle leaves room for the inner wheel's 30 degree limit. -->
                 <max_steer>0.42</max_steer>
-                <max_speed>0.9</max_speed>
+                <max_speed>1.0</max_speed>
                 <publish_odom>true</publish_odom>
                 <publish_odom_tf>true</publish_odom_tf>
                 <publish_wheel_tf>false</publish_wheel_tf>

@@ -7,7 +7,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
 
-def convert_twist(speed, yaw_rate, wheelbase=0.24, max_steer=0.42, max_speed=0.9,
+def convert_twist(speed, yaw_rate, wheelbase=0.24, max_steer=0.42, max_speed=1.0,
                   wheel_track=0.213):
     if not math.isfinite(speed) or not math.isfinite(yaw_rate):
         return 0.0, 0.0

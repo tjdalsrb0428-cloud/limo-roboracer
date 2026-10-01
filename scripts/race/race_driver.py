@@ -43,7 +43,7 @@ REAR = 0.12             # base_link -> 후륜축 거리
 K_MAX = 1.0 / 0.56      # 최대 곡률(조향 0.42rad)
 TRACK_RATIO = 0.213 / (2 * 0.24)
 # 속도
-V_MAX = 0.9
+V_MAX = 1.0
 A_LAT = 2.2             # 횡가속 한계(m/s^2)
 A_ACC = 2.0
 A_DEC = 1.8

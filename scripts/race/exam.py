@@ -47,6 +47,19 @@ def say(msg):
     print(f'\033[1;36m[exam {time.strftime("%H:%M:%S")}]\033[0m {msg}', flush=True)
 
 
+def wait_msg(topic, proc=None, timeout=60):
+    """토픽 메시지를 실제로 1개 받을 때까지 대기 (daemon 캐시에 속지 않음)"""
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        if proc is not None and proc.poll() is not None:
+            return False
+        r = subprocess.run(['timeout', '4', 'ros2', 'topic', 'echo', '--once', '--no-daemon', topic],
+                           capture_output=True, text=True)
+        if r.returncode == 0 and r.stdout.strip():
+            return True
+    return False
+
+
 def wait_topic(topic, timeout=60):
     t0 = time.time()
     while time.time() - t0 < timeout:
@@ -98,9 +111,9 @@ def main():
             w = f' world:={os.path.abspath(a.world)}' if a.world else ''
             g = ' gui:=false rviz:=false' if a.no_gui else ''
             say(f'1) Gazebo 시작{w}')
-            run_bg('sim', f'ros2 launch limo_car roboracer_sim.launch.py{w}{g}')
-            if not wait_topic('/scan', 90):
-                say('Gazebo /scan 안 나옴 - logs/exam/sim.log 확인')
+            sim = run_bg('sim', f'ros2 launch limo_car roboracer_sim.launch.py{w}{g}')
+            if not wait_msg('/scan', sim, 90):
+                say('Gazebo 기동 실패(/scan 수신 안 됨) - logs/exam/sim.log 확인')
                 return
             time.sleep(2.0)
         traj = ''
