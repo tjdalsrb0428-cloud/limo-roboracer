@@ -70,6 +70,73 @@ def wait_topic(topic, timeout=60):
     return False
 
 
+TELEOP_HELP = '''
+  [매핑 조종]  u i o  : 좌전진 / 전진 / 우전진
+               j k l  : 좌전진 / 정지 / 우전진
+               m , .  : 좌후진 / 후진 / 우후진
+               q/z 속도 +/-   w/x 조향 +/-   엔터 = 매핑 끝(정지 후 저장)
+'''
+
+
+def teleop_until_enter():
+    """같은 터미널 키보드 조종(10Hz 연속 발행). 엔터 입력 시 정지하고 반환"""
+    if not sys.stdin.isatty():          # 자동 테스트(파이프 입력): 엔터만 대기
+        input()
+        return
+    import select
+    import termios
+    import tty
+    import rclpy
+    from geometry_msgs.msg import Twist
+    rclpy.init()
+    n = rclpy.create_node('exam_teleop')
+    pub = n.create_publisher(Twist, '/cmd_vel', 1)
+    speed, turn = 0.5, 1.0
+    v = w = 0.0
+    keys = {'i': (1, 0), 'u': (1, 1), 'o': (1, -1), 'j': (1, 1), 'l': (1, -1), 'k': (0, 0),
+            ',': (-1, 0), 'm': (-1, -1), '.': (-1, 1)}
+    print(TELEOP_HELP, flush=True)
+    old = termios.tcgetattr(sys.stdin)
+    try:
+        tty.setcbreak(sys.stdin.fileno())
+        t_pub = 0.0
+        while True:
+            r, _, _ = select.select([sys.stdin], [], [], 0.05)
+            if r:
+                c = sys.stdin.read(1)
+                if c in ('\n', '\r'):
+                    break
+                if c in keys:
+                    a, b = keys[c]
+                    v, w = a * speed, b * turn
+                elif c == 'q':
+                    speed = min(speed + 0.1, 0.8)
+                elif c == 'z':
+                    speed = max(speed - 0.1, 0.1)
+                elif c == 'x':
+                    turn = max(turn - 0.1, 0.3)
+                elif c == 'w':
+                    turn = min(turn + 0.1, 2.0)
+                if c in 'qzwx':
+                    print(f'\r  속도 {speed:.1f} m/s  조향 {turn:.1f}    ', end='', flush=True)
+                    if v != 0.0:
+                        v = math.copysign(speed, v)
+                        w = math.copysign(turn, w) if w else 0.0
+            if time.time() - t_pub > 0.1:
+                m = Twist()
+                m.linear.x, m.angular.z = v, w
+                pub.publish(m)
+                t_pub = time.time()
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old)
+        for _ in range(5):
+            pub.publish(Twist())
+            time.sleep(0.05)
+        n.destroy_node()
+        rclpy.shutdown()
+    print(flush=True)
+
+
 def _unused_get_pose(timeout=10.0):
     import rclpy
     from rclpy.time import Time
@@ -125,9 +192,8 @@ def main():
             os.makedirs(OUT, exist_ok=True)
             base = os.path.join(OUT, 'map_' + time.strftime('%m%d_%H%M%S'))
             run_bg('mapper', f'{sys.executable} -u {WS}/scripts/race/odom_mapper.py {base}')
-            say('   다른 터미널에서 teleop 으로 한 바퀴 돌고, 출발 위치/방향에 세운 뒤 여기서 엔터')
-            say('   (teleop:  python3 src/limo_ros2/limo_car/scripts/ackermann_teleop.py)')
-            input()
+            say('   키보드로 한 바퀴 돌고, 출발 위치/방향에 세운 뒤 엔터 (외부 teleop 써도 됨)')
+            teleop_until_enter()
             t_save = time.time()
             kill('mapper')
             map_yaml = base + '.yaml'
