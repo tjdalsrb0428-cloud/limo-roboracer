@@ -25,6 +25,8 @@ import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
 from rclpy.time import Time
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy, qos_profile_sensor_data
 from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path, Odometry
@@ -56,7 +58,7 @@ N_RIDGE = 6             # 정거장별 추가 노드(clearance 능선=틈 중앙
 BODY_OFF = (-0.12, -0.06, 0.0, 0.06, 0.12)
 C_HARD = 0.165          # 원 중심-장애물 최소거리(반경 0.1325 + 여유 3cm)
 C_TIGHT = 0.142         # 막혔을 때만: 0.35m 틈 통과용 빠듯한 기준(여유 1cm)
-V_TIGHT = 0.3           # 빠듯한 기준 경로 속도 상한
+V_TIGHT = 0.2           # 빠듯한 기준 경로 속도 상한
 V_BLOCKED = 0.5         # 앞이 막혀 보일 때 속도 상한
 C_START = 0.12          # 현재 위치 근처(첫 구간 앞부분)는 완화: 이미 가까워도 빠져나갈 경로 허용
 DYN_RES = 0.025
@@ -76,6 +78,7 @@ OBS_RANGE = 5.5
 WALL_TOL = 0.22         # 정적맵 벽에서 이 이상 떨어진 스캔점 = 장애물
 OBS_MEM = 3.0
 LOC_HALF = 6.0          # 로컬 장애물 격자 반경(m)
+USE_BLOB_PTS = False    # 지도 박스 셀을 장애물 점으로 추가(래스터 오차로 틈이 좁아져 기본 비활성, 회피는 라이다)
 M2O_TAU = 2.0           # map->odom 평활 시정수(s)
 STOP_MARGIN = 0.35      # 막혔을 때 정지 여유(m)
 REV_T = 0.9             # 복구 후진 시간(s)
@@ -107,7 +110,14 @@ class Race(Node):
         super().__init__('race_driver', parameter_overrides=[
             rclpy.parameter.Parameter('use_sim_time', value=True)])
         self.a = a
-        self.m = GridMap(a.map)
+        # 지도의 독립 장애물(박스)은 벽이 아니라 '장애물 점'으로 취급: 정밀거리/장애물 여유 적용
+        self.m = GridMap(a.map, np.loadtxt(a.traj, delimiter=',', skiprows=1)[:, :2] if a.traj else None,
+                         drop_blobs=True, unknown_free=True)
+        bm = self.m.blobs & ~ndimage.binary_erosion(self.m.blobs)
+        rr, cc = np.nonzero(bm)
+        self.blob_pts = self.m.xy(rr, cc) if len(rr) else np.zeros((0, 2))
+        if len(self.blob_pts):
+            self.get_logger().info(f'지도 장애물 셀 {len(self.blob_pts)}개(장애물로 처리)')
         R = np.loadtxt(a.line, delimiter=',', skiprows=1)
         Q = np.vstack([R, R[:1]])
         s = np.concatenate([[0], np.cumsum(np.hypot(*np.diff(Q, axis=0).T))])
@@ -124,15 +134,18 @@ class Race(Node):
         self.get_logger().info(f'레이스라인 {self.L:.2f}m, 최대곡률 {np.abs(self.kap).max():.2f}')
 
         self.tfb = tf2_ros.Buffer()
-        self.tfl = tf2_ros.TransformListener(self.tfb, self)
+        self.tfl = tf2_ros.TransformListener(self.tfb, self, spin_thread=True)   # TF 는 전용 스레드
+        cg_ctrl = MutuallyExclusiveCallbackGroup()
+        cg_sens = MutuallyExclusiveCallbackGroup()
+        cg_plan = MutuallyExclusiveCallbackGroup()
         self.pub = self.create_publisher(Twist, '/cmd_vel', 1)
         self.pub_path = self.create_publisher(Path, '/race/local_path', 1)
         qtl = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL,
                          reliability=ReliabilityPolicy.RELIABLE)
         self.pub_line = self.create_publisher(Path, '/race/raceline', qtl)
         self.pub_init = self.create_publisher(PoseWithCovarianceStamped, '/initialpose', 1)
-        self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data)
-        self.create_subscription(Odometry, '/odom', self.on_odom, 10)
+        self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data, callback_group=cg_sens)
+        self.create_subscription(Odometry, '/odom', self.on_odom, 10, callback_group=cg_ctrl)
         self.pub_line.publish(self.to_path(self.R[::4]))
 
         self.v_meas = 0.0
@@ -154,8 +167,9 @@ class Race(Node):
         self.recover_steer = 0.0
         self.stat = {}
         self.t_log = 0.0
-        self.create_timer(0.1, self.plan_step)
-        self.create_timer(0.025, self.control_step)
+        # 플래너(느릴 수 있음)와 제어(40Hz)를 다른 스레드에서 -> 계획 중에도 조향 갱신 유지
+        self.create_timer(0.1, self.plan_step, callback_group=cg_plan)
+        self.create_timer(0.025, self.control_step, callback_group=cg_ctrl)
 
     # ---------- 유틸 ----------
     def now(self):
@@ -175,6 +189,9 @@ class Race(Node):
 
     # map->odom(AMCL 보정)을 저역통과 필터로 평활: AMCL 순간 떨림 제거, 느린 드리프트는 추종
     def update_m2o(self):
+        if self.a.odom:                 # odom 지도 모드: map = odom (AMCL 없음)
+            self.m2o = np.zeros(3)
+            return
         try:
             t = self.tfb.lookup_transform('map', 'odom', Time())
         except Exception:
@@ -228,12 +245,11 @@ class Race(Node):
         if self.m2o is None:
             return
         try:
-            t = self.tfb.lookup_transform('odom', sc.header.frame_id, Time.from_msg(sc.header.stamp))
+            # 스캔 시점의 정확한 pose 만 사용(없으면 버림: 오래된 pose 로 변환하면 장애물이 번짐)
+            t = self.tfb.lookup_transform('odom', sc.header.frame_id, Time.from_msg(sc.header.stamp),
+                                          timeout=Duration(seconds=0.05))
         except Exception:
-            try:
-                t = self.tfb.lookup_transform('odom', sc.header.frame_id, Time())
-            except Exception:
-                return
+            return
         tr = t.transform
         lx, ly, lyaw = self.to_map(tr.translation.x, tr.translation.y, yaw_of(tr.rotation))
         r = np.asarray(sc.ranges, dtype=float)
@@ -286,6 +302,11 @@ class Race(Node):
     # ---------- 로컬 장애물 clearance ----------
     def build_dyn(self, x, y):
         pts = [p for _, p in self.obs if len(p)]
+        if USE_BLOB_PTS and len(self.blob_pts):
+            bp = self.blob_pts
+            near = (np.abs(bp[:, 0] - x) < LOC_HALF) & (np.abs(bp[:, 1] - y) < LOC_HALF)
+            if near.any():
+                pts.append(bp[near])
         res = DYN_RES
         n = int(2 * LOC_HALF / res)
         self.dyn_origin = (x - LOC_HALF, y - LOC_HALF)
@@ -556,7 +577,7 @@ class Race(Node):
         ld = float(np.clip(0.25 + 0.55 * max(abs(self.v_meas), vref * 0.8), 0.35, 0.85))
         # 좁은 곳에서는 lookahead 축소(코너 깎기 감소)
         tmin = float(pl['tight'][ic:ic + 25].min()) if ic < len(P) - 1 else 1.0
-        ld = max(0.28, ld * (0.6 + 0.4 * tmin))
+        ld = max(0.22 if self.stat.get('tight') else 0.28, ld * (0.6 + 0.4 * tmin))
         # 후륜축에서 ld 만큼 떨어진 경로점
         far = np.where((d >= ld) & (np.arange(len(P)) > ic))[0]
         it = int(far[0]) if len(far) else len(P) - 1
@@ -770,7 +791,9 @@ def main():
     ap.add_argument('--map', required=True)
     ap.add_argument('--line', required=True)
     ap.add_argument('--init', nargs=3, type=float)
+    ap.add_argument('--traj', default=None, help='매핑 주행 궤적(지도 미관측 보정)')
     ap.add_argument('--go', action='store_true')
+    ap.add_argument('--odom', action='store_true', help='지도 프레임=odom (odom_mapper 지도, AMCL 미사용)')
     a = ap.parse_args()
     rclpy.init()
     node = Race(a)
@@ -791,6 +814,7 @@ def main():
     # TF/스캔/첫 계획 준비
     t0 = time.time()
     while rclpy.ok() and (node.plan is None) and time.time() - t0 < 30:
+        node.update_m2o()
         rclpy.spin_once(node, timeout_sec=0.05)
     print('READY' + ('' if a.go else ' - 엔터를 누르면 즉시 출발'), flush=True)
     if not a.go:
@@ -802,7 +826,9 @@ def main():
             node.go = True
         threading.Thread(target=wait_enter, daemon=True).start()
     try:
-        rclpy.spin(node)
+        ex = MultiThreadedExecutor(num_threads=4)
+        ex.add_node(node)
+        ex.spin()
     except KeyboardInterrupt:
         pass
     finally:

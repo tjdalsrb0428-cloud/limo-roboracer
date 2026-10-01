@@ -111,7 +111,7 @@ def plan(start, goal, ok_fn, ok_point_fn, half=4.0, max_time=1.5, goal_tol=0.25,
 
 
 def plan_loop(clear_fn, start, goal, h_fn, curvs, step=0.2, cost_fn=None, max_time=30.0,
-              goal_tol=0.3, goal_th=0.4, xy_res=0.1, th_bins=72, blocked_fn=None):
+              goal_tol=0.3, goal_th=0.4, xy_res=0.1, th_bins=72, blocked_fn=None, h_w=1.8):
     """전진 전용 Hybrid A* (레이스라인용). clear_fn(P,H)->bool, h_fn(x,y)->남은거리, cost_fn(P,H)->추가비용"""
     t0 = time.time()
 
@@ -129,7 +129,7 @@ def plan_loop(clear_fn, start, goal, h_fn, curvs, step=0.2, cost_fn=None, max_ti
                 sub.append((math.sin(k * s) / k, (1 - math.cos(k * s)) / k, k * s))
         prims.append((k, sub))
     sx, sy, sth = start
-    openq = [(h_fn(sx, sy), 0.0, sx, sy, sth, 0.0, None)]
+    openq = [(h_w * h_fn(sx, sy), 0.0, sx, sy, sth, 0.0, None)]
     nodes = {}
     closed = set()
     nexp = 0
@@ -165,5 +165,5 @@ def plan_loop(clear_fn, start, goal, h_fn, curvs, step=0.2, cost_fn=None, max_ti
             if key(nx, ny, nth) in closed:
                 continue
             g2 = g + step * (1.0 + ex) + 0.02 * abs(k - k0)
-            heapq.heappush(openq, (g2 + h_fn(nx, ny), g2, nx, ny, nth, k, kk))
+            heapq.heappush(openq, (g2 + h_w * h_fn(nx, ny), g2, nx, ny, nth, k, kk))
     return None, nexp

@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 class GridMap:
-    def __init__(self, yml):
+    def __init__(self, yml, traj=None, drop_blobs=False, unknown_free=False):
         y = yaml.safe_load(open(yml))
         p = y['image']
         if not os.path.isabs(p):
@@ -38,9 +38,51 @@ class GridMap:
         self.H, self.W = img.shape
         occ_p = (255 - img) / 255.0
         self.occ = occ_p > float(y.get('occupied_thresh', 0.65))
-        free = occ_p < float(y.get('free_thresh', 0.25))
+        self.blobs = np.zeros_like(self.occ)
+        if drop_blobs:
+            # 독립된 작은 점유 덩어리(장애물 박스) 제거 -> 레이스라인은 트랙 기준, 회피는 주행 플래너가
+            lab, nl = ndimage.label(ndimage.binary_dilation(self.occ, iterations=1), structure=np.ones((3, 3)))
+            for i, sl in enumerate(ndimage.find_objects(lab), 1):
+                h = (sl[0].stop - sl[0].start) * self.res
+                w = (sl[1].stop - sl[1].start) * self.res
+                if math.hypot(h, w) < 1.4:
+                    self.blobs[sl] |= (lab[sl] == i) & self.occ[sl]
+            self.occ &= ~self.blobs
+            img = img.copy()
+            img[self.blobs] = 254
+        free = occ_p < min(float(y.get('free_thresh', 0.25)), 0.1)   # 흰색만 free(205=미관측 제외)
         # 작은 unknown 구멍(매핑 잡음)은 free로 메움, 벽(occupied)은 유지
         free = ndimage.binary_closing(free, iterations=2) & ~self.occ
+        # 미관측(unknown) 영역 중 경계 대부분이 free 인 것(트랙 바닥 관측 누락)은 free 로
+        # (지도 외곽에 닿거나 벽으로 둘러싸인 섬 내부는 유지)
+        unk = ~free & ~self.occ
+        lab, nl = ndimage.label(unk, structure=np.ones((3, 3)))
+        if nl:
+            border = np.zeros_like(unk)
+            border[0, :] = border[-1, :] = border[:, 0] = border[:, -1] = True
+            touch = np.unique(lab[border & unk])
+            ring_free = ndimage.sum(ndimage.binary_dilation(free, np.ones((3, 3))) & unk, lab, np.arange(1, nl + 1))
+            ring_occ = ndimage.sum(ndimage.binary_dilation(self.occ, np.ones((3, 3))) & unk, lab, np.arange(1, nl + 1))
+            for i in range(1, nl + 1):
+                if i in touch:
+                    continue
+                if ring_free[i - 1] > 3 * ring_occ[i - 1]:
+                    free |= lab == i
+        free &= ~self.occ
+        if traj is not None and len(traj):
+            # 매핑 주행 궤적: 차체가 지나간 띠는 free 확정, 그 주변 0.6m 미관측도 free
+            tr_mask = np.zeros_like(free)
+            Q = resample_open(traj, 0.02)
+            rr, cc = self.rc(Q)
+            rr = np.clip(np.round(rr).astype(int), 0, self.H - 1)
+            cc = np.clip(np.round(cc).astype(int), 0, self.W - 1)
+            tr_mask[rr, cc] = True
+            near = ndimage.distance_transform_edt(~tr_mask) * self.res
+            free |= (near <= 0.6) & ~self.occ & (self.img > 100)
+            free |= near <= 0.08
+        if unknown_free:
+            # 주행용: 실제 점유(벽) 셀만 장애물, 미관측은 바닥으로 간주(박스 그늘/내부 등)
+            free = ~self.occ
         self.free = free
         self.dist = ndimage.distance_transform_edt(free) * self.res
         dsm = ndimage.gaussian_filter(self.dist, 1.0)
@@ -64,6 +106,12 @@ class GridMap:
     def grad(self, P):
         g = np.stack([self.samp(self.gc, P), -self.samp(self.gr, P)], 1)
         return g / np.maximum(np.hypot(g[:, 0], g[:, 1]), 1e-9)[:, None]
+
+
+def resample_open(P, step):
+    d = np.concatenate([[0], np.cumsum(np.hypot(*np.diff(P, axis=0).T))])
+    t = np.arange(0, d[-1], step)
+    return np.stack([np.interp(t, d, P[:, 0]), np.interp(t, d, P[:, 1])], 1)
 
 
 def resample(P, step=None, n=None):
@@ -247,6 +295,7 @@ def optimize(m, P0, clear, kmax, verbose=True, ds=0.1):
 
 
 BODY_OFF = (-0.12, -0.06, 0.0, 0.06, 0.12)
+K_ACCEPT = 1.7          # 이 이하 곡률이면 QP 결과 채택(차량 한계 1.79)
 STATIC_BIAS = 0.03
 
 
@@ -338,43 +387,151 @@ def check(m, Q):
     return Q2, L, float(k.max()), float(m.clear(Q2).min())
 
 
-def make(yml, x0=0.0, y0=0.0, yaw0=0.0, clear=0.30, kmax=1.25, out=None, verbose=True):
+def avoid_dp(m, R, ds_st=0.3, verbose=True):
+    """장애물(지도 블롭)을 반영한 전역 회피 DP: 레이스라인 R 기준 횡오프셋 경로 (폐루프)"""
     t0 = time.time()
-    m = GridMap(yml)
+    Rs, L = resample(R, step=ds_st)
+    K = len(Rs)
+    N = normals(ndimage.gaussian_filter1d(Rs, 1.0, axis=0, mode='wrap'))
+    offs = np.round(np.arange(-1.6, 1.6001, 0.04), 3)
+    J = len(offs)
+    wall = m.dist - STATIC_BIAS
+    obs = ndimage.distance_transform_edt(~m.blobs) * m.res if m.blobs.any() else np.full_like(m.dist, 9.0)
+
+    def look(A, Q):
+        r = np.floor(m.H - (Q[:, 1] - m.oy) / m.res).astype(int)
+        c = np.floor((Q[:, 0] - m.ox) / m.res).astype(int)
+        ins = (r >= 0) & (r < m.H) & (c >= 0) & (c < m.W)
+        out = np.zeros(len(Q))
+        out[ins] = A[r[ins], c[ins]]
+        return out
+
+    def body(P, H):
+        u = np.stack([np.cos(H), np.sin(H)], -1).reshape(-1, 2)
+        Pf = P.reshape(-1, 2)
+        cw = np.full(len(Pf), 9.0)
+        co = np.full(len(Pf), 9.0)
+        for off in BODY_OFF:
+            Q = Pf + off * u
+            cw = np.minimum(cw, look(wall, Q))
+            co = np.minimum(co, look(obs, Q))
+        return cw.reshape(P.shape[:-1]), co.reshape(P.shape[:-1])
+    nodes = Rs[:, None, :] + N[:, None, :] * offs[None, :, None]
+    lam = np.linspace(0.0, 1.0, 5)[1:]
+    INF = 1e9
+    j0 = int(np.argmin(np.abs(offs)))
+
+    def run(c_hard):
+        cost = np.full(J, INF)
+        cost[j0] = 0.0
+        back = np.zeros((K + 1, J), int)
+        for k in range(1, K + 1):
+            A = nodes[(k - 1) % K]
+            B = nodes[k % K]
+            seg = A[:, None, None, :] * (1 - lam)[None, None, :, None] + B[None, :, None, :] * lam[None, None, :, None]
+            hd = np.arctan2(B[None, :, 1] - A[:, None, 1], B[None, :, 0] - A[:, None, 0])
+            cw, co = body(seg, np.broadcast_to(hd[:, :, None], seg.shape[:3]))
+            cm = np.minimum(cw, co).min(2)
+            dO = offs[None, :] - offs[:, None]
+            f_t = np.clip((0.25 - cm) / 0.08, 0, 1)
+            ec = ((0.6 + 80.0 * f_t) * dO ** 2 / ds_st + 0.6 * ds_st * offs[None, :] ** 2
+                  + ds_st * (40.0 * np.maximum(0, 0.30 - cw) ** 2 + 150.0 * np.maximum(0, 0.45 - co) ** 2).mean(2))
+            ec[(cm < c_hard) | (np.abs(dO) > 0.28 * ds_st / 0.4)] = INF
+            tot = cost[:, None] + ec
+            back[k] = np.argmin(tot, 0)
+            cost = tot[back[k], np.arange(J)]
+        if cost[j0] >= INF / 2:
+            return None
+        seq = [j0]
+        j = j0
+        for k in range(K, 1, -1):
+            j = back[k][j]
+            seq.append(j)
+        return np.array(seq[::-1])
+    seq = None
+    for ch in (0.165, 0.142, 0.12):
+        seq = run(ch)
+        if seq is not None:
+            break
+    if seq is None:
+        if verbose:
+            print('  회피 DP 실패: 장애물 무시 레이스라인 사용')
+        return R
+    o = offs[seq]
+    # 평활(간격 0.3m 기준 sigma=1) 후 충돌검사, 위반 구간은 원본 유지
+    o_s = ndimage.gaussian_filter1d(o, 1.0, mode='wrap')
+    P_s = Rs + N * o_s[:, None]
+    d = np.roll(P_s, -1, 0) - np.roll(P_s, 1, 0)
+    cw, co = body(P_s[:, None, :], np.arctan2(d[:, 1], d[:, 0])[:, None])
+    bad = np.minimum(cw, co)[:, 0] < ch
+    o_f = np.where(ndimage.binary_dilation(bad, iterations=2), o, o_s)
+    P = resample(Rs + N * o_f[:, None], step=0.1)[0]
+    if verbose:
+        print(f'  장애물 회피 DP: 최대 오프셋 {np.abs(o_f).max():.2f}m, c_hard={ch}  {time.time() - t0:.1f}s')
+    return P
+
+
+def make(yml, x0=0.0, y0=0.0, yaw0=0.0, clear=0.30, kmax=1.25, out=None, verbose=True, traj=None, use_astar=False):
+    t0 = time.time()
+    T = np.loadtxt(traj, delimiter=',', skiprows=1)[:, :2] if traj else None
+    m = GridMap(yml, T, drop_blobs=True)
+    m_full = GridMap(yml, T)
+    if verbose and m.blobs.any():
+        nb = ndimage.label(m.blobs, structure=np.ones((3, 3)))[1]
+        print(f'  독립 장애물 {nb}개는 레이스라인에서 제외(주행 중 회피)')
     best = None
     ref = None
-    for kp, ch in ((kmax, 0.165), (1.7, 0.14)):
-        ref = hybrid_reference(m, x0, y0, yaw0, kp, c_hard=ch, max_time=15.0, verbose=verbose)
-        if ref is not None:
+    # 1) 빠른 방식: 최단선 + QP (장애물 없는 트랙은 대부분 여기서 끝)
+    P = None
+    for c_min in (0.25, 0.20, 0.16, 0.13):
+        try:
+            P = extract_loop(m, x0, y0, yaw0, c_min)
             break
-    if ref is not None:
-        Qa = check(m, ref)
-        Q = refine(m, ref, clear, max(kmax, kp), verbose=verbose)
-        Qr = check(m, Q)
+        except RuntimeError:
+            pass
+    if P is not None:
+        q = optimize(m, P, clear, kmax, verbose=verbose)
         if verbose:
-            print(f'  A* 기준선: 길이 {Qa[1]:.2f}m 최대곡률 {Qa[2]:.2f} 최소벽거리 {Qa[3]:.2f}m')
-            print(f'  QP 다듬기: 길이 {Qr[1]:.2f}m 최대곡률 {Qr[2]:.2f} 최소벽거리 {Qr[3]:.2f}m')
-        lim_k = max(kmax, kp) * 1.15
-        if Qr[2] <= lim_k and Qr[3] >= min(Qa[3], clear) - 0.03:
-            best = Qr
-        else:
-            Qs = check(m, ref)
-            # A* 경로 약한 평활(곡률 지그재그 완화)만
-            Qs2 = check(m, resample(ndimage.gaussian_filter1d(ref, 1.5, axis=0, mode='wrap'), step=0.1)[0])
-            best = Qs2 if Qs2[3] >= Qs[3] - 0.02 else Qs
-    else:
-        # 폴백: 기존 방식(최단선 + QP)
-        P = None
-        for c_min in (0.25, 0.20, 0.16, 0.13):
-            try:
-                P = extract_loop(m, x0, y0, yaw0, c_min)
+            print(f'  [QP] 길이 {q[1]:.2f}m 최대곡률 {q[2]:.2f} 최소벽거리 {q[3]:.2f}m')
+        if q[2] <= K_ACCEPT and q[3] >= min(clear, c_min) - 0.03:
+            best, ref = q, P
+        elif q[3] < 0.12:
+            # QP 결과가 벽/장애물에 너무 가까움 -> 추출 루프(중앙 선호)를 약하게 평활해 사용
+            for sg in (4, 2, 1):
+                cand = check(m, resample(ndimage.gaussian_filter1d(P, sg, axis=0, mode='wrap'), step=0.1)[0])
+                if cand[3] >= 0.15:
+                    break
+            if verbose:
+                print(f'  QP 여유 부족 -> 중앙 루프 사용: 길이 {cand[1]:.2f}m 곡률 {cand[2]:.2f} 여유 {cand[3]:.2f}')
+            best, ref = cand, P
+    # 2) (옵션 --astar) 곡률/여유 미달 시 전역 Hybrid A* 기준선. 기본은 QP 결과 사용(회피는 주행 플래너 담당)
+    if best is None and not use_astar and P is not None:
+        best, ref = q, P
+        if verbose:
+            print('  참고: 곡률 한도 초과 구간은 주행 시 감속/로컬 플래너가 처리')
+    if best is None:
+        for kp, ch in ((kmax, 0.165), (1.7, 0.14)):
+            ref = hybrid_reference(m, x0, y0, yaw0, kp, c_hard=ch, max_time=15.0, verbose=verbose)
+            if ref is not None:
                 break
-            except RuntimeError:
-                pass
-        if P is None:
+        if ref is not None:
+            Qa = check(m, ref)
+            Qr = check(m, refine(m, ref, clear, max(kmax, kp), verbose=verbose))
+            if verbose:
+                print(f'  [A*] 기준선 길이 {Qa[1]:.2f}m 곡률 {Qa[2]:.2f} 여유 {Qa[3]:.2f} / '
+                      f'다듬기 길이 {Qr[1]:.2f}m 곡률 {Qr[2]:.2f} 여유 {Qr[3]:.2f}')
+            if Qr[2] <= max(kmax, kp) * 1.15 and Qr[3] >= min(Qa[3], clear) - 0.03:
+                best = Qr
+            else:
+                Qs2 = check(m, resample(ndimage.gaussian_filter1d(ref, 1.5, axis=0, mode='wrap'), step=0.1)[0])
+                best = Qs2 if Qs2[3] >= Qa[3] - 0.02 else Qa
+        elif P is not None:
+            best, ref = q, P
+            print('  경고: 곡률 한도 초과 경로 사용(오버레이 확인)')
+        else:
             raise RuntimeError('루프 추출 실패')
-        best = optimize(m, P, clear, kmax, verbose=verbose)
-        ref = P
+    if m.blobs.any():
+        best = check(m_full, avoid_dp(m, best[0], verbose=verbose))
     R, L, kx, dmin = best
     i0 = int(np.argmin(np.hypot(R[:, 0] - x0, R[:, 1] - y0)))
     R = np.roll(R, -i0, 0)
@@ -409,10 +566,12 @@ def main():
     ap.add_argument('out')
     ap.add_argument('pose', nargs='*', type=float)
     ap.add_argument('--clear', type=float, default=0.30)
+    ap.add_argument('--traj', default=None, help='매핑 주행 궤적 csv(x,y)')
+    ap.add_argument('--astar', action='store_true', help='QP 곡률 미달 시 전역 Hybrid A* 시도(느림)')
     ap.add_argument("--kmax", type=float, default=1.25)
     a = ap.parse_args()
     x0, y0, yaw0 = (list(a.pose) + [0.0, 0.0, 0.0])[:3]
-    make(a.map, x0, y0, yaw0, a.clear, a.kmax, a.out)
+    make(a.map, x0, y0, yaw0, a.clear, a.kmax, a.out, traj=a.traj, use_astar=a.astar)
 
 
 if __name__ == '__main__':
