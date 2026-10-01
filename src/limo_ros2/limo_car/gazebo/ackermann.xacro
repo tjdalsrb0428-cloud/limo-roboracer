@@ -17,8 +17,8 @@ Es würde einfach in andere Datei angerufen werden. -->
 
     <!-- das Value sind all gemessen -->
     <xacro:property name="base_mass" value="4.34"/>
-    <xacro:property name="base_x_size" value="0.19" />
-    <xacro:property name="base_y_size" value="0.31" />
+    <xacro:property name="base_x_size" value="0.31" />
+    <xacro:property name="base_y_size" value="0.19" />
     <xacro:property name="base_z_size" value="0.12" />
 
     <xacro:property name="wheelbase" value="0.24"/>

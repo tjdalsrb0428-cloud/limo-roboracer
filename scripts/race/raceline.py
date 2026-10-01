@@ -12,12 +12,15 @@ import os
 import math
 import time
 import argparse
+import sys
 import numpy as np
 import yaml
 from PIL import Image, ImageDraw
 from scipy import ndimage
 from scipy.interpolate import CubicSpline
 from skimage.graph import MCP_Geometric
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
 class GridMap:
@@ -217,8 +220,9 @@ def solve_offsets(Rf, N, lb, ub, wc):
 def optimize(m, P0, clear, kmax, verbose=True, ds=0.1):
     T = taut(m, P0, clear, ds)
     Lt = float(np.sum(np.hypot(*np.diff(np.vstack([T, T[:1]]), axis=0).T)))
-    C, _ = resample(ndimage.gaussian_filter1d(T, 0.5 / ds, axis=0, mode='wrap'), step=ds)
-    N = normals(ndimage.gaussian_filter1d(C, 0.3 / ds, axis=0, mode='wrap'))
+    # 기준선 = 최단선 그대로(벽여유 만족), 법선만 평활 -> 장애물 모서리에서도 경계가 일관됨
+    C, _ = resample(ndimage.gaussian_filter1d(T, 0.1 / ds, axis=0, mode='wrap'), step=ds)
+    N = normals(ndimage.gaussian_filter1d(C, 0.4 / ds, axis=0, mode='wrap'))
     lb, ub = bounds(m, C, N, clear)
     eps = 1e-3
     ub = np.maximum(ub, lb + eps)
@@ -242,23 +246,136 @@ def optimize(m, P0, clear, kmax, verbose=True, ds=0.1):
     return Q2, L, float(k2.max()), dmin
 
 
-def make(yml, x0=0.0, y0=0.0, yaw0=0.0, clear=0.30, kmax=1.3, out=None, verbose=True):
+BODY_OFF = (-0.12, -0.06, 0.0, 0.06, 0.12)
+STATIC_BIAS = 0.03
+
+
+def hybrid_reference(m, x0, y0, yaw0, kprim, c_hard=0.165, c_soft=0.32, max_time=40.0, verbose=True):
+    """전역 Hybrid A*: 최소 회전반경(1/kprim)을 지키는 루프 한 바퀴(길이+근접벌점 최소)"""
+    import hybrid_astar
+    D = m.dist - STATIC_BIAS
+    t = np.array([math.cos(yaw0), math.sin(yaw0)])
+    nv = np.array([-t[1], t[0]])
+    p0 = np.array([x0, y0])
+    pc = p0 - 0.25 * t
+    # 절단선(출발점 뒤 0.25m) 래스터
+    cut = np.zeros_like(m.free)
+    for sg in (1, -1):
+        for l in np.arange(0, 6.0, m.res / 2):
+            q = pc + sg * nv * l
+            r, c = m.rc(q[None])
+            r, c = int(round(r[0])), int(round(c[0]))
+            if not (0 <= r < m.H and 0 <= c < m.W) or D[r, c] <= -STATIC_BIAS + 1e-6:
+                break
+            cut[max(r - 1, 0):r + 2, max(c - 1, 0):c + 2] = True
+    goal = (p0[0] - 0.5 * t[0], p0[1] - 0.5 * t[1], yaw0)
+    # 휴리스틱: 목표에서 루프 방향 거리(절단선 막음)
+    cost = np.where((D >= 0.12) & ~cut, 1.0, np.inf)
+    gr, gc = m.rc(np.array(goal[:2])[None])
+    gr, gc = int(round(gr[0])), int(round(gc[0]))
+    if not np.isfinite(cost[gr, gc]):
+        raise RuntimeError('목표점 통과 불가')
+    acc, _ = MCP_Geometric(cost, fully_connected=True).find_costs([(gr, gc)])
+    acc = acc * m.res
+
+    def look(A, Q):
+        r = np.floor(m.H - (Q[:, 1] - m.oy) / m.res).astype(int)
+        c = np.floor((Q[:, 0] - m.ox) / m.res).astype(int)
+        ins = (r >= 0) & (r < m.H) & (c >= 0) & (c < m.W)
+        out = np.full(len(Q), -1.0 if A is D else np.inf)
+        out[ins] = A[r[ins], c[ins]]
+        return out
+
+    def body(P, H):
+        u = np.stack([np.cos(H), np.sin(H)], 1)
+        cmin = np.full(len(P), 9.0)
+        for off in BODY_OFF:
+            cmin = np.minimum(cmin, look(D, P + off * u))
+        return cmin
+
+    def h_fn(x, y):
+        v = look(acc, np.array([[x, y]]))[0]
+        return v if np.isfinite(v) else 1e6
+
+    path, nexp = hybrid_astar.plan_loop(
+        lambda P, H: body(P, H) >= c_hard, (x0, y0, yaw0), goal, h_fn,
+        curvs=(-kprim, -kprim / 2, 0.0, kprim / 2, kprim), step=0.2,
+        cost_fn=lambda P, H: 3.0 * (np.maximum(0, c_soft - body(P, H)) / c_soft) ** 2,
+        blocked_fn=lambda P: look(cut.astype(float), P) > 0.5, max_time=max_time)
+    if verbose:
+        print(f'  Hybrid A*(k={kprim:.2f}): {"성공" if path else "실패"}, 확장 {nexp}')
+    if path is None:
+        return None
+    return np.array(path)[:, :2]
+
+
+def refine(m, Rf, clear, kmax, ds=0.1, verbose=True):
+    """조향 가능한 기준선 주변에서 QP(길이+곡률)로 다듬기"""
+    C, _ = resample(ndimage.gaussian_filter1d(Rf, 1.0, axis=0, mode='wrap'), step=ds)
+    N = normals(ndimage.gaussian_filter1d(C, 0.3 / ds, axis=0, mode='wrap'))
+    lb, ub = bounds(m, C, N, clear)
+    # 기준선 자체가 clear 미만인 구간(좁은 틈)은 기준선 유지
+    c0 = m.clear(C)
+    tight = c0 < clear
+    lb[tight] = -0.01
+    ub[tight] = 0.01
+    ub = np.maximum(ub, lb + 1e-3)
+    wc = np.full(len(C), (0.3 / ds) ** 2)
+    for rep in range(25):
+        a = solve_offsets(C, N, lb, ub, wc)
+        Q = C + N * a[:, None]
+        k = ndimage.uniform_filter1d(np.abs(curvature(Q)), 3, mode='wrap')
+        bad = k > kmax * 0.92
+        if not bad.any():
+            break
+        wc[ndimage.binary_dilation(bad, iterations=int(0.6 / ds))] *= 1.8
+    return Q
+
+
+def check(m, Q):
+    Q2, L = resample(Q, step=0.05)
+    k = ndimage.uniform_filter1d(np.abs(curvature(Q2)), 3, mode='wrap')
+    return Q2, L, float(k.max()), float(m.clear(Q2).min())
+
+
+def make(yml, x0=0.0, y0=0.0, yaw0=0.0, clear=0.30, kmax=1.25, out=None, verbose=True):
     t0 = time.time()
     m = GridMap(yml)
-    P = None
-    for c_min in (0.25, 0.20, 0.16, 0.13):
-        try:
-            P = extract_loop(m, x0, y0, yaw0, c_min)
+    best = None
+    ref = None
+    for kp, ch in ((kmax, 0.165), (1.7, 0.14)):
+        ref = hybrid_reference(m, x0, y0, yaw0, kp, c_hard=ch, max_time=15.0, verbose=verbose)
+        if ref is not None:
             break
-        except RuntimeError as e:
-            if verbose:
-                print(f'  루프 추출 c_min={c_min}: {e}')
-    if P is None:
-        raise RuntimeError('루프 추출 실패')
-    Lc = np.sum(np.hypot(*np.diff(P, axis=0).T))
-    if verbose:
-        print(f'루프 추출: 길이 {Lc:.2f}m (c_min={c_min})  {time.time() - t0:.1f}s')
-    R, L, kx, dmin = optimize(m, P, clear, kmax, verbose=verbose)
+    if ref is not None:
+        Qa = check(m, ref)
+        Q = refine(m, ref, clear, max(kmax, kp), verbose=verbose)
+        Qr = check(m, Q)
+        if verbose:
+            print(f'  A* 기준선: 길이 {Qa[1]:.2f}m 최대곡률 {Qa[2]:.2f} 최소벽거리 {Qa[3]:.2f}m')
+            print(f'  QP 다듬기: 길이 {Qr[1]:.2f}m 최대곡률 {Qr[2]:.2f} 최소벽거리 {Qr[3]:.2f}m')
+        lim_k = max(kmax, kp) * 1.15
+        if Qr[2] <= lim_k and Qr[3] >= min(Qa[3], clear) - 0.03:
+            best = Qr
+        else:
+            Qs = check(m, ref)
+            # A* 경로 약한 평활(곡률 지그재그 완화)만
+            Qs2 = check(m, resample(ndimage.gaussian_filter1d(ref, 1.5, axis=0, mode='wrap'), step=0.1)[0])
+            best = Qs2 if Qs2[3] >= Qs[3] - 0.02 else Qs
+    else:
+        # 폴백: 기존 방식(최단선 + QP)
+        P = None
+        for c_min in (0.25, 0.20, 0.16, 0.13):
+            try:
+                P = extract_loop(m, x0, y0, yaw0, c_min)
+                break
+            except RuntimeError:
+                pass
+        if P is None:
+            raise RuntimeError('루프 추출 실패')
+        best = optimize(m, P, clear, kmax, verbose=verbose)
+        ref = P
+    R, L, kx, dmin = best
     i0 = int(np.argmin(np.hypot(R[:, 0] - x0, R[:, 1] - y0)))
     R = np.roll(R, -i0, 0)
     if verbose:
@@ -266,7 +383,7 @@ def make(yml, x0=0.0, y0=0.0, yaw0=0.0, clear=0.30, kmax=1.3, out=None, verbose=
               f'점 {len(R)}개  총 {time.time() - t0:.1f}s')
     if out:
         np.savetxt(out, R, delimiter=',', fmt='%.4f', header='x,y', comments='')
-        overlay(m, [(P, (0, 0, 255)), (R, (255, 0, 0))], os.path.splitext(out)[0] + '.png',
+        overlay(m, [(ref, (0, 0, 255)), (R, (255, 0, 0))], os.path.splitext(out)[0] + '.png',
                 start=(x0, y0, yaw0))
     return R, m
 
