@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """시험용 통합 실행기 (컨테이너 안에서 실행)
 
-  python3 scripts/race/exam.py [--world WORLD] [--no-gui] [--map-only] [--skip-mapping MAP.yaml]
+  python3 scripts/race/exam.py [--world WORLD] [--no-gui] [--skip-mapping MAP.yaml --odom]
 
 순서
-  1) Gazebo 실행(world 선택)               - 이미 떠 있으면 --no-sim
-  2) cartographer 매핑 시작 -> 다른 터미널에서 teleop 으로 한 바퀴 -> 출발 위치에 세우고 엔터
-  3) 지도 저장(maps/exam/), 현재 pose 기록, cartographer 종료
-  4) 레이스라인 생성(현재 pose/방향 기준) + AMCL 위치추정 시작(초기 pose 자동)
-  5) race_driver 실행 -> READY 뜨면 "시작"과 함께 엔터
-종료: Ctrl+C 후  killros
+  1) Gazebo 실행(world 선택)                       - 이미 떠 있으면 --no-sim
+  2) odom 매핑 시작 -> 같은 터미널 키보드(u/i/o, ,) 로 한 바퀴 -> 출발 위치/방향에 세우고 엔터
+  3) 지도 저장(maps/exam/), 마지막 pose = 출발 pose
+  4) 레이스라인 생성(출발 pose 기준, 2~10초)
+  5) race_driver 실행 -> READY 뜨면 "시작"과 함께 엔터 (무한 랩, Ctrl+C 로 정지)
+종료: Ctrl+C 후  pkill -f scripts/race; killros
 """
 import os
 import sys

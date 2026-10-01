@@ -59,10 +59,13 @@ BODY_OFF = (-0.12, -0.06, 0.0, 0.06, 0.12)
 C_HARD = 0.165          # 원 중심-장애물 최소거리(반경 0.1325 + 여유 3cm)
 C_TIGHT = 0.142         # 막혔을 때만: 0.35m 틈 통과용 빠듯한 기준(여유 1cm)
 V_TIGHT = 0.2           # 빠듯한 기준 경로 속도 상한
+TIGHT_PAD = 1.0         # 빠듯한 구간 앞뒤 저속 여유(m)
 V_BLOCKED = 0.5         # 앞이 막혀 보일 때 속도 상한
 C_START = 0.12          # 현재 위치 근처(첫 구간 앞부분)는 완화: 이미 가까워도 빠져나갈 경로 허용
 DYN_RES = 0.025
 STATIC_BIAS = 0.03      # 점유격자 셀중심 거리 -> 실제 벽면 거리 보정
+RAW_MEM = 1.0           # 빠듯한 기준용 라이다 원점(벽 포함) 기억 시간(s)
+RAW_UP = 0.02           # 빠듯한 기준: 벽 여유 = 라이다 실측거리, 단 [지도-0.03, 지도+0.02] 범위로 제한
 C_SOFT = 0.30           # 벽 여유(레이스라인 자체가 0.30)
 C_SOFT_OBS = 0.45       # 장애물 여유
 W_OBS = 150.0
@@ -166,6 +169,9 @@ class Race(Node):
         self.recover_until = 0.0
         self.recover_steer = 0.0
         self.stat = {}
+        self.raw = []              # (t, Nx2) 벽 포함 라이다 점
+        self.kdt_raw = None
+        self.tight_static = False
         self.t_log = 0.0
         # 플래너(느릴 수 있음)와 제어(40Hz)를 다른 스레드에서 -> 계획 중에도 조향 갱신 유지
         self.create_timer(0.1, self.plan_step, callback_group=cg_plan)
@@ -259,6 +265,9 @@ class Race(Node):
         P = np.stack([lx + r * np.cos(ang + lyaw), ly + r * np.sin(ang + lyaw)], 1)
         if len(P) == 0:
             return
+        tnow = self.now()
+        self.raw.append((tnow, P))
+        self.raw = [o for o in self.raw if tnow - o[0] < RAW_MEM]
         c = self.m.clear(P)
         keep = c > WALL_TOL
         P, r, ang = P[keep], r[keep], ang[keep]
@@ -300,6 +309,15 @@ class Race(Node):
         return i, o
 
     # ---------- 로컬 장애물 clearance ----------
+    def build_raw(self, x, y):
+        pts = [p for _, p in self.raw if len(p)]
+        self.kdt_raw = None
+        if pts:
+            P = np.vstack(pts)
+            P = P[(np.abs(P[:, 0] - x) < 4.0) & (np.abs(P[:, 1] - y) < 4.0)]
+            if len(P):
+                self.kdt_raw = cKDTree(np.unique(np.round(P / 0.01).astype(np.int64), axis=0) * 0.01)
+
     def build_dyn(self, x, y):
         pts = [p for _, p in self.obs if len(p)]
         if USE_BLOB_PTS and len(self.blob_pts):
@@ -330,7 +348,15 @@ class Race(Node):
 
     def clear2(self, P):
         """(정적맵 clearance, 장애물 clearance)"""
-        c = self.m.clear(P) - STATIC_BIAS
+        cm = self.m.clear(P)
+        c = cm - STATIC_BIAS
+        if self.tight_static and self.kdt_raw is not None:
+            # 빠듯한 기준: 지도 래스터 오차(박스-벽 게이트에서 ~0.02 좁게 잡힘) 대신 라이다 실측 거리
+            nr = cm < 0.30
+            if nr.any():
+                dr = self.kdt_raw.query(P[nr], k=1, workers=-1)[0]
+                seen = dr < cm[nr] + 0.05          # 라이다가 그 벽면을 실제로 본 경우만(안 보이면 지도값 유지)
+                c[nr] = np.where(seen, np.clip(dr, cm[nr] - STATIC_BIAS, cm[nr] + RAW_UP), cm[nr] - STATIC_BIAS)
         if self.dyn is None:
             return c, np.full(len(P), LOC_HALF)
         res = DYN_RES
@@ -441,16 +467,21 @@ class Race(Node):
         i0, o0 = self.project(x, y)
         self.idx = i0
         nobs = self.build_dyn(x, y)
+        self.tight_static = False
         c_hard = C_HARD
         kk, o_seq, Pn, ist = self.lattice(x, y, yaw, i0, o0, C_HARD)
         tight_mode = False
         if kk < N_ST - 1:
             # 여유 기준으로 막힘 -> 빠듯한 기준(좁은 틈 통과)으로 재탐색, 성공 시 저속
+            self.build_raw(x, y)
+            self.tight_static = True
             kk2, o2, P2, ist2 = self.lattice(x, y, yaw, i0, o0, C_TIGHT)
             if kk2 > kk:
                 kk, o_seq, Pn, ist = kk2, o2, P2, ist2
                 tight_mode = True
                 c_hard = C_TIGHT
+            else:
+                self.tight_static = False
         blocked = kk < N_ST - 1
         if DEBUG and blocked and self.now() - getattr(self, 't_dump', 0) > 2.0:
             self.t_dump = self.now()
@@ -486,7 +517,12 @@ class Race(Node):
                            np.clip((cd - c_hard) / (0.40 - c_hard), 0, 1))
         vlim = np.minimum(vlim, V_MIN_CLR + (V_MAX - V_MIN_CLR) * tight)
         if tight_mode:
-            vlim = np.minimum(vlim, V_TIGHT)
+            # 빠듯한 구간(여유 < C_HARD)과 그 앞뒤 TIGHT_PAD 만 저속, 나머지는 정상 속도
+            narrow = cP < C_HARD
+            if narrow.any():
+                pad = max(1, int(TIGHT_PAD / dsm))
+                narrow = ndimage.binary_dilation(narrow, iterations=pad)
+                vlim[narrow] = np.minimum(vlim[narrow], V_TIGHT)
         elif blocked:
             vlim = np.minimum(vlim, V_BLOCKED)   # 앞이 막힘: 미리 감속해 재계획 여유 확보
         if blocked:
