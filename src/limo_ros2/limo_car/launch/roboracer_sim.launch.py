@@ -41,7 +41,8 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(gazebo_share, "launch", "gazebo.launch.py")
         ),
-        launch_arguments={"world": world, "verbose": "false"}.items(),
+        launch_arguments={"world": world, "verbose": "false",
+                          "gui": LaunchConfiguration("gui")}.items(),
     )
 
     spawn = Node(
@@ -78,6 +79,7 @@ def generate_launch_description():
         DeclareLaunchArgument("spawn_z", default_value="0.15"),
         DeclareLaunchArgument("spawn_yaw", default_value="0.0"),
         DeclareLaunchArgument("rviz", default_value="true"),
+        DeclareLaunchArgument("gui", default_value="true"),
         robot_description,
         gazebo,
         TimerAction(period=2.0, actions=[spawn]),
