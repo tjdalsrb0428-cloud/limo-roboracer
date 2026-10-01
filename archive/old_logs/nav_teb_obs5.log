@@ -1,0 +1,1740 @@
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-09-30-14-28-44-716327-mksung0428-16Z90TP-KA5WK-16992
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [controller_server-1]: process started with pid [16995]
+[INFO] [smoother_server-2]: process started with pid [16997]
+[INFO] [planner_server-3]: process started with pid [16999]
+[INFO] [behavior_server-4]: process started with pid [17001]
+[INFO] [bt_navigator-5]: process started with pid [17003]
+[INFO] [waypoint_follower-6]: process started with pid [17005]
+[INFO] [velocity_smoother-7]: process started with pid [17007]
+[INFO] [lifecycle_manager-8]: process started with pid [17009]
+[lifecycle_manager-8] [INFO] [1790746125.257868970] [lifecycle_manager_navigation]: Creating
+[lifecycle_manager-8] [INFO] [1790746125.263632209] [lifecycle_manager_navigation]: [34m[1mCreating and initializing lifecycle service clients[0m[0m
+[planner_server-3] [INFO] [1790746125.265408424] [planner_server]: 
+[planner_server-3] 	planner_server lifecycle node launched. 
+[planner_server-3] 	Waiting on external lifecycle transitions to activate
+[planner_server-3] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[planner_server-3] [INFO] [1790746125.266750959] [planner_server]: Creating
+[waypoint_follower-6] [INFO] [1790746125.275341457] [waypoint_follower]: 
+[waypoint_follower-6] 	waypoint_follower lifecycle node launched. 
+[waypoint_follower-6] 	Waiting on external lifecycle transitions to activate
+[waypoint_follower-6] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[waypoint_follower-6] [INFO] [1790746125.275868226] [waypoint_follower]: Creating
+[controller_server-1] [INFO] [1790746125.281152183] [controller_server]: 
+[controller_server-1] 	controller_server lifecycle node launched. 
+[controller_server-1] 	Waiting on external lifecycle transitions to activate
+[controller_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[behavior_server-4] [INFO] [1790746125.295129709] [behavior_server]: 
+[behavior_server-4] 	behavior_server lifecycle node launched. 
+[behavior_server-4] 	Waiting on external lifecycle transitions to activate
+[behavior_server-4] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[controller_server-1] [INFO] [1790746125.295158502] [controller_server]: Creating controller server
+[bt_navigator-5] [INFO] [1790746125.298218476] [bt_navigator]: 
+[bt_navigator-5] 	bt_navigator lifecycle node launched. 
+[bt_navigator-5] 	Waiting on external lifecycle transitions to activate
+[bt_navigator-5] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[bt_navigator-5] [INFO] [1790746125.298791425] [bt_navigator]: Creating
+[planner_server-3] [INFO] [1790746125.300987877] [global_costmap.global_costmap]: 
+[planner_server-3] 	global_costmap lifecycle node launched. 
+[planner_server-3] 	Waiting on external lifecycle transitions to activate
+[planner_server-3] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[planner_server-3] [INFO] [1790746125.301637141] [global_costmap.global_costmap]: Creating Costmap
+[smoother_server-2] [INFO] [1790746125.304798994] [smoother_server]: 
+[smoother_server-2] 	smoother_server lifecycle node launched. 
+[smoother_server-2] 	Waiting on external lifecycle transitions to activate
+[smoother_server-2] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[smoother_server-2] [INFO] [1790746125.308380750] [smoother_server]: Creating smoother server
+[velocity_smoother-7] [INFO] [1790746125.312330114] [velocity_smoother]: 
+[velocity_smoother-7] 	velocity_smoother lifecycle node launched. 
+[velocity_smoother-7] 	Waiting on external lifecycle transitions to activate
+[velocity_smoother-7] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[controller_server-1] [INFO] [1790746125.329146417] [local_costmap.local_costmap]: 
+[controller_server-1] 	local_costmap lifecycle node launched. 
+[controller_server-1] 	Waiting on external lifecycle transitions to activate
+[controller_server-1] 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[controller_server-1] [INFO] [1790746125.330847248] [local_costmap.local_costmap]: Creating Costmap
+[lifecycle_manager-8] [INFO] [1790746125.520631426] [lifecycle_manager_navigation]: [34m[1mStarting managed nodes bringup...[0m[0m
+[lifecycle_manager-8] [INFO] [1790746125.520672729] [lifecycle_manager_navigation]: [34m[1mConfiguring controller_server[0m[0m
+[controller_server-1] [INFO] [1790746125.521108280] [controller_server]: Configuring controller interface
+[controller_server-1] [INFO] [1790746125.521210033] [controller_server]: getting goal checker plugins..
+[controller_server-1] [INFO] [1790746125.521240777] [controller_server]: Controller frequency set to 20.0000Hz
+[controller_server-1] [INFO] [1790746125.521258199] [local_costmap.local_costmap]: Configuring
+[controller_server-1] [INFO] [1790746125.526452006] [local_costmap.local_costmap]: Using plugin "voxel_layer"
+[controller_server-1] [INFO] [1790746125.530905505] [local_costmap.local_costmap]: Subscribed to Topics: scan
+[controller_server-1] [INFO] [1790746125.536341702] [local_costmap.local_costmap]: Initialized plugin "voxel_layer"
+[controller_server-1] [INFO] [1790746125.536375117] [local_costmap.local_costmap]: Using plugin "inflation_layer"
+[controller_server-1] [INFO] [1790746125.536674248] [local_costmap.local_costmap]: Initialized plugin "inflation_layer"
+[controller_server-1] [INFO] [1790746125.546157056] [controller_server]: Created progress_checker : progress_checker of type nav2_controller::SimpleProgressChecker
+[controller_server-1] [INFO] [1790746125.546571963] [controller_server]: Created goal checker : general_goal_checker of type nav2_controller::SimpleGoalChecker
+[controller_server-1] [INFO] [1790746125.546654790] [controller_server]: Controller Server has general_goal_checker  goal checkers available.
+[controller_server-1] [INFO] [1790746125.552398418] [controller_server]: Created controller : FollowPath of type teb_local_planner::TebLocalPlannerROS
+[controller_server-1] [INFO] [1790746125.563915844] [TEBLocalPlanner]: No robot footprint model specified for trajectory optimization. Using point-shaped model.
+[controller_server-1] [INFO] [1790746125.563967998] [controller_server]: Parallel planning in distinctive topologies enabled.
+[controller_server-1] [INFO] [1790746125.564092404] [controller_server]: No costmap conversion plugin specified. All occupied costmap cells are treaten as point obstacles.
+[controller_server-1] [INFO] [1790746125.568909021] [controller_server]: Controller Server has FollowPath  controllers available.
+[lifecycle_manager-8] [INFO] [1790746125.574248721] [lifecycle_manager_navigation]: [34m[1mConfiguring smoother_server[0m[0m
+[smoother_server-2] [INFO] [1790746125.574920033] [smoother_server]: Configuring smoother server
+[smoother_server-2] [INFO] [1790746125.594391158] [smoother_server]: Created smoother : simple_smoother of type nav2_smoother::SimpleSmoother
+[smoother_server-2] [INFO] [1790746125.594616735] [smoother_server]: Smoother Server has simple_smoother  smoothers available.
+[lifecycle_manager-8] [INFO] [1790746125.598430741] [lifecycle_manager_navigation]: [34m[1mConfiguring planner_server[0m[0m
+[planner_server-3] [INFO] [1790746125.598722508] [planner_server]: Configuring
+[planner_server-3] [INFO] [1790746125.598753371] [global_costmap.global_costmap]: Configuring
+[planner_server-3] [INFO] [1790746125.602642595] [global_costmap.global_costmap]: Using plugin "static_layer"
+[planner_server-3] [INFO] [1790746125.605369450] [global_costmap.global_costmap]: Subscribing to the map topic (/map) with transient local durability
+[planner_server-3] [INFO] [1790746125.606733427] [global_costmap.global_costmap]: Initialized plugin "static_layer"
+[planner_server-3] [INFO] [1790746125.606756051] [global_costmap.global_costmap]: Using plugin "obstacle_layer"
+[planner_server-3] [INFO] [1790746125.607404511] [global_costmap.global_costmap]: Subscribed to Topics: scan
+[planner_server-3] [INFO] [1790746125.611204711] [global_costmap.global_costmap]: Initialized plugin "obstacle_layer"
+[planner_server-3] [INFO] [1790746125.611241938] [global_costmap.global_costmap]: Using plugin "inflation_layer"
+[planner_server-3] [INFO] [1790746125.612091449] [global_costmap.global_costmap]: Initialized plugin "inflation_layer"
+[planner_server-3] [INFO] [1790746125.621580516] [global_costmap.global_costmap]: StaticLayer: Resizing costmap to 452 X 177 at 0.050000 m/pix
+[planner_server-3] [INFO] [1790746125.626190442] [planner_server]: Created global planner plugin GridBased of type nav2_smac_planner/SmacPlannerHybrid
+[planner_server-3] [INFO] [1790746125.626268458] [planner_server]: Configuring GridBased of type SmacPlannerHybrid
+[planner_server-3] [INFO] [1790746125.627966917] [planner_server]: Even sized heuristic lookup table size set 400.000000, increasing size by 1 to make odd
+[planner_server-3] [INFO] [1790746138.256765294] [planner_server]: Configured plugin GridBased of type SmacPlannerHybrid with maximum iterations 1000000, max on approach iterations 1000, and allowing unknown traversal. Tolerance 0.25.Using motion model: Reeds-Shepp.
+[planner_server-3] [INFO] [1790746138.256813999] [planner_server]: Planner Server has GridBased  planners available.
+[lifecycle_manager-8] [INFO] [1790746138.265785747] [lifecycle_manager_navigation]: [34m[1mConfiguring behavior_server[0m[0m
+[behavior_server-4] [INFO] [1790746138.266106204] [behavior_server]: Configuring
+[behavior_server-4] [INFO] [1790746138.272100803] [behavior_server]: Creating behavior plugin backup of type nav2_behaviors/BackUp
+[behavior_server-4] [INFO] [1790746138.272783434] [behavior_server]: Configuring backup
+[behavior_server-4] [INFO] [1790746138.275605187] [behavior_server]: Creating behavior plugin drive_on_heading of type nav2_behaviors/DriveOnHeading
+[behavior_server-4] [INFO] [1790746138.276297267] [behavior_server]: Configuring drive_on_heading
+[behavior_server-4] [INFO] [1790746138.278641522] [behavior_server]: Creating behavior plugin assisted_teleop of type nav2_behaviors/AssistedTeleop
+[behavior_server-4] [INFO] [1790746138.280463345] [behavior_server]: Configuring assisted_teleop
+[behavior_server-4] [INFO] [1790746138.283384781] [behavior_server]: Creating behavior plugin wait of type nav2_behaviors/Wait
+[behavior_server-4] [INFO] [1790746138.284264012] [behavior_server]: Configuring wait
+[lifecycle_manager-8] [INFO] [1790746138.287208156] [lifecycle_manager_navigation]: [34m[1mConfiguring bt_navigator[0m[0m
+[bt_navigator-5] [INFO] [1790746138.287466206] [bt_navigator]: Configuring
+[lifecycle_manager-8] [INFO] [1790746138.346212179] [lifecycle_manager_navigation]: [34m[1mConfiguring waypoint_follower[0m[0m
+[waypoint_follower-6] [INFO] [1790746138.346580486] [waypoint_follower]: Configuring
+[waypoint_follower-6] [INFO] [1790746138.354634116] [waypoint_follower]: Created waypoint_task_executor : wait_at_waypoint of type nav2_waypoint_follower::WaitAtWaypoint
+[lifecycle_manager-8] [INFO] [1790746138.359259483] [lifecycle_manager_navigation]: [34m[1mConfiguring velocity_smoother[0m[0m
+[velocity_smoother-7] [INFO] [1790746138.359661007] [velocity_smoother]: Configuring velocity smoother
+[lifecycle_manager-8] [INFO] [1790746138.362190450] [lifecycle_manager_navigation]: [34m[1mActivating controller_server[0m[0m
+[controller_server-1] [INFO] [1790746138.362329419] [controller_server]: Activating
+[controller_server-1] [INFO] [1790746138.362377286] [local_costmap.local_costmap]: Activating
+[controller_server-1] [INFO] [1790746138.362409022] [local_costmap.local_costmap]: Checking transform
+[controller_server-1] [INFO] [1790746138.362533780] [local_costmap.local_costmap]: start
+[controller_server-1] [INFO] [1790746138.414458308] [controller_server]: Creating bond (controller_server) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746138.519188927] [lifecycle_manager_navigation]: Server controller_server connected with bond.
+[lifecycle_manager-8] [INFO] [1790746138.519291348] [lifecycle_manager_navigation]: [34m[1mActivating smoother_server[0m[0m
+[smoother_server-2] [INFO] [1790746138.519854676] [smoother_server]: Activating
+[smoother_server-2] [INFO] [1790746138.519922053] [smoother_server]: Creating bond (smoother_server) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746138.624746433] [lifecycle_manager_navigation]: Server smoother_server connected with bond.
+[lifecycle_manager-8] [INFO] [1790746138.624847595] [lifecycle_manager_navigation]: [34m[1mActivating planner_server[0m[0m
+[planner_server-3] [INFO] [1790746138.625496181] [planner_server]: Activating
+[planner_server-3] [INFO] [1790746138.625533607] [global_costmap.global_costmap]: Activating
+[planner_server-3] [INFO] [1790746138.625546623] [global_costmap.global_costmap]: Checking transform
+[planner_server-3] [INFO] [1790746138.625664609] [global_costmap.global_costmap]: start
+[planner_server-3] [INFO] [1790746139.676339901] [planner_server]: Activating plugin GridBased of type SmacPlannerHybrid
+[planner_server-3] [INFO] [1790746139.677249722] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746139.781884661] [lifecycle_manager_navigation]: Server planner_server connected with bond.
+[lifecycle_manager-8] [INFO] [1790746139.781954948] [lifecycle_manager_navigation]: [34m[1mActivating behavior_server[0m[0m
+[behavior_server-4] [INFO] [1790746139.782469367] [behavior_server]: Activating
+[behavior_server-4] [INFO] [1790746139.782502947] [behavior_server]: Activating backup
+[behavior_server-4] [INFO] [1790746139.782514244] [behavior_server]: Activating drive_on_heading
+[behavior_server-4] [INFO] [1790746139.782521200] [behavior_server]: Activating assisted_teleop
+[behavior_server-4] [INFO] [1790746139.782528363] [behavior_server]: Activating wait
+[behavior_server-4] [INFO] [1790746139.782540030] [behavior_server]: Creating bond (behavior_server) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746139.885638922] [lifecycle_manager_navigation]: Server behavior_server connected with bond.
+[lifecycle_manager-8] [INFO] [1790746139.885733709] [lifecycle_manager_navigation]: [34m[1mActivating bt_navigator[0m[0m
+[bt_navigator-5] [INFO] [1790746139.886353468] [bt_navigator]: Activating
+[bt_navigator-5] [WARN] [1790746139.901972988] [bt_navigator_navigate_through_poses_rclcpp_node]: Wait duration is negative or zero (0). Setting to positive.
+[bt_navigator-5] [INFO] [1790746139.913905177] [bt_navigator]: Creating bond (bt_navigator) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746140.019638106] [lifecycle_manager_navigation]: Server bt_navigator connected with bond.
+[lifecycle_manager-8] [INFO] [1790746140.019693140] [lifecycle_manager_navigation]: [34m[1mActivating waypoint_follower[0m[0m
+[waypoint_follower-6] [INFO] [1790746140.020707811] [waypoint_follower]: Activating
+[waypoint_follower-6] [INFO] [1790746140.020756795] [waypoint_follower]: Creating bond (waypoint_follower) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746140.127658480] [lifecycle_manager_navigation]: Server waypoint_follower connected with bond.
+[lifecycle_manager-8] [INFO] [1790746140.127707258] [lifecycle_manager_navigation]: [34m[1mActivating velocity_smoother[0m[0m
+[velocity_smoother-7] [INFO] [1790746140.128022286] [velocity_smoother]: Activating
+[velocity_smoother-7] [INFO] [1790746140.128082193] [velocity_smoother]: Creating bond (velocity_smoother) to lifecycle manager.
+[lifecycle_manager-8] [INFO] [1790746140.234496393] [lifecycle_manager_navigation]: Server velocity_smoother connected with bond.
+[lifecycle_manager-8] [INFO] [1790746140.234560849] [lifecycle_manager_navigation]: [34m[1mManaged nodes are active[0m[0m
+[lifecycle_manager-8] [INFO] [1790746140.234571595] [lifecycle_manager_navigation]: [34m[1mCreating bond timer...[0m[0m
+[controller_server-1] [INFO] [1790746144.400542446] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746144.652745498] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746144.900881988] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746145.200870435] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746145.450879527] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746145.700876416] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746145.950855148] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746146.202541829] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746146.500854597] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746146.750870999] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746146.752749118] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746146.958899865] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746147.001110631] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746147.250864499] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746147.500873958] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746147.802659556] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746147.902429963] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746148.050965167] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746148.300989139] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746148.550872184] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746148.801118423] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746149.100855694] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746149.350879546] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746149.600855191] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746149.704881793] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746149.851026135] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746150.101187266] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746150.350862234] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746150.652751932] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746150.901559135] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746151.150871897] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746151.400865918] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746151.650858669] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746151.900880867] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746152.150855847] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746152.400858885] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746152.650925286] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746152.900969513] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746153.203173227] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746153.450867954] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746153.701873844] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746153.950861962] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746154.201151969] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746154.450851107] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746154.750866845] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746155.000877718] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746155.250867307] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746155.500869561] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746155.751016745] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746156.000871081] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746156.250879973] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746156.500857544] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746156.800854881] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746157.050859537] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746157.303120666] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746157.552704138] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746157.800864085] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746158.050897294] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746158.052513078] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746158.300862610] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746158.550852723] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746158.850830281] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746158.857041663] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746158.952614144] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.003645603] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.053827962] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746159.101231143] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746159.103024768] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.152300810] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.202349197] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.253646839] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.303705832] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746159.303768447] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746159.303855413] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746159.305284989] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746159.356588001] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.407842352] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.459174726] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.509351114] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.557404777] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746159.605574380] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746159.607908795] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.657403396] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.708346359] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746159.708394028] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746159.708460492] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746159.828642009] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746159.832054205] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.880356273] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.930385354] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746159.981492646] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.031691782] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.081683927] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746160.128921794] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746160.130339060] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.181094547] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.230426880] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746160.230476052] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746160.230531305] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746160.342521545] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746160.346959720] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.395808585] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.446205860] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.497108667] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.549648473] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.594794633] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746160.642693496] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746160.646344457] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.695501308] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.746185601] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746160.746266931] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746160.746369090] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746160.857057469] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746160.861307941] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.909228725] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746160.960482598] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.009531400] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.059426594] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.108641706] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746161.157336846] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746161.161791741] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.215414856] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746161.215534994] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746161.215688615] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746161.376774128] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746161.380186092] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.430261063] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.478291702] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.529190557] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.579210275] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.629459098] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746161.677350126] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746161.679120883] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.730831226] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746161.730891575] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746161.730975215] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746161.879091857] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746161.881068621] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.930582409] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746161.982342399] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746162.031026390] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746162.082899436] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[behavior_server-4] [INFO] [1790746162.126964518] [behavior_server]: Running backup
+[behavior_server-4] [INFO] [1790746162.127313780] [behavior_server]: DriveOnHeading: no acceleration or deceleration limits set
+[controller_server-1] [INFO] [1790746162.129314667] [controller_server]: Goal was canceled. Stopping the robot.
+[controller_server-1] [INFO] [1790746162.129365524] [controller_server]: [follow_path] [ActionServer] Client requested to cancel the goal. Cancelling.
+[behavior_server-4] [INFO] [1790746164.627368017] [behavior_server]: backup completed successfully
+[controller_server-1] [INFO] [1790746164.637470078] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746164.937698428] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746165.187709129] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746165.437700186] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746165.687709927] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746165.937802412] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746166.187705761] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746166.487700934] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746166.737708874] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746166.987931701] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746167.237699711] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746167.487714010] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746167.737839596] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746167.987711275] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746168.237725372] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746168.537697720] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746168.787712067] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746169.037725587] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746169.287737067] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746169.589250275] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746169.838997120] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746170.087705970] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746170.338069100] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746170.590994059] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746170.837703255] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746171.137700006] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746171.387725480] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746171.637705459] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746171.887707355] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746172.137731933] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746172.387710423] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746172.637703983] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746172.937728142] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746173.187733897] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746173.437875064] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746173.687728633] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746173.937703636] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746174.187702738] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746174.437704963] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746174.687700875] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746174.987701896] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746175.237783532] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746175.487697385] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746175.737714184] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746175.988510136] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746176.237707377] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746176.487697225] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746176.737734111] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746176.989497114] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746177.037714997] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746177.288037907] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746177.537728826] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746177.787701172] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746178.037696140] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746178.287766577] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746178.540753189] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746178.838944301] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746179.087710040] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746179.337699767] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746179.587723959] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746179.837771593] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746180.087703055] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746180.337705046] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746180.637708878] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746180.887787236] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746181.137747056] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746181.387695545] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746181.637727956] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746181.887714215] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746182.188729164] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746182.438714218] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746182.687968438] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746182.937749680] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746183.187737069] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746183.437711815] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746183.687695543] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746183.937789816] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746184.237706981] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746184.487933277] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746184.737695955] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746184.987703379] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746185.239879733] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746185.537704544] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746185.787724200] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746186.037816326] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746186.287743701] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746186.538232243] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746186.787706607] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746187.037702405] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746187.287707902] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746187.587709019] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746187.837723109] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746188.087706121] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746188.337702016] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746188.587746061] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746188.840775044] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746189.087725905] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746189.337709854] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746189.637724789] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746189.887834141] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746190.137784522] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746190.388545181] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746190.637702155] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746190.887720900] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746191.187705569] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746191.189643436] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746191.437708807] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746191.687708451] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746191.739423435] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746191.940961839] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746192.187740421] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746192.438166754] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746192.687725196] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746192.937714865] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746193.237727902] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746193.487714040] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746193.737698218] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746193.987722836] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746194.237738233] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746194.487748986] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746194.737725568] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746195.037723382] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746195.287702533] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746195.537719242] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746195.788143217] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746196.037699072] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746196.287696647] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746196.537730773] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746196.837704045] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746197.088667747] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746197.340765759] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746197.587711305] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746197.837719664] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746198.087704271] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746198.337735543] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746198.587709156] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746198.887711959] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746199.137714397] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746199.388337351] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746199.637721228] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746199.889768513] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746200.187727042] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746200.437762624] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746200.687697937] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746200.937709951] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746201.187703554] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746201.437710093] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746201.687833818] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746201.937734884] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746202.237712296] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746202.488453994] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746202.737707546] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746202.987731572] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746203.237720733] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746203.488915554] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746203.787698928] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746204.037705826] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746204.287703935] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746204.537735851] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746204.787724208] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746205.038669071] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746205.287710090] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746205.587699435] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746205.837698212] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746206.087701955] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746206.337699751] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746206.587788818] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746206.838187189] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746207.142860512] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746207.387802176] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746207.637723144] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746207.887729932] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746208.139940491] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746208.387699324] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746208.687715169] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746208.938816375] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746209.187740345] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746209.437722975] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746209.492463240] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746209.737771436] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746209.987713242] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746210.237807718] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746210.487818541] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746210.737731472] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746210.987713925] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746211.237721354] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746211.240186147] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746211.289737509] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746211.487931095] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746211.490734910] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746211.787714383] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746212.037736147] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746212.287723869] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746212.537702329] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746212.787702215] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746213.037712915] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746213.287708953] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746213.587768262] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746213.838122848] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746214.087709669] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746214.337707952] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746214.587731623] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746214.887727962] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746215.137698902] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746215.387896743] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746215.492168062] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746215.638025714] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746215.887697212] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746216.140982439] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746216.389755765] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746216.687726384] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746216.937699905] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746217.188213033] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746217.437768242] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746217.687809916] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746217.988739758] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746218.237726631] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746218.487752285] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746218.737767184] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746218.987706755] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746219.287732027] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746219.537709917] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746219.787715118] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746220.037693387] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746220.287701415] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746220.537708812] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746220.789144323] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746221.087738447] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746221.337758832] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746221.587701979] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746221.837707038] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746222.087708020] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746222.337730230] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746222.637732722] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746222.887730328] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746223.137725211] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746223.387706318] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746223.638130834] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746223.887723699] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746224.137731432] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746224.387754470] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746224.637845369] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746224.887711839] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746225.138427741] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746225.437699105] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746225.687699975] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746225.937864577] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746226.139855528] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746226.187725433] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746226.188922275] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746226.238968928] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746226.340182880] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746226.391374026] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746226.437699086] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746226.439309130] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746226.687969425] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746226.987721719] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746227.237703724] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746227.487730770] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746227.737696613] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746227.740176452] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746227.987708409] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746228.237702662] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746228.537711134] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746228.589265660] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746228.787746527] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746229.037782093] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746229.288978802] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746229.537738767] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746229.787721792] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746230.087698138] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746230.337847973] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746230.587785169] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746230.837706585] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746231.090743796] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746231.337712118] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746231.587731558] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746231.840906257] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746232.087703349] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746232.387729444] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746232.637710859] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746232.887736914] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746233.137904942] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746233.387729368] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746233.639622865] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746233.887704687] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746234.187720347] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746234.437823815] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746234.687700468] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746234.937707396] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746235.187698281] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746235.437703968] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746235.737700898] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746235.739316081] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746235.791072877] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746235.840465992] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746235.889428889] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746235.939973339] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746235.987756293] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746235.990113284] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.040360891] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746236.040426467] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746236.040496193] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746236.204837428] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746236.208444334] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.258853388] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.306877321] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.357299801] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.409257748] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.457311088] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746236.505349143] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746236.507435026] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.557236507] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746236.557293609] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746236.557360779] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746236.716412085] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746236.719787937] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.768491456] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.819466540] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.871183182] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.920830402] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746236.969836287] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746237.018534334] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746237.021471935] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.068643799] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.118408942] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746237.118462941] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746237.118536289] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746237.237058722] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746237.238809519] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.289560799] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.339416958] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.389306125] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.439295599] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.489292031] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746237.537384211] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746237.540348468] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.589731737] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.640527824] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746237.640602312] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746237.640699070] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746237.743860421] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746237.746598131] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.797432298] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.846364144] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.896301807] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.946886294] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746237.995927302] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746238.044277657] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746238.049167082] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746238.096443325] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746238.146772969] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746238.146833879] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746238.146913995] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746238.258853734] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746238.260595248] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746238.310950965] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746238.361250201] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746238.411158969] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746238.460541066] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746238.509164404] [controller_server]: Goal was canceled. Stopping the robot.
+[controller_server-1] [INFO] [1790746238.509225299] [controller_server]: [follow_path] [ActionServer] Client requested to cancel the goal. Cancelling.
+[behavior_server-4] [INFO] [1790746238.510207817] [behavior_server]: Running backup
+[behavior_server-4] [INFO] [1790746240.910490999] [behavior_server]: backup completed successfully
+[controller_server-1] [INFO] [1790746240.947348180] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746241.247508620] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746241.497551696] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746241.747506960] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746241.997537862] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746242.248142563] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746242.498525751] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746242.747897991] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746243.047526353] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746243.298749583] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746243.547549804] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746243.797545198] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746244.097705781] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746244.347515086] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746244.598022555] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746244.847640469] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746245.147508189] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746245.397503090] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746245.648049196] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746245.897511060] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746246.147493333] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746246.447493254] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746246.697590703] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746246.947528195] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746247.197517149] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746247.447509612] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746247.747515717] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746247.997502513] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746248.247749454] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746248.498763508] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746248.747515527] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746249.048853267] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746249.297540674] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746249.547508324] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746249.797967311] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746249.949361586] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746249.999450932] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746250.047518624] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746250.347509573] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746250.399416679] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746250.451310878] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746250.499136315] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746250.548635619] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746250.597514458] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746250.601008433] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746250.800365829] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746250.848731912] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746250.950626253] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746251.097499111] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746251.100485846] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746251.151077375] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746251.201442702] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746251.257312323] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746251.347509769] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746251.649734682] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746251.897498797] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746252.147513049] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746252.397603138] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746252.647514471] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746252.897505187] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746253.147501088] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746253.397515739] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746253.647500675] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746253.947507429] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746254.198021409] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746254.447518519] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746254.697491677] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746254.947496142] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746255.198052173] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746255.499923252] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746255.747532575] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746255.997621141] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746256.248102908] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746256.497505263] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746256.747506315] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746256.997496687] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746257.249523437] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746257.257266098] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746257.498862131] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746257.797640016] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746258.047515221] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746258.297594116] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746258.548700817] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746258.797748000] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746258.949925093] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746259.047582160] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746259.298248031] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746259.597513264] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746259.847512801] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746259.849881899] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746260.097494147] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746260.347509726] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746260.349463973] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746260.597579388] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746260.847490166] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746261.097595401] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746261.100273508] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746261.397526244] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746261.647500431] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746261.897802013] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746262.147967674] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746262.152011530] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746262.204370577] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746262.252657428] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746262.299622244] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746262.350411900] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746262.397505149] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746262.401647979] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746262.449371941] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746262.500346559] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746262.500392409] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746262.500453471] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746262.648166065] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746262.898937420] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746263.202749984] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746263.448578115] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746263.698680080] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746263.948582934] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746264.198629695] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746264.215486136] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746264.250317520] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746264.448576147] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746264.550025097] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746264.604940455] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746264.650184599] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746264.698585235] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746264.801351198] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746264.852044210] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746264.906577319] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746264.948592133] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746265.050727926] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746265.101010615] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746265.150307801] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746265.200273592] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746265.248594216] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746265.498606423] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746265.500975324] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746265.748583643] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746265.998601749] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746266.248578340] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746266.498594514] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746266.748580562] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746267.048589117] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746267.298580334] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746267.548669782] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746267.798850893] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746268.048592156] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746268.298597661] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746268.548580111] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746268.848586214] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746269.098592810] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746269.348574746] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746269.598593465] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746269.799757187] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746269.848590676] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746270.099280156] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746270.348586512] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746270.649196939] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746270.898573611] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746271.150161778] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746271.398918795] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746271.651599115] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746271.898576987] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746272.149129372] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746272.398587702] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746272.699742580] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746272.949398301] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746273.198580210] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746273.448576354] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746273.698613339] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746273.948600808] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746274.198587284] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746274.448589101] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746274.748715117] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746274.999142817] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746275.249065858] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746275.498640702] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746275.748733035] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746275.998679144] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746276.248583200] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746276.548620907] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746276.798602078] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746277.048600620] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746277.298584608] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746277.548587771] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746277.798588763] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746278.048752465] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746278.348598246] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746278.598841809] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746278.848600203] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746279.098773133] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746279.348572371] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746279.598760545] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746279.848584731] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746280.098857613] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746280.398573504] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746280.648596815] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746280.900005547] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746281.149755642] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746281.399771838] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746281.648593118] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746281.898617787] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746282.149027264] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746282.448598091] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746282.698607236] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746282.948668406] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746283.248613115] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746283.498595747] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746283.748583338] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746283.998614312] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746284.248676993] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746284.498591184] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746284.748573924] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746284.998816399] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746285.251755996] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746285.498587999] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746285.748590695] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746286.048684376] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746286.248750861] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746286.548574220] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746286.798739764] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746287.049758329] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746287.298577617] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746287.548621592] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746287.798842870] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746288.098578272] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746288.348599171] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746288.598607046] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746288.848594089] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746289.098590863] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746289.348616561] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746289.598598499] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746289.898589127] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746290.148580344] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746290.398733153] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746290.648588161] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746290.899439549] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746291.151901930] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746291.398588287] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746291.648592114] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746291.898790841] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746292.198593507] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746292.448595234] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746292.698574620] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746292.948581887] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746293.198572828] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746293.448597667] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746293.698583382] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746293.948576689] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746294.248626462] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746294.498556339] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746294.748590756] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746294.998589700] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746295.248580008] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746295.498587144] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746295.748586690] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746296.000065538] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746296.298590534] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746296.548754592] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746296.798609172] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746297.048590860] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746297.298588699] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746297.548584153] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746297.798581441] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746298.098587661] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746298.350454658] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746298.598594802] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746298.848638269] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746299.098568703] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746299.348591535] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746299.598602679] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746299.898710144] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746300.148656047] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746300.398590021] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746300.648598416] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746300.898580402] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746301.148659597] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746301.398913870] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746301.698573649] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746301.948591439] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746302.198589909] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746302.448568901] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746302.698594009] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746302.948570015] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746303.198581053] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746303.449278749] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746303.698543000] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746304.001823620] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746304.248581374] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746304.250931244] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.350423851] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.400881632] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.451983216] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746304.498790548] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746304.500681471] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.551359041] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746304.748672838] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746304.755926525] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.802411062] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.850376930] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.901764420] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746304.952303275] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746304.998650976] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746305.248586234] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746305.500172229] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746305.501957424] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746305.798593714] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746306.048581283] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746306.298604750] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746306.548579196] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746306.798577190] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746307.048595139] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746307.298574419] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746307.548684254] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746307.849409211] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746308.099206342] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746308.348599422] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746308.601783624] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746308.848582848] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746309.098584577] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746309.348578592] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746309.598602487] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746309.898738841] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746310.149739668] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746310.398598157] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746310.648585933] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746310.901117033] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746310.904294759] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746311.148603130] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746311.398961538] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746311.698616093] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746311.948607575] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746312.198576719] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746312.449739431] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746312.698583651] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746312.948586995] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746313.248561087] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746313.498567851] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746313.750741031] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746313.998554216] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746314.300909485] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746314.548565193] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746314.798574433] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746315.098567805] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746315.348560709] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746315.598568894] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746315.851619220] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746316.098619710] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746316.398585207] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746316.648620076] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746316.898588858] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746317.148554266] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746317.398842327] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746317.648563463] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746317.948560999] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746318.198560086] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746318.448717355] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746318.698561716] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746318.998580989] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746319.248574401] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746319.498626919] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746319.748603767] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746320.000305357] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746320.248696070] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746320.498569271] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746320.798569812] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746321.048603500] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746321.298844208] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746321.549872132] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746321.800737216] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746322.048564144] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746322.298567860] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746322.549240710] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746322.848676291] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746323.098602384] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746323.348571469] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746323.598741383] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746323.848670664] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746324.099305778] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746324.348587872] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746324.648575626] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746324.898582247] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746325.148587623] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746325.398587630] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746325.648578775] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746325.900744633] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746326.050410894] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746326.148568709] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746326.448575151] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746326.698568866] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746326.948865971] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746327.198727401] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746327.448650238] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746327.700741176] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746327.948710219] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746328.248576735] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746328.499224277] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746328.748571177] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746328.998571463] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746329.248578986] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746329.498579452] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746329.748665472] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746329.998582111] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746330.248697120] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746330.548722584] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746330.798580764] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746331.048719526] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746331.301752058] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746331.553728057] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746331.707641019] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746331.798596105] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746332.048571715] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746332.298823296] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746332.548614309] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746332.798576177] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746333.098571982] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746333.350756965] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746333.598660773] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746333.849044974] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746334.098575863] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746334.348710562] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746334.648588962] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746334.898595661] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746335.148553650] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746335.401905983] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746335.648582924] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746335.654019172] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746335.704063180] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746335.898570919] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746335.901784592] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746335.951749358] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746336.001361087] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746336.149740290] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746336.152941395] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746336.203380528] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746336.251693083] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746336.300432303] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746336.398580164] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746336.400915683] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746336.698662164] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746336.948721253] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746337.198590830] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746337.448578759] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746337.698586680] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746337.948602240] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746338.248572607] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746338.448593659] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746338.748571264] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746338.998594766] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746339.248587946] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746339.498596402] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746339.748722826] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746339.998574454] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746340.249758865] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746340.548582646] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746340.798596949] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746341.048575499] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746341.298558855] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746341.598575889] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746341.848593324] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746342.098601117] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746342.151332931] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.204121257] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.249870130] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746342.348576580] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746342.355794432] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.550719019] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746342.599188667] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746342.602456243] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.650656351] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.701152792] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746342.848576067] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746342.850236971] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.899849497] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746342.950240009] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.002135696] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.050132034] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746343.098581122] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746343.300579136] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746343.348574646] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746343.350811628] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.400514349] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.454565001] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.500309537] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.550945707] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746343.600296799] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746343.603003049] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.652063339] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746343.652139312] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746343.652262269] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746343.857274632] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746343.860441527] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.911400541] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746343.959661573] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.008969001] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.061526813] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.109028771] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746344.157476508] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746344.159319154] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.210216063] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.260078528] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746344.260127857] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746344.260208935] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746344.381749756] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746344.385169176] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.433535256] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.487793756] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.534812636] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.583822242] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.637561603] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746344.681993332] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746344.684749629] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.733588544] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.783397644] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746344.783449442] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746344.783515603] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746344.904003316] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746344.906828294] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746344.959076222] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.005742545] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.059941280] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.105592731] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746345.154157829] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746345.155797843] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.210869309] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.257464215] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746345.257522877] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746345.257592973] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746345.403646737] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746345.405428806] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.458962935] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.507509468] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.556039002] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.605581953] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.656269931] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746345.703869752] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746345.712082940] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746345.756280007] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746345.756333254] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746345.756416456] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[behavior_server-4] [INFO] [1790746345.929154371] [behavior_server]: Running backup
+[behavior_server-4] [INFO] [1790746348.029550520] [behavior_server]: backup completed successfully
+[controller_server-1] [INFO] [1790746348.062255734] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746348.362504983] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746348.424978609] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746348.612474922] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746348.862475698] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746349.113392177] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746349.362487687] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746349.368292260] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.514415688] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.565230888] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746349.612495973] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746349.617199948] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.666834810] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.714480004] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.763770231] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.814200131] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746349.864521228] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746349.864570685] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746349.864637972] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746349.870263751] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746350.170381978] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746350.171981806] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746350.225436419] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746350.421442824] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746350.670397506] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746350.920418149] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746351.171753592] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746351.420675165] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746351.670385899] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746351.920442743] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746352.220381354] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746352.470379768] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746352.720397782] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746352.970387494] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746353.220389573] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746353.470427491] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746353.720378275] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746353.970391366] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746354.271743547] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746354.520437103] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746354.770456070] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746355.020555030] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746355.270394489] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746355.520387247] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746355.770379414] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746356.070533173] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746356.320396873] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746356.570384626] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746356.820396586] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746357.070971537] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746357.320533438] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746357.620759798] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746357.870382308] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746358.120401136] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746358.370380214] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746358.620406547] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746358.870392209] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746359.120736891] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746359.370428356] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746359.670465789] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746359.922748070] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746360.170402901] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746360.420472579] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746360.522831478] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746360.671638969] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746360.920384863] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746360.975926348] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746361.170384820] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746361.420359940] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746361.720465021] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746361.970386948] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746362.220390312] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746362.470383947] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746362.720552114] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746362.970749115] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746363.220443645] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746363.470402241] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746363.770389163] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746364.021188650] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746364.270708425] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746364.520394883] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746364.770380996] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746365.020378118] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746365.320400980] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746365.570389003] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746365.820380808] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746366.070430367] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746366.320379856] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746366.570392046] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746366.820609800] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746367.070388363] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746367.321145162] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746367.571743639] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746367.870401946] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746368.120389993] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746368.371752395] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746368.620380989] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746368.870356754] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746369.121938755] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746369.420387784] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746369.670389446] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746369.920770823] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746370.170337490] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746370.174040985] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746370.221606057] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746370.420827386] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746370.670397695] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746370.920387229] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746371.222738264] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746371.470394374] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746371.720765019] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746371.970356851] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746372.222033357] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746372.470380671] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746372.720423429] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746373.020487689] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746373.270579825] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746373.520643310] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746373.770379614] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746374.020380704] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746374.270382026] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746374.570396183] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746374.820400942] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746375.070403625] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746375.320740482] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746375.570393373] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746375.871380994] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746376.120391192] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746376.370391231] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746376.620392389] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746376.920383066] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746377.170381889] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746377.420382878] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746377.720390956] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746377.970377593] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746378.220742271] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746378.470401239] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746378.720762147] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746378.970732743] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746379.220383098] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746379.470445155] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746379.772137502] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746380.020578221] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746380.270378622] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746380.520391968] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746380.771620706] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746381.021251598] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746381.270405327] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746381.520412298] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746381.820385566] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746382.070494860] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746382.320742223] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746382.570533949] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746382.820492798] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746383.070398201] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746383.370390035] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746383.620380554] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746383.870397146] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746384.120385265] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746384.370390554] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746384.620392199] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746384.870457730] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746385.170401597] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746385.420735917] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746385.670388967] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746385.921599994] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746386.220386516] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746386.470402216] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746386.720384420] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746386.970402010] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746387.220822641] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746387.470391694] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746387.720480923] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746387.970383793] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746388.270397820] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746388.520403719] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746388.770756928] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746389.020816805] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746389.320381360] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746389.570417726] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746389.820394167] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746390.070395822] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746390.320408201] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746390.570390502] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746390.820393539] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746391.123740581] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746391.370387822] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746391.620386583] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746391.870397740] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746392.120380771] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746392.370727899] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746392.620393525] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746392.920561713] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746393.170391657] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746393.420738726] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746393.670383126] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746393.920394742] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746394.170380302] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746394.420466575] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746394.720752018] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746394.970402118] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746395.220383232] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746395.380704640] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746395.423557140] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746395.470396534] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746395.623276352] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746395.673043636] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746395.720396762] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746395.722433732] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746395.773163849] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746395.873753366] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746395.970374819] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746396.221386496] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746396.520389086] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746396.770396608] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746397.020773115] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746397.270386647] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746397.520379483] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746397.770387649] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746398.020457645] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746398.320378837] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746398.570390325] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746398.820433951] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746399.071276905] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746399.320383388] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746399.570509375] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746399.820378599] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746400.121473553] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746400.370407260] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746400.620489086] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746400.870736026] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746401.120723601] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746401.374774911] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746401.621109594] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746401.920387715] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746402.171221673] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746402.421089021] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746402.423547516] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746402.475951030] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746402.622038197] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746402.670390613] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746402.920439948] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746403.170422779] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746403.175496083] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746403.226478710] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746403.372913715] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746403.422721887] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746403.426756225] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746403.720782860] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746403.970424919] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746404.220462535] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746404.471038376] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746404.720380631] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746404.971687679] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746405.222736941] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746405.470741471] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746405.770467172] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746406.020519209] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746406.270395093] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746406.520608359] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746406.770396559] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746407.021273192] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746407.270387341] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746407.520441063] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746407.820382686] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746408.070378368] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746408.320399991] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746408.570381516] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746408.821234806] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746409.120426632] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746409.370382081] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746409.473467094] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746409.620380518] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746409.870398122] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746409.923614205] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746410.120377457] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746410.370761600] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746410.620389018] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746410.920397542] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746411.171367110] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746411.420457057] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746411.670388620] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746411.920726068] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746412.220400128] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746412.470619264] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746412.720399289] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746412.970390527] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746413.220384496] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746413.471861084] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746413.770393710] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746414.020380269] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746414.270389420] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746414.570393483] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746414.820691661] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746415.070724291] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746415.321014977] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746415.570374216] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746415.870384569] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746416.120737399] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746416.370473331] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746416.620376197] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746416.870387101] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746417.120753360] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746417.420687877] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746417.670396394] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746417.920389053] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746418.170799401] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746418.427539639] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746418.470379110] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746418.720375143] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746418.872311212] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746418.970389518] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746419.220376990] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746419.470382091] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746419.624836614] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746419.721897746] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746420.020979617] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746420.270397996] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746420.520396313] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746420.770393996] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746421.020820821] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746421.270399721] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746421.570394275] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746421.820388468] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746422.071294497] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746422.320381849] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746422.570469299] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746422.820389193] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746423.072984129] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746423.320379863] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746423.620392117] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746423.870417803] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746424.120382404] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746424.370395597] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746424.620378686] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746424.870400452] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746425.120388040] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746425.370421553] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746425.620390527] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746425.920384815] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746426.170390262] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746426.421138776] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746426.670407007] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746426.920379718] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746427.220391985] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746427.470385000] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746427.720397537] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746427.970379853] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746428.220389618] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746428.470398278] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746428.720389787] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746429.020576580] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746429.270396161] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746429.520386724] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746429.770421007] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746429.829915931] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746430.020386174] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746430.270377268] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746430.520379976] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746430.820387107] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746431.070409737] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746431.320469230] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746431.570386925] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746431.820399606] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746432.070397828] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746432.370831932] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746432.570375933] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746432.870380715] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746433.120377312] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746433.370397888] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746433.620378979] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746433.870388098] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746434.121730089] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746434.421965196] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746434.670393652] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746434.920406595] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746435.170391368] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746435.420387946] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746435.425058971] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746435.474390628] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746435.671019088] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746435.921734303] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746436.220492839] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746436.470382698] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746436.720386624] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746436.970395870] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746437.220401637] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746437.470829625] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746437.720387536] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746438.020636233] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746438.270389088] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746438.520560830] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746438.771085954] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746439.020379567] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746439.270446922] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746439.520343666] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746439.820393208] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746440.070379868] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746440.320405149] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746440.323221555] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746440.372259938] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746440.422892339] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746440.472372352] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746440.522851178] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746440.570698856] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746440.820396075] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746440.924482835] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746440.973155872] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.022424922] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746441.070416469] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746441.126019469] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.173120606] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.222814328] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.274007823] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746441.320398389] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746441.471962557] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.522442412] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746441.571860331] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746441.574329566] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.622957629] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746441.820454822] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746441.923386815] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746441.974037261] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.022761517] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746442.071203139] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746442.072799520] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.122654998] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.172450831] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746442.371253786] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746442.422482504] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.472589078] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.522123526] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.572314696] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746442.620379664] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746442.622828496] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.673218344] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.722095557] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.772690119] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746442.772751783] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746442.772820767] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746442.832926663] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746442.834659382] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.885599422] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.936229444] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746442.985163050] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.038804113] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.085819092] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746443.133169091] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746443.135622682] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.185773285] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746443.185816555] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746443.185892790] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746443.360827340] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746443.368603941] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.413256550] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.463340751] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.514844889] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.562967198] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.613907006] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746443.661042331] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746443.672259369] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.713277172] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.765733438] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746443.765818641] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746443.765897127] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746443.880536662] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746443.891412933] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.940252168] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746443.983945719] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.032998058] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.087963717] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.132017211] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746444.180807966] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746444.185425700] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.234043811] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.283161137] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746444.283213716] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746444.283280671] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746444.393187548] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746444.395392252] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.445331280] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.495441495] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.545973441] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.599217306] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.647455515] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746444.693453916] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746444.696600178] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.745349377] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.796253952] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746444.796545324] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746444.796635107] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[controller_server-1] [INFO] [1790746444.901236697] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [WARN] [1790746444.904124199] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746444.952974200] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746445.003405993] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746445.053287688] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746445.103551270] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746445.155263717] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746445.201386041] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746445.204974023] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746445.256036092] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [ERROR] [1790746445.256169605] [controller_server]: Controller patience exceeded
+[controller_server-1] [WARN] [1790746445.256338289] [controller_server]: [follow_path] [ActionServer] Aborting handle.
+[behavior_server-4] [INFO] [1790746445.407112572] [behavior_server]: Running backup
+[behavior_server-4] [INFO] [1790746447.307410764] [behavior_server]: backup completed successfully
+[controller_server-1] [INFO] [1790746447.320492518] [controller_server]: Received a goal, begin computing control effort.
+[controller_server-1] [INFO] [1790746447.620669348] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746447.871271245] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746448.120674938] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746448.370652935] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746448.620735519] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746448.870660135] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746449.170660263] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746449.420684362] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746449.670654507] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746449.922913138] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746450.171042100] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746450.470678888] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746450.720736056] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746450.970668614] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746451.221527765] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746451.470664152] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746451.721228587] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746451.970657243] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746452.270682782] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746452.520736746] [controller_server]: Passing new path to controller.
+[controller_server-1] [INFO] [1790746452.770668379] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746452.823695330] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [WARN] [1790746452.922467471] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746453.022061701] [controller_server]: Passing new path to controller.
+[controller_server-1] [WARN] [1790746453.026705191] [controller_server]: TebLocalPlannerROS: trajectory is not feasible. Resetting planner...
+[controller_server-1] [INFO] [1790746453.120657416] [controller_server]: Goal was canceled. Stopping the robot.
+[controller_server-1] [INFO] [1790746453.120706941] [controller_server]: [follow_path] [ActionServer] Client requested to cancel the goal. Cancelling.

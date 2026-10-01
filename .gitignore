@@ -4,3 +4,8 @@ log/
 launch/__pycache__/
 __pycache__/
 .sim_tmp/
+maps/exam/
+logs/exam/
+**/__pycache__/
+archive/old_logs/*.log
+archive/old_logs/*.txt

@@ -54,6 +54,8 @@ def main():
     rclpy.init(args=['--ros-args', '-p', 'use_sim_time:=true'])
     nav = BasicNavigator()
     pts = load(sys.argv[1])
+    if math.hypot(*(pts[-1] - pts[0])) < 0.03:
+        pts = pts[:-1]   # 끝점=시작점 중복이면 seg=0 -> NaN
     n = len(pts)
     dv = np.roll(pts, -1, 0) - pts
     seg = np.hypot(dv[:, 0], dv[:, 1])
@@ -248,7 +250,7 @@ def main():
             nav.followPath(pm, 'FollowPath', 'general_goal_checker')
             pub.publish(pm)
             t2 = time.monotonic()
-            print(f'[{mode}] idx={last}/{n} pos=({x:.2f},{y:.2f}) obs={len(plan)} '
+            print(f'[{mode}] idx={last}/{n} pos=({x:.2f},{y:.2f}) obs={len(plan)}{[(o[0], o[1]) for o in plan]} '
                   f'계산={(t1 - t0) * 1000:.0f}ms 발행={(t2 - t1) * 1000:.0f}ms', flush=True)
     except KeyboardInterrupt:
         pass
