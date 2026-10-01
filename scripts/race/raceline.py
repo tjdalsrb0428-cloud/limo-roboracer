@@ -21,6 +21,7 @@ from scipy.interpolate import CubicSpline
 from skimage.graph import MCP_Geometric
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+WS = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 class GridMap:
@@ -72,7 +73,10 @@ class GridMap:
         if traj is not None and len(traj):
             # 매핑 주행 궤적: 차체가 지나간 띠는 free 확정, 그 주변 0.6m 미관측도 free
             tr_mask = np.zeros_like(free)
-            Q = resample_open(traj, 0.02)
+            # 리셋(Ctrl+R) 등 순간이동 구간은 잇지 않음(벽을 가로지르는 띠 방지)
+            cut = np.where(np.hypot(*np.diff(traj, axis=0).T) > 0.3)[0] + 1
+            segs = [s for s in np.split(np.asarray(traj), cut) if len(s) >= 2]
+            Q = np.vstack([resample_open(s, 0.02) for s in segs]) if segs else np.asarray(traj)
             rr, cc = self.rc(Q)
             rr = np.clip(np.round(rr).astype(int), 0, self.H - 1)
             cc = np.clip(np.round(cc).astype(int), 0, self.W - 1)
@@ -175,6 +179,26 @@ def extract_loop(m, x0, y0, yaw0, c_min):
         raise RuntimeError('루프가 닫히지 않음')
     path = np.array(mcp.traceback(s_back))
     return m.xy(path[:, 0], path[:, 1])
+
+
+def deseam(m, P, p0, c_min, half=1.2):
+    """추출 루프는 출발점을 반드시 지나므로 출발 위치가 중앙에서 벗어나 있으면 꺾임(S자)이 생김.
+    출발점 앞뒤 half(m) 구간을 지우고 주기 스플라인으로 다시 이음. 여유(c_min) 위반 시 원본 유지"""
+    Q, _ = resample(P, step=0.05)
+    s = np.concatenate([[0], np.cumsum(np.hypot(*np.diff(np.vstack([Q, Q[:1]]), axis=0).T))])
+    L = s[-1]
+    i0 = int(np.argmin(np.hypot(Q[:, 0] - p0[0], Q[:, 1] - p0[1])))
+    ds = (s[:-1] - s[i0] + L / 2) % L - L / 2           # 출발점 기준 부호 있는 거리
+    keep = np.abs(ds) > half
+    if keep.sum() < 10:
+        return P
+    order = np.argsort(np.where(keep, (s[:-1] - s[i0]) % L, np.inf))[:keep.sum()]
+    sk = (s[:-1][order] - s[i0]) % L
+    cs = CubicSpline(np.concatenate([sk, [sk[0] + L]]), np.vstack([Q[order], Q[order][:1]]), bc_type='periodic')
+    R = cs(np.sort(np.arange(sk[0], sk[0] + L, 0.05)))
+    if m.clear(R).min() < c_min:
+        return P
+    return R
 
 
 def normals(P):
@@ -416,6 +440,11 @@ def avoid_dp(m, R, ds_st=0.3, verbose=True):
             cw = np.minimum(cw, look(wall, Q))
             co = np.minimum(co, look(obs, Q))
         return cw.reshape(P.shape[:-1]), co.reshape(P.shape[:-1])
+    # 폐루프 DP 의 고정점(오프셋 0)은 박스에서 가장 먼 정거장으로: 출발선 근처에 고정하면
+    # 게이트 앞 정렬 경로가 고정점에서 억지로 꺾여(S자) 2랩째부터 흔들린 채 게이트 진입
+    ka = int(np.argmax(look(obs, Rs)))
+    Rs = np.roll(Rs, -ka, 0)
+    N = np.roll(N, -ka, 0)
     nodes = Rs[:, None, :] + N[:, None, :] * offs[None, :, None]
     lam = np.linspace(0.0, 1.0, 5)[1:]
     INF = 1e9
@@ -486,6 +515,7 @@ def make(yml, x0=0.0, y0=0.0, yaw0=0.0, clear=0.30, kmax=1.25, out=None, verbose
     for c_min in (0.25, 0.20, 0.16, 0.13):
         try:
             P = extract_loop(m, x0, y0, yaw0, c_min)
+            P = deseam(m, P, (x0, y0), min(c_min, 0.16))
             break
         except RuntimeError:
             pass
@@ -562,14 +592,21 @@ def overlay(m, paths, png, start=None, S=3):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('map')
-    ap.add_argument('out')
-    ap.add_argument('pose', nargs='*', type=float)
+    ap.add_argument('map', nargs='?', default=os.path.join(WS, 'maps', 'exam', 'map.yaml'))
+    ap.add_argument('out', nargs='?', default=None, help='기본: MAP_raceline.csv')
+    ap.add_argument('pose', nargs='*', type=float, help='출발 pose. 생략 시 궤적(--traj) 마지막 행')
     ap.add_argument('--clear', type=float, default=0.30)
     ap.add_argument('--traj', default=None, help='매핑 주행 궤적 csv(x,y)')
     ap.add_argument('--astar', action='store_true', help='QP 곡률 미달 시 전역 Hybrid A* 시도(느림)')
     ap.add_argument("--kmax", type=float, default=1.25)
     a = ap.parse_args()
+    if a.out is None:
+        a.out = os.path.splitext(a.map)[0] + '_raceline.csv'
+    if a.traj is None and os.path.exists(os.path.splitext(a.map)[0] + '_traj.csv'):
+        a.traj = os.path.splitext(a.map)[0] + '_traj.csv'
+    if not a.pose and a.traj:
+        a.pose = list(np.loadtxt(a.traj, delimiter=',', skiprows=1)[-1, :3])
+        print(f'출발 pose(궤적 마지막) = ({a.pose[0]:.2f}, {a.pose[1]:.2f}, {a.pose[2]:.2f})', flush=True)
     x0, y0, yaw0 = (list(a.pose) + [0.0, 0.0, 0.0])[:3]
     make(a.map, x0, y0, yaw0, a.clear, a.kmax, a.out, traj=a.traj, use_astar=a.astar)
 

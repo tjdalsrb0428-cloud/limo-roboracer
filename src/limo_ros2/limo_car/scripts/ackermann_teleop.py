@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import termios
 import tty
 
-import rclpy
+os.environ.setdefault('ROS_LOCALHOST_ONLY', '1')   # Gazebo 런치와 같은 localhost 전용 통신
+import rclpy  # noqa: E402
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 

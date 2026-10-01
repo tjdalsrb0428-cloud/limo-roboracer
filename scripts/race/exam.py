@@ -32,7 +32,8 @@ os.environ['GAZEBO_IP'] = '127.0.0.1'
 def run_bg(name, cmd):
     os.makedirs(LOG, exist_ok=True)
     f = open(os.path.join(LOG, name + '.log'), 'w')
-    p = subprocess.Popen(cmd, shell=True, stdout=f, stderr=subprocess.STDOUT, preexec_fn=os.setsid, cwd=WS)
+    p = subprocess.Popen(cmd, shell=True, stdin=subprocess.DEVNULL, stdout=f, stderr=subprocess.STDOUT,
+                         preexec_fn=os.setsid, cwd=WS)
     PROCS.append((name, p))
     return p
 

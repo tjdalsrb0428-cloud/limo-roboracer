@@ -125,14 +125,14 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
-      Color: 25; 255; 0
+      Color: 0; 170; 255
       Enabled: true
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
-      Name: Path
+      Line Style: Billboards
+      Line Width: 0.03999999910593033
+      Name: Raceline
       Offset:
         X: 0
         Y: 0
@@ -144,11 +144,11 @@ Visualization Manager:
       Shaft Length: 0.10000000149011612
       Topic:
         Depth: 5
-        Durability Policy: Volatile
+        Durability Policy: Transient Local
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /plan
+        Value: /race/raceline
       Value: true
     - Alpha: 0.699999988079071
       Class: rviz_default_plugins/Map
@@ -200,9 +200,9 @@ Visualization Manager:
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
-      Name: Path
+      Line Style: Billboards
+      Line Width: 0.05999999865889549
+      Name: Local Path
       Offset:
         X: 0
         Y: 0
@@ -218,13 +218,10 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /plan
+        Value: /race/local_path
       Value: true
-    - Alpha: 1
-      Axes Length: 1
-      Axes Radius: 0.10000000149011612
-      Class: rviz_default_plugins/PoseWithCovariance
-      Color: 255; 0; 0
+    - Angle Tolerance: 0.05
+      Class: rviz_default_plugins/Odometry
       Covariance:
         Orientation:
           Alpha: 0.5
@@ -233,27 +230,34 @@ Visualization Manager:
           Frame: Local
           Offset: 1
           Scale: 1
-          Value: true
+          Value: false
         Position:
           Alpha: 0.30000001192092896
           Color: 204; 51; 204
           Scale: 1
-          Value: true
-        Value: true
+          Value: false
+        Value: false
       Enabled: true
-      Head Length: 0.30000001192092896
-      Head Radius: 0.30000001192092896
-      Name: PoseWithCovariance
-      Shaft Length: 1
-      Shaft Radius: 0.05000000074505806
-      Shape: Arrow
+      Keep: 1
+      Name: Car Pose
+      Position Tolerance: 0.05
+      Shape:
+        Alpha: 1
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 170; 0
+        Head Length: 0.15000000596046448
+        Head Radius: 0.15000000596046448
+        Shaft Length: 0.4000000059604645
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
       Topic:
         Depth: 5
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /amcl_pose
+        Value: /odom
       Value: true
     - Alpha: 1
       Buffer Length: 1

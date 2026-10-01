@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """레이스라인 추종 + 장애물 회피 드라이버 (Nav2 불필요, /cmd_vel 직접 발행)
 
-사용: python3 scripts/race/race_driver.py --map MAP.yaml --line RACELINE.csv [--init X Y YAW] [--go]
-  --init : AMCL 초기 pose 자동 발행(map 좌표)
+사용: python3 scripts/race/race_driver.py [--map MAP.yaml] [--line RACELINE.csv] [--init X Y YAW] [--go]
+  인자 생략 시 maps/exam/map.yaml, map_raceline.csv, map_traj.csv (odom_mapper/raceline 기본 출력)
+  --init : AMCL 모드(초기 pose 자동 발행). 없으면 odom 모드(map=odom)
+  Ctrl+C : 정지 명령(속도 0) 발행 후 종료
   --go   : 엔터 대기 없이 바로 출발(테스트용)
 
 구조
@@ -11,6 +13,7 @@
     장애물 = /scan 점 중 정적맵 벽에서 떨어진 점(최근 3초 기억)
   제어(40Hz): pure pursuit(후륜축 기준) + 곡률/여유거리 기반 속도 프로파일
 """
+import os
 import sys
 import math
 import time
@@ -21,14 +24,16 @@ from scipy import ndimage
 from scipy.interpolate import CubicSpline
 from scipy.spatial import cKDTree
 
-import rclpy
-from rclpy.node import Node
+os.environ.setdefault('ROS_LOCALHOST_ONLY', '1')     # 오프라인(Wi-Fi 없음)에서도 통신
+import rclpy  # noqa: E402
+from rclpy.signals import SignalHandlerOptions  # noqa: E402
+from rclpy.node import Node  # noqa: E402
 from rclpy.duration import Duration
 from rclpy.time import Time
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy, qos_profile_sensor_data
-from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped, TransformStamped
 from nav_msgs.msg import Path, Odometry
 from sensor_msgs.msg import LaserScan
 import tf2_ros
@@ -59,12 +64,14 @@ BODY_OFF = (-0.12, -0.06, 0.0, 0.06, 0.12)
 C_HARD = 0.165          # 원 중심-장애물 최소거리(반경 0.1325 + 여유 3cm)
 C_TIGHT = 0.142         # 막혔을 때만: 0.35m 틈 통과용 빠듯한 기준(여유 1cm)
 V_TIGHT = 0.2           # 빠듯한 기준 경로 속도 상한
-TIGHT_PAD = 1.0         # 빠듯한 구간 앞뒤 저속 여유(m)
+TIGHT_PAD = 1.6         # 빠듯한 구간 앞뒤 저속 여유(m)
 V_BLOCKED = 0.5         # 앞이 막혀 보일 때 속도 상한
 C_START = 0.12          # 현재 위치 근처(첫 구간 앞부분)는 완화: 이미 가까워도 빠져나갈 경로 허용
 DYN_RES = 0.025
 STATIC_BIAS = 0.03      # 점유격자 셀중심 거리 -> 실제 벽면 거리 보정
 RAW_MEM = 1.0           # 빠듯한 기준용 라이다 원점(벽 포함) 기억 시간(s)
+RAW_RES = 0.01          # 라이다 실측 거리표 해상도(m)
+RAW_HALF = 3.5          # 거리표 창 반폭(m): 계획 범위(7.2m) 중 빠듯한 구간 판정에 충분
 RAW_UP = 0.02           # 빠듯한 기준: 벽 여유 = 라이다 실측거리, 단 [지도-0.03, 지도+0.02] 범위로 제한
 C_SOFT = 0.30           # 벽 여유(레이스라인 자체가 0.30)
 C_SOFT_OBS = 0.45       # 장애물 여유
@@ -138,6 +145,14 @@ class Race(Node):
 
         self.tfb = tf2_ros.Buffer()
         self.tfl = tf2_ros.TransformListener(self.tfb, self, spin_thread=True)   # TF 는 전용 스레드
+        if a.odom:
+            # odom 모드: map = odom 항등 static TF (RViz 의 map 고정 프레임에서 경로/차량 화살표 표시용)
+            self.stf = tf2_ros.StaticTransformBroadcaster(self)
+            st = TransformStamped()
+            st.header.frame_id = 'map'
+            st.child_frame_id = 'odom'
+            st.transform.rotation.w = 1.0
+            self.stf.sendTransform(st)
         cg_ctrl = MutuallyExclusiveCallbackGroup()
         cg_sens = MutuallyExclusiveCallbackGroup()
         cg_plan = MutuallyExclusiveCallbackGroup()
@@ -170,7 +185,7 @@ class Race(Node):
         self.recover_steer = 0.0
         self.stat = {}
         self.raw = []              # (t, Nx2) 벽 포함 라이다 점
-        self.kdt_raw = None
+        self.raw_dt = None
         self.tight_static = False
         self.t_log = 0.0
         # 플래너(느릴 수 있음)와 제어(40Hz)를 다른 스레드에서 -> 계획 중에도 조향 갱신 유지
@@ -310,13 +325,22 @@ class Race(Node):
 
     # ---------- 로컬 장애물 clearance ----------
     def build_raw(self, x, y):
+        """벽 포함 라이다 점 -> 1cm 격자 거리표(창 ±RAW_HALF). KD-tree 반복 질의보다 훨씬 빠름"""
         pts = [p for _, p in self.raw if len(p)]
-        self.kdt_raw = None
-        if pts:
-            P = np.vstack(pts)
-            P = P[(np.abs(P[:, 0] - x) < 4.0) & (np.abs(P[:, 1] - y) < 4.0)]
-            if len(P):
-                self.kdt_raw = cKDTree(np.unique(np.round(P / 0.01).astype(np.int64), axis=0) * 0.01)
+        self.raw_dt = None
+        if not pts:
+            return
+        P = np.vstack(pts)
+        n = int(2 * RAW_HALF / RAW_RES)
+        self.raw_origin = (x - RAW_HALF, y - RAW_HALF)
+        ix = ((P[:, 0] - self.raw_origin[0]) / RAW_RES).astype(int)
+        iy = ((P[:, 1] - self.raw_origin[1]) / RAW_RES).astype(int)
+        k = (ix >= 0) & (ix < n) & (iy >= 0) & (iy < n)
+        if not k.any():
+            return
+        g = np.ones((n, n), bool)
+        g[iy[k], ix[k]] = False
+        self.raw_dt = ndimage.distance_transform_edt(g) * RAW_RES
 
     def build_dyn(self, x, y):
         pts = [p for _, p in self.obs if len(p)]
@@ -350,11 +374,14 @@ class Race(Node):
         """(정적맵 clearance, 장애물 clearance)"""
         cm = self.m.clear(P)
         c = cm - STATIC_BIAS
-        if self.tight_static and self.kdt_raw is not None:
+        if self.tight_static and self.raw_dt is not None:
             # 빠듯한 기준: 지도 래스터 오차(박스-벽 게이트에서 ~0.02 좁게 잡힘) 대신 라이다 실측 거리
             nr = cm < 0.30
             if nr.any():
-                dr = self.kdt_raw.query(P[nr], k=1, workers=-1)[0]
+                Q = P[nr]
+                ox, oy = self.raw_origin
+                dr = ndimage.map_coordinates(self.raw_dt, [(Q[:, 1] - oy) / RAW_RES, (Q[:, 0] - ox) / RAW_RES],
+                                             order=1, mode='constant', cval=9.0)
                 seen = dr < cm[nr] + 0.05          # 라이다가 그 벽면을 실제로 본 경우만(안 보이면 지도값 유지)
                 c[nr] = np.where(seen, np.clip(dr, cm[nr] - STATIC_BIAS, cm[nr] + RAW_UP), cm[nr] - STATIC_BIAS)
         if self.dyn is None:
@@ -823,17 +850,49 @@ def curvature_open(P):
     return ndimage.uniform_filter1d(k, 5)
 
 
+def stop_car(node, n=10):
+    """정지 명령(속도 0) 반복 발행: Gazebo 플러그인은 마지막 명령을 유지하므로 종료 전에 반드시 필요"""
+    node.go = False
+    for _ in range(n):
+        try:
+            node.pub.publish(Twist())
+        except Exception:
+            return
+        time.sleep(0.03)
+
+
 def main():
+    ws = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    base = os.path.join(ws, 'maps', 'exam', 'map')
     ap = argparse.ArgumentParser()
-    ap.add_argument('--map', required=True)
-    ap.add_argument('--line', required=True)
+    ap.add_argument('--map', default=base + '.yaml')
+    ap.add_argument('--line', default=None, help='기본: MAP_raceline.csv')
     ap.add_argument('--init', nargs=3, type=float)
-    ap.add_argument('--traj', default=None, help='매핑 주행 궤적(지도 미관측 보정)')
+    ap.add_argument('--traj', default=None, help='매핑 주행 궤적(지도 미관측 보정). 기본: MAP_traj.csv')
     ap.add_argument('--go', action='store_true')
-    ap.add_argument('--odom', action='store_true', help='지도 프레임=odom (odom_mapper 지도, AMCL 미사용)')
+    ap.add_argument('--odom', action='store_true', help='(호환용) --init 없으면 항상 odom 모드')
     a = ap.parse_args()
-    rclpy.init()
+    stem = os.path.splitext(a.map)[0]
+    if a.line is None:
+        a.line = stem + '_raceline.csv'
+    if a.traj is None and os.path.exists(stem + '_traj.csv'):
+        a.traj = stem + '_traj.csv'
+    a.odom = a.init is None
+    # Ctrl+C 를 rclpy 가 가로채 통신을 먼저 끊지 않게: KeyboardInterrupt 로 받아 정지 명령을 보낸 뒤 종료
+    rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     node = Race(a)
+    try:
+        run(node, a)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        stop_car(node)
+        print('\n정지 명령 발행 후 종료', flush=True)
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+def run(node, a):
     if a.init:
         # AMCL 이 구독 시작 + map->odom TF 가 나올 때까지 반복 발행
         t0 = time.time()
@@ -862,19 +921,13 @@ def main():
                 return
             node.go = True
         threading.Thread(target=wait_enter, daemon=True).start()
+    ex = MultiThreadedExecutor(num_threads=4)
+    ex.add_node(node)
     try:
-        ex = MultiThreadedExecutor(num_threads=4)
-        ex.add_node(node)
         ex.spin()
-    except KeyboardInterrupt:
-        pass
     finally:
-        try:
-            node.pub.publish(Twist())
-        except Exception:
-            pass
-        if rclpy.ok():
-            rclpy.shutdown()
+        node.go = False
+        ex.shutdown(timeout_sec=0.5)
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -72,6 +72,9 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        # 시험장 오프라인(Wi-Fi 없음/학교망 혼선) 대비: ROS2·Gazebo 통신을 이 PC 내부로 한정
+        SetEnvironmentVariable("ROS_LOCALHOST_ONLY", "1"),
+        SetEnvironmentVariable("GAZEBO_IP", "127.0.0.1"),
         DeclareLaunchArgument("world", default_value=default_world),
         DeclareLaunchArgument("spawn_x", default_value="0.0"),
         # One 1 m grid cell above the green +Y start line, facing +X.
