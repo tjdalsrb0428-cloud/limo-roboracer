@@ -187,7 +187,13 @@ def _unused_get_pose(timeout=10.0):
     return pose
 
 
+def _interrupt(*_):
+    raise KeyboardInterrupt
+
+
 def main():
+    signal.signal(signal.SIGHUP, _interrupt)      # 터미널 창 닫힘
+    signal.signal(signal.SIGTERM, _interrupt)
     ap = argparse.ArgumentParser()
     ap.add_argument('--world', default='')
     ap.add_argument('--no-gui', action='store_true')
@@ -286,10 +292,18 @@ def main():
                                    '--map', map_yaml, '--line', line] + targ +
                   (['--init', f"{pose[0]:.4f}", f"{pose[1]:.4f}", f"{pose[2]:.4f}"] if use_amcl else ['--odom']))
     except KeyboardInterrupt:
-        say('중단 - 백그라운드 프로세스 정리')
+        say('중단')
+    finally:
+        # 여기 도달 = 드라이버 실행(exec) 전에 끝남(에러/중단/터미널 닫힘): 남은 Gazebo·매퍼 정리
+        # (남겨두면 재실행 시 두 개가 충돌)
+        if PROCS:
+            say('백그라운드 프로세스 정리 (Gazebo/매퍼 종료)')
         for n, p in PROCS:
             if p.poll() is None:
-                os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+                try:
+                    os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+                except Exception:
+                    pass
 
 
 if __name__ == '__main__':
