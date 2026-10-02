@@ -34,7 +34,7 @@ from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy, qos_profile_sensor_data
 from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped, TransformStamped
-from nav_msgs.msg import Path, Odometry
+from nav_msgs.msg import Path, Odometry, OccupancyGrid
 from sensor_msgs.msg import LaserScan
 import tf2_ros
 
@@ -165,6 +165,9 @@ class Race(Node):
         self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data, callback_group=cg_sens)
         self.create_subscription(Odometry, '/odom', self.on_odom, 10, callback_group=cg_ctrl)
         self.pub_line.publish(self.to_path(self.R[::4]))
+        # 불러온 지도를 /map 으로 발행(저장된 지도로 시작할 때 RViz 에 지도 표시. 매퍼가 없을 때만 의미)
+        self.pub_map = self.create_publisher(OccupancyGrid, '/map', qtl)
+        self.pub_map.publish(self.map_msg(a.map))
 
         self.v_meas = 0.0
         self.m2o = None
@@ -193,6 +196,25 @@ class Race(Node):
         self.create_timer(0.025, self.control_step, callback_group=cg_ctrl)
 
     # ---------- 유틸 ----------
+    @staticmethod
+    def map_msg(yml):
+        import yaml
+        from PIL import Image
+        y = yaml.safe_load(open(yml))
+        p = y['image'] if os.path.isabs(y['image']) else os.path.join(os.path.dirname(os.path.abspath(yml)), y['image'])
+        img = np.array(Image.open(p).convert('L'))[::-1]          # 아래쪽 행이 원점
+        g = np.full(img.shape, -1, np.int8)
+        g[img >= 250] = 0
+        g[img <= 50] = 100
+        m = OccupancyGrid()
+        m.header.frame_id = 'map'
+        m.info.resolution = float(y['resolution'])
+        m.info.height, m.info.width = img.shape
+        m.info.origin.position.x, m.info.origin.position.y = float(y['origin'][0]), float(y['origin'][1])
+        m.info.origin.orientation.w = 1.0
+        m.data = g.ravel().tolist()
+        return m
+
     def now(self):
         return self.get_clock().now().nanoseconds * 1e-9
 
