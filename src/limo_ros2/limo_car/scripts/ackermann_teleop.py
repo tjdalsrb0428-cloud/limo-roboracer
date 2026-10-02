@@ -5,7 +5,7 @@ import sys
 import termios
 import tty
 
-os.environ.setdefault('ROS_LOCALHOST_ONLY', '1')   # Gazebo 런치와 같은 localhost 전용 통신
+os.environ['ROS_LOCALHOST_ONLY'] = '1'   # Gazebo 런치와 같은 localhost 전용 통신
 import rclpy  # noqa: E402
 from rclpy.node import Node
 from geometry_msgs.msg import Twist

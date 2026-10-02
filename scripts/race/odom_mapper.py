@@ -15,7 +15,7 @@ import time
 import signal
 import numpy as np
 
-os.environ.setdefault('ROS_LOCALHOST_ONLY', '1')     # 오프라인(Wi-Fi 없음)에서도 통신
+os.environ['ROS_LOCALHOST_ONLY'] = '1'     # 오프라인(Wi-Fi 없음)에서도 통신
 import rclpy  # noqa: E402
 from rclpy.node import Node  # noqa: E402
 from rclpy.time import Time  # noqa: E402

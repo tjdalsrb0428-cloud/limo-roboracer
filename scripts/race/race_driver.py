@@ -24,7 +24,7 @@ from scipy import ndimage
 from scipy.interpolate import CubicSpline
 from scipy.spatial import cKDTree
 
-os.environ.setdefault('ROS_LOCALHOST_ONLY', '1')     # 오프라인(Wi-Fi 없음)에서도 통신
+os.environ['ROS_LOCALHOST_ONLY'] = '1'     # 오프라인(Wi-Fi 없음)에서도 통신
 import rclpy  # noqa: E402
 from rclpy.signals import SignalHandlerOptions  # noqa: E402
 from rclpy.node import Node  # noqa: E402
