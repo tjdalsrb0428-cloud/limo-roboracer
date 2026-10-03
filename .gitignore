@@ -9,3 +9,4 @@ logs/exam/
 **/__pycache__/
 archive/old_logs/*.log
 archive/old_logs/*.txt
+/*.world
