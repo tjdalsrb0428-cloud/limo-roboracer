@@ -20,12 +20,12 @@ python3 scripts/race/exam.py --world 파일.world    # world 파일을 ws 안에
 2. 출발 위치/방향에 세운다(Gazebo Ctrl+R로 초기 위치 복귀해도 된다) → **엔터**.
 3. 지도 저장 → 레이스라인 생성(2~15초) → `READY`가 뜨면 "시작"과 함께 **엔터**를 친다. 무한 랩을 돈다.
 
-### B. 단계별 실행 (터미널 2개)
+### B. 단계별 실행 (터미널 3개, 시험에서 사용)
 
 **터미널 1** (Gazebo, 끝날 때까지 그대로 둔다):
 ```bash
 cd /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble
-ros2 launch limo_car roboracer_sim.launch.py world:=/home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/파일.world
+ros2 launch limo_car roboracer_sim.launch.py world:=$PWD/FILE.world
 ```
 Q1 기본 트랙이면 `world:=...`를 생략한다.
 
@@ -36,9 +36,16 @@ python3 scripts/race/odom_mapper.py
 python3 scripts/race/raceline.py
 python3 scripts/race/race_driver.py
 ```
-1. `odom_mapper.py`: 키보드로 한 바퀴 돌고 출발 위치에 세운 뒤(Ctrl+R 가능) **엔터**를 친다. 지도와 출발 위치가 `maps/exam/map.*`에 저장된다.
+1. `odom_mapper.py`: 키보드로 한 바퀴 돌고 출발 위치에 세운 뒤(Gazebo Ctrl+R 가능) **Ctrl+C** → 정지 + 저장(`maps/exam/map.*`).
+   이름 지정: `odom_mapper.py maps/exam/이름` → `raceline.py maps/exam/이름.yaml` → `race_driver.py --map maps/exam/이름.yaml`.
 2. `raceline.py`: 레이스라인을 생성한다(인자 없이 위 지도와 출발 위치를 자동으로 쓴다).
-3. `race_driver.py`: `READY`가 뜨면 "시작"과 함께 **엔터**를 친다.
+3. `race_driver.py`: `READY`(RViz에 지도 + 파란 선)로 대기한다.
+
+**터미널 3** (출발):
+```bash
+cd /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble
+python3 scripts/race/go.py      # "시작"과 동시에 실행 → 약 0.1초 안에 출발
+```
 
 ## 종료
 
