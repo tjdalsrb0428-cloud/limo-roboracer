@@ -450,36 +450,51 @@ def avoid_dp(m, R, ds_st=0.3, verbose=True):
     INF = 1e9
     j0 = int(np.argmin(np.abs(offs)))
 
-    def run(c_hard):
-        cost = np.full(J, INF)
-        cost[j0] = 0.0
-        back = np.zeros((K + 1, J), int)
-        for k in range(1, K + 1):
-            A = nodes[(k - 1) % K]
-            B = nodes[k % K]
-            seg = A[:, None, None, :] * (1 - lam)[None, None, :, None] + B[None, :, None, :] * lam[None, None, :, None]
-            hd = np.arctan2(B[None, :, 1] - A[:, None, 1], B[None, :, 0] - A[:, None, 0])
-            cw, co = body(seg, np.broadcast_to(hd[:, :, None], seg.shape[:3]))
-            cm = np.minimum(cw, co).min(2)
-            dO = offs[None, :] - offs[:, None]
-            f_t = np.clip((0.25 - cm) / 0.08, 0, 1)
-            ec = ((0.6 + 80.0 * f_t) * dO ** 2 / ds_st + 0.6 * ds_st * offs[None, :] ** 2
-                  + ds_st * (40.0 * np.maximum(0, 0.30 - cw) ** 2 + 150.0 * np.maximum(0, 0.45 - co) ** 2).mean(2))
-            ec[(cm < c_hard) | (np.abs(dO) > 0.28 * ds_st / 0.4)] = INF
-            tot = cost[:, None] + ec
-            back[k] = np.argmin(tot, 0)
-            cost = tot[back[k], np.arange(J)]
-        if cost[j0] >= INF / 2:
+    # 정거장 사이 에지(from j -> to j) 기본 비용/여유는 기준과 무관 -> 한 번만 계산
+    dO = offs[None, :] - offs[:, None]
+    EC, CM = [], []
+    for k in range(1, K + 1):
+        A = nodes[(k - 1) % K]
+        B = nodes[k % K]
+        seg = A[:, None, None, :] * (1 - lam)[None, None, :, None] + B[None, :, None, :] * lam[None, None, :, None]
+        hd = np.arctan2(B[None, :, 1] - A[:, None, 1], B[None, :, 0] - A[:, None, 0])
+        cw, co = body(seg, np.broadcast_to(hd[:, :, None], seg.shape[:3]))
+        cm = np.minimum(cw, co).min(2)
+        f_t = np.clip((0.25 - cm) / 0.08, 0, 1)
+        ec = ((0.6 + 80.0 * f_t) * dO ** 2 / ds_st + 0.6 * ds_st * offs[None, :] ** 2
+              + ds_st * (40.0 * np.maximum(0, 0.30 - cw) ** 2 + 150.0 * np.maximum(0, 0.45 - co) ** 2).mean(2))
+        ec[np.abs(dO) > 0.28 * ds_st / 0.4] = INF
+        EC.append(ec)
+        CM.append(cm)
+    # 2차 DP: 상태 = (직전 정거장 오프셋, 현재 오프셋) -> 세 점으로 곡률 계산, 차량이 돌 수 있는 곡률만 허용
+    # 곡률 ~= k_ref/(1 - k_ref*o) + o'' (o'' = 오프셋 2차 차분/ds^2)
+    kref = curvature(Rs)
+    SD = offs[:, None, None] - 2 * offs[None, :, None] + offs[None, None, :]      # (a, b, c)
+    OPP = SD / ds_st ** 2
+    W_K = 0.05
+
+    def run(c_hard, klim):
+        E = [np.where(cm < c_hard, INF, ec) for ec, cm in zip(EC, CM)]
+        S = np.full((J, J), INF)
+        S[j0, :] = E[0][j0, :]
+        backs = [None, None]
+        for k in range(2, K + 1):
+            kr = kref[(k - 1) % K]
+            kk = (kr / np.maximum(1 - kr * offs, 0.2))[None, :, None] + OPP
+            curv = np.where(np.abs(kk) > klim, INF, W_K * ds_st * OPP ** 2)
+            T = S[:, :, None] + curv + E[k - 1][None, :, :]
+            b = np.argmin(T, 0)                                   # (b, c) -> 최적 a
+            S = np.take_along_axis(T, b[None], 0)[0]
+            backs.append(b)
+        if S[:, j0].min() >= INF / 2:
             return None
-        seq = [j0]
-        j = j0
-        for k in range(K, 1, -1):
-            j = back[k][j]
-            seq.append(j)
-        return np.array(seq[::-1])
+        seq = [j0, int(np.argmin(S[:, j0]))]                     # 정거장 K(=0), K-1
+        for k in range(K, 2, -1):
+            seq.append(int(backs[k][seq[-1], seq[-2]]))
+        return np.array([j0] + seq[::-1][:-1])                   # 정거장 0..K-1 (정거장 0 = 고정점)
     seq = None
-    for ch in (0.165, 0.142, 0.12):
-        seq = run(ch)
+    for ch, kl in ((0.165, 1.5), (0.142, 1.5), (0.165, 1.75), (0.142, 1.75), (0.12, 1.75), (0.12, 99.0)):
+        seq = run(ch, kl)
         if seq is not None:
             break
     if seq is None:
@@ -496,7 +511,7 @@ def avoid_dp(m, R, ds_st=0.3, verbose=True):
     o_f = np.where(ndimage.binary_dilation(bad, iterations=2), o, o_s)
     P = resample(Rs + N * o_f[:, None], step=0.1)[0]
     if verbose:
-        print(f'  장애물 회피 DP: 최대 오프셋 {np.abs(o_f).max():.2f}m, c_hard={ch}  {time.time() - t0:.1f}s')
+        print(f'  장애물 회피 DP: 최대 오프셋 {np.abs(o_f).max():.2f}m, c_hard={ch}, 곡률한도 {kl}  {time.time() - t0:.1f}s')
     return P
 
 
