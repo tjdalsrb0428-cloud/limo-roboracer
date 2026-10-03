@@ -35,6 +35,7 @@ from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy, qos_profile_sensor_data
 from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped, TransformStamped
 from nav_msgs.msg import Path, Odometry, OccupancyGrid
+from std_msgs.msg import Empty
 from sensor_msgs.msg import LaserScan
 import tf2_ros
 
@@ -164,6 +165,8 @@ class Race(Node):
         self.pub_init = self.create_publisher(PoseWithCovarianceStamped, '/initialpose', 1)
         self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data, callback_group=cg_sens)
         self.create_subscription(Odometry, '/odom', self.on_odom, 10, callback_group=cg_ctrl)
+        # 출발 신호(/race/go): python3 scripts/race/go.py 또는 ros2 topic pub --once /race/go std_msgs/msg/Empty
+        self.create_subscription(Empty, '/race/go', self.on_go, 10, callback_group=cg_ctrl)
         self.pub_line.publish(self.to_path(self.R[::4]))
         # 불러온 지도를 /map 으로 발행(저장된 지도로 시작할 때 RViz 에 지도 표시. 매퍼가 없을 때만 의미)
         self.pub_map = self.create_publisher(OccupancyGrid, '/map', qtl)
@@ -281,6 +284,10 @@ class Race(Node):
         self.pub_init.publish(msg)
 
     # ---------- 센서 ----------
+    def on_go(self, _):
+        if not self.go:
+            self.go = True
+
     def on_odom(self, m):
         self.v_meas = m.twist.twist.linear.x
 
@@ -891,7 +898,8 @@ def main():
     ap.add_argument('--line', default=None, help='기본: MAP_raceline.csv')
     ap.add_argument('--init', nargs=3, type=float)
     ap.add_argument('--traj', default=None, help='매핑 주행 궤적(지도 미관측 보정). 기본: MAP_traj.csv')
-    ap.add_argument('--go', action='store_true')
+    ap.add_argument('--go', action='store_true', help='대기 없이 바로 출발(테스트용)')
+    ap.add_argument('--enter', action='store_true', help='엔터로 출발(exam.py 통합 실행용)')
     ap.add_argument('--odom', action='store_true', help='(호환용) --init 없으면 항상 odom 모드')
     a = ap.parse_args()
     stem = os.path.splitext(a.map)[0]
@@ -934,8 +942,11 @@ def run(node, a):
     while rclpy.ok() and (node.plan is None) and time.time() - t0 < 30:
         node.update_m2o()
         rclpy.spin_once(node, timeout_sec=0.05)
-    print('READY' + ('' if a.go else ' - 엔터를 누르면 즉시 출발'), flush=True)
-    if not a.go:
+    if a.go:
+        print('READY', flush=True)
+    elif a.enter:                      # 통합 실행(exam.py): 엔터로 출발
+        print('READY - 엔터를 누르면 즉시 출발', flush=True)
+
         def wait_enter():
             try:
                 input()
@@ -943,6 +954,8 @@ def run(node, a):
                 return
             node.go = True
         threading.Thread(target=wait_enter, daemon=True).start()
+    else:                              # 단계별 실행: 다른 터미널에서 출발 명령 실행
+        print('READY - 다른 터미널에서 출발 명령:  python3 scripts/race/go.py', flush=True)
     ex = MultiThreadedExecutor(num_threads=4)
     ex.add_node(node)
     try:

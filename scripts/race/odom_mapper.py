@@ -2,7 +2,7 @@
 """odom 기반 점유격자 매핑 (위치를 아는 매핑: 시뮬 odom = 정확한 위치)
 
   python3 scripts/race/odom_mapper.py [OUT_BASE]     (기본 OUT_BASE = maps/exam/map)
-    - 터미널에서 직접 실행하면 키보드 조종 가능(u/i/o, ,), 엔터 = 정지 + 저장 + 종료
+    - 터미널에서 직접 실행하면 키보드 조종 가능(u/i/o, ,), Ctrl+C = 정지 + 저장 + 종료
     - Ctrl+C(SIGINT) 도 저장 후 종료
   저장: OUT_BASE.pgm/.yaml + OUT_BASE_traj.csv (마지막 행 = 종료 시점 /odom pose = 출발 pose)
 map 프레임 = odom 프레임 (static TF map->odom 항등 발행, /map 1Hz 발행 -> RViz 확인용)
@@ -28,7 +28,7 @@ import tf2_ros  # noqa: E402
 
 WS = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 RES = 0.025
-SIZE_X, SIZE_Y = 36.0, 24.0
+SIZE_X, SIZE_Y = 60.0, 60.0      # 출발점 기준 ±30 m (큰 트랙도 잘리지 않게; 저장/발행은 그린 영역만)
 L_FREE, L_OCC, L_MIN, L_MAX = -0.4, 0.9, -2.0, 3.5
 MISS_LEN = 5.0
 PENDING = 5             # 반영 지연 스캔 수(약 0.5s): 리셋 순간의 잘못된 스캔이 지도에 찍히기 전에 버림
@@ -38,7 +38,7 @@ SKIP_AFTER = 1.0        # 리셋 감지 후 스캔 무시 시간(벽시계 s)
 TELEOP_HELP = '''
   [매핑 조종]  u i o  : 좌전진 / 전진 / 우전진
                m , .  : 좌후진 / 후진 / 우후진
-               k : 정지   q/z 속도 +/-   w/x 조향 +/-   엔터 = 매핑 끝(정지 후 저장)
+               k : 정지   q/z 속도 +/-   w/x 조향 +/-   Ctrl+C = 매핑 끝(정지 후 저장)
 '''
 
 
@@ -148,14 +148,26 @@ class Mapper(Node):
     def publish(self):
         if self.origin is None:
             return
+        # 그린 영역(관측된 칸)만 잘라 발행: 60 m 격자 전체를 매초 보내면 느림
+        rows = np.nonzero(np.any(self.L != 0, axis=1))[0]
+        cols = np.nonzero(np.any(self.L != 0, axis=0))[0]
+        if len(rows) == 0:
+            return
+        r0, r1 = max(rows[0] - 10, 0), min(rows[-1] + 11, self.ny)
+        c0, c1 = max(cols[0] - 10, 0), min(cols[-1] + 11, self.nx)
+        p = 1 - 1 / (1 + np.exp(self.L[r0:r1, c0:c1]))
+        g = np.full(p.shape, -1, np.int8)
+        g[p < 0.35] = 0
+        g[p > 0.65] = 100
         m = OccupancyGrid()
         m.header.frame_id = 'map'
         m.header.stamp = self.get_clock().now().to_msg()
         m.info.resolution = RES
-        m.info.width, m.info.height = self.nx, self.ny
-        m.info.origin.position.x, m.info.origin.position.y = self.origin
+        m.info.height, m.info.width = g.shape
+        m.info.origin.position.x = self.origin[0] + c0 * RES
+        m.info.origin.position.y = self.origin[1] + r0 * RES
         m.info.origin.orientation.w = 1.0
-        m.data = self.grid().ravel().tolist()
+        m.data = g.ravel().tolist()
         self.pub.publish(m)
 
     def save(self):
@@ -225,8 +237,6 @@ def main():
             r, _, _ = select.select([sys.stdin], [], [], 0.0)
             if r:
                 c = sys.stdin.read(1)
-                if c in ('\n', '\r'):
-                    break
                 if c in keys:
                     a, b = keys[c]
                     v, w = a * speed, b * turn

@@ -289,7 +289,7 @@ def main():
         say(f'5) 드라이버 실행 (준비 총 {time.time() - t_all:.0f}s). READY 후 엔터 = 즉시 출발')
         sys.stdout.flush()
         os.execvp(sys.executable, [sys.executable, '-u', os.path.join(WS, 'scripts/race/race_driver.py'),
-                                   '--map', map_yaml, '--line', line] + targ +
+                                   '--map', map_yaml, '--line', line, '--enter'] + targ +
                   (['--init', f"{pose[0]:.4f}", f"{pose[1]:.4f}", f"{pose[2]:.4f}"] if use_amcl else ['--odom']))
     except KeyboardInterrupt:
         say('중단')
