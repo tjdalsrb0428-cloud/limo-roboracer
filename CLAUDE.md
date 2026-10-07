@@ -151,6 +151,7 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - Pure pursuit(후륜축 기준, base_link 뒤 0.12 m): κ = 2·sinα / L_d, ω = v·κ (어댑터가 δ = atan(L·κ)로 변환), |κ| ≤ 1/0.56.
 - L_d = clip(0.25 + 0.55·max(|v|, 0.8·v_ref), 0.35, 0.85) × (0.6 + 0.4·여유비), 최소 0.22(TIGHT)/0.28.
 - 속도 프로파일: v ≤ min(1.0, √(2.2/κ), 0.35 + 0.65·여유비) → 뒤→앞 감속 1.8 m/s², 앞→뒤 가속 2.0 m/s². 명령은 min(v_ref, √(2.2/|κ|)), 방향 오차 > 1.4 rad면 0.3.
+  **2026-10-07부터 기본 = 감속 없음**: 여유비 항(0.35+0.65·여유비)과 TIGHT 0.2 m/s를 끈다(곡률 제한, BLOCK 0.5·정지는 유지). 예전 동작은 `race_driver.py --slow`. ifac_roboracer_obstacles_1에서 무충돌, 랩타임 단축 확인.
   여유비 = min(clip((벽−c)/(0.28−c)), clip((장애물−c)/(0.40−c))).
 - 계획(cg_plan)·제어(cg_ctrl)·센서(cg_sens) 콜백 그룹 분리 + MultiThreadedExecutor(4), TF 리스너 전용 스레드.
   (단일 스레드였을 때 계획이 제어를 막아 지연된 자세로 장애물이 번지던 문제 → 가장 큰 개선)

@@ -67,7 +67,7 @@ C_TIGHT = 0.142         # 막혔을 때만: 0.35m 틈 통과용 빠듯한 기준
 V_TIGHT = 0.2           # 빠듯한 기준 경로 속도 상한
 TIGHT_PAD = 1.6         # 빠듯한 구간 앞뒤 저속 여유(m)
 V_BLOCKED = 0.5         # 앞이 막혀 보일 때 속도 상한
-NO_SLOW = False         # --no-slow: 여유 기반 감속·TIGHT 저속 끔(곡률 제한·막힘 정지는 유지)
+NO_SLOW = True          # 기본: 여유 기반 감속·TIGHT 저속 끔(곡률 제한·막힘 정지는 유지). --slow 로 켬
 C_START = 0.12          # 현재 위치 근처(첫 구간 앞부분)는 완화: 이미 가까워도 빠져나갈 경로 허용
 DYN_RES = 0.025
 STATIC_BIAS = 0.03      # 점유격자 셀중심 거리 -> 실제 벽면 거리 보정
@@ -903,10 +903,10 @@ def main():
     ap.add_argument('--go', action='store_true', help='대기 없이 바로 출발(테스트용)')
     ap.add_argument('--enter', action='store_true', help='엔터로 출발(exam.py 통합 실행용)')
     ap.add_argument('--odom', action='store_true', help='(호환용) --init 없으면 항상 odom 모드')
-    ap.add_argument('--no-slow', action='store_true', help='좁은 곳 감속 끔(테스트용)')
+    ap.add_argument('--slow', action='store_true', help='좁은 곳 감속 켬(예전 기본 동작)')
     a = ap.parse_args()
     global NO_SLOW
-    NO_SLOW = a.no_slow
+    NO_SLOW = not a.slow
     stem = os.path.splitext(a.map)[0]
     if a.line is None:
         a.line = stem + '_raceline.csv'
