@@ -74,7 +74,7 @@ python3 scripts/race/go.py                 # "시작"과 동시에 엔터 → �
 | `record_traj.py` | (`exam.py --carto` 전용) cartographer 매핑 궤적 기록 |
 
 수정한 패키지 파일:
-- `src/limo_ros2/limo_car/gazebo/ackermann.xacro`: ackermann 플러그인 max_speed 0.5→1.0, 차체 충돌박스 x/y 뒤바뀜 수정(0.31×0.19)
+- `src/limo_ros2/limo_car/gazebo/ackermann.xacro`: ackermann 플러그인 max_speed 0.5→1.0, 차체 충돌박스는 수업 배포본(2026-10-07) 값 0.19×0.31 사용(예전엔 0.31×0.19로 고쳐 썼음, 배포본으로도 ifac_roboracer_obstacles_1 무충돌)
 - `ackermann_twist_adapter.py`: max_speed 1.0 (Twist 회전속도 → 조향각 변환)
 - `launch/roboracer_sim.launch.py`: `gui` 인자, `ROS_LOCALHOST_ONLY=1`, `GAZEBO_IP=127.0.0.1` 설정(오프라인/학교망 혼선 대비). 스폰 (0, 1, yaw 0) = 출발선
 - `rviz/gazebo.rviz`: Map, LaserScan, Raceline(/race/raceline 파랑), Local Path(/race/local_path 초록), Car Pose(/odom 주황 화살표)
