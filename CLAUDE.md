@@ -199,6 +199,7 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - Ctrl+C 후 계속 직진 → 정지 명령 발행. Ctrl+R 리셋 시 유령 벽 → 지연 반영/폐기.
 - exam.py 중단 시 매퍼/Gazebo 고아 프로세스 → 항상 정리(SIGHUP/SIGTERM 포함).
 - 저장 지도로 시작 시 RViz 지도 없음 → 드라이버가 /map 발행. 큰 트랙 지도 잘림 → 60×60 m.
+- 드라이버 시작 시 `AttributeError: 'Race' object has no attribute 'm2o'`(GUI 부하 때 발생): TF 리스너 스레드가 노드 전체 콜백을 돌려 초기화 중 /scan 이 먼저 처리됨 → TF 리스너를 `__init__` 맨 끝에서 시작(2026-10-09).
 
 ## 10. 테스트 하네스 (.sim_tmp/, gitignore)
 - `batch.sh TAG world...`(결과 `.sim_tmp/batch_TAG.txt`), `pipeline_test.sh WORLD TAG RUNSEC MAPPATH`(env: RESET=1 리셋 포함, FV=매핑 속도, RUNSEC, GUI=1).
