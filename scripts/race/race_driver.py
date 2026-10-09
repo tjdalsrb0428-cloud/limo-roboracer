@@ -145,8 +145,6 @@ class Race(Node):
         self.n = len(self.s)
         self.get_logger().info(f'레이스라인 {self.L:.2f}m, 최대곡률 {np.abs(self.kap).max():.2f}')
 
-        self.tfb = tf2_ros.Buffer()
-        self.tfl = tf2_ros.TransformListener(self.tfb, self, spin_thread=True)   # TF 는 전용 스레드
         if a.odom:
             # odom 모드: map = odom 항등 static TF (RViz 의 map 고정 프레임에서 경로/차량 화살표 표시용)
             self.stf = tf2_ros.StaticTransformBroadcaster(self)
@@ -198,6 +196,10 @@ class Race(Node):
         # 플래너(느릴 수 있음)와 제어(40Hz)를 다른 스레드에서 -> 계획 중에도 조향 갱신 유지
         self.create_timer(0.1, self.plan_step, callback_group=cg_plan)
         self.create_timer(0.025, self.control_step, callback_group=cg_ctrl)
+        # TF 전용 스레드는 노드의 다른 콜백(/scan 등)도 돌리므로, 상태 변수를 모두 만든 뒤 마지막에 시작
+        # (먼저 시작하면 초기화 도중 도착한 스캔이 on_scan 에서 AttributeError -> TF 스레드 종료)
+        self.tfb = tf2_ros.Buffer()
+        self.tfl = tf2_ros.TransformListener(self.tfb, self, spin_thread=True)   # TF 는 전용 스레드
 
     # ---------- 유틸 ----------
     @staticmethod
