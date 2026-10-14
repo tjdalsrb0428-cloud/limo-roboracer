@@ -20,7 +20,13 @@ Nav2/AMCL/cartographer 없이 `scripts/race/`의 자체 구현으로 동작한�
 ## 2. 시험 규정
 - 순서: Q1 준비 5분 → Q1 주행 5분 → Q2 준비 5분 → Q2 주행 5분. 준비 초과 시 실패.
 - Q1: 장애물 없는 맵, Q2: 장애물 있는 맵(0.65 m 정육면체 3개, 벽과 틈 0.35 m 기준). 심사위원이 USB로 .world 3개 제공, 학생이 하나 골라 배포.
-- 트랙은 처음 보는 맵 → 현장 매핑부터. 알고리즘 자유(오픈소스/Claude 허용). 인터넷·메모장·alias·단축키 금지, 명령은 직접 입력.
+- **매핑은 Q1(장애물 없는 맵)에서만.** Q2는 Q1과 같은 트랙 + 랜덤 장애물이고 매핑 금지 → Q1 지도·레이스라인을 그대로 불러와
+  local planner(라이다 실시간 장애물 인식)로 회피 주행(2026-10-14 확인된 규정). Q2 world는 Q1과 같은 트랙을 골라야 함.
+- 트랙은 처음 보는 맵 → Q1 현장 매핑부터. 알고리즘 자유(오픈소스/Claude 허용). 인터넷·메모장·alias·단축키 금지, 명령은 직접 입력.
+- 시험은 본인 노트북. 조교 공지 "시험 때 컨테이너에 있던 것 다 지운다" — 범위 미확인(조교에게 확인 필요).
+  컨테이너는 조교 이미지 `yspark98/limo:gazebo_humble` 기반이고, 원본 이미지에는 scikit-image 없음(raceline.py 필요), numpy 1.21/scipy 1.8, pip 없음.
+  지금 컨테이너에 추가 설치돼 있음(numpy 1.26, scipy 1.15, skimage 0.25). 컨테이너를 원본으로 재생성해야 하면 그 전에 `docker commit`으로 이미지 저장 필요.
+  ws(호스트 마운트)는 컨테이너 삭제와 무관.
 - "시작"과 동시에 랩타임 측정(심사위원 스톱워치, Gazebo 화면 보면서). 무한 랩으로 돌리다 학생이 Ctrl+C로 정지.
   출발선/완주 인지·자동정지 로직은 넣지 않음(심사위원마다 측정 방식이 다름).
 
@@ -33,32 +39,45 @@ Nav2/AMCL/cartographer 없이 `scripts/race/`의 자체 구현으로 동작한�
 | D | USB → ws 복사 | 호스트 |
 
 ```bash
-# D (호스트): USB world 복사
+# ===== Q1: 장애물 없는 맵 (매핑 + 주행) =====
+# D (호스트): USB world 복사 (Q1, Q2 같이)
 ls /media/mksung0428/ ; ls /media/mksung0428/USB이름/
-cp /media/mksung0428/USB이름/FILE.world /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/
+cp /media/mksung0428/USB이름/Q1파일.world /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/
+cp /media/mksung0428/USB이름/Q2파일.world /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble/
 # A
 xhost +local:docker
 docker start -ai limo_gazebo_humble
 cd /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble
-ros2 launch limo_car roboracer_sim.launch.py world:=$PWD/FILE.world     # 기본 트랙이면 world:= 생략
+ros2 launch limo_car roboracer_sim.launch.py world:=$PWD/Q1파일.world   # 기본 트랙이면 world:= 생략
 # B
 docker exec -it limo_gazebo_humble bash
 cd /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble
-python3 scripts/race/odom_mapper.py        # 키보드로 한 바퀴 → Gazebo Ctrl+R(출발선 복귀) → 터미널 B에서 Ctrl+C(정지+저장)
-python3 scripts/race/raceline.py           # global path 생성
-python3 scripts/race/race_driver.py        # READY 대기(RViz에 지도+파란 선)
+python3 scripts/race/odom_mapper.py maps/exam/q          # 키보드로 한 바퀴 → Gazebo Ctrl+R(출발선 복귀) → 터미널 B에서 Ctrl+C(정지+저장)
+python3 scripts/race/raceline.py maps/exam/q.yaml        # global path 생성
+python3 scripts/race/race_driver.py --map maps/exam/q.yaml   # READY 대기(RViz에 지도+파란 선)
 # C
 docker exec -it limo_gazebo_humble bash
 cd /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble
 python3 scripts/race/go.py                 # "시작"과 동시에 엔터 → 약 0.1초 안에 출발
 # 정지: B Ctrl+C(속도 0 발행 후 종료) → A Ctrl+C. 남으면: pkill -9 -f gzserver; pkill -9 -f gzclient; pkill -9 -f rviz2
+
+# ===== Q2: 장애물 있는 맵 (매핑 없음, Q1 지도 사용) =====
+# A
+ros2 launch limo_car roboracer_sim.launch.py world:=$PWD/Q2파일.world
+# B  (odom_mapper·raceline 치지 않음)
+python3 scripts/race/race_driver.py --map maps/exam/q.yaml
+# C
+python3 scripts/race/go.py
 ```
+- 매핑은 반드시 장애물 없는 world에서. 장애물 world에서 매핑하면 장애물이 지도에 벽으로 찍힘(2026-10-14 `ifac1` 지도가 이 상태였음 → RViz에 장애물 표시).
+- Q2 RViz: 회색 지도엔 장애물 없음이 정상. 파란 선(global)은 장애물을 관통, 초록 선(local)이 비켜 감.
+- 드라이버는 `--map X.yaml`이면 `X_raceline.csv`(global path), `X_traj.csv`를 자동 로드(`--line`으로 지정 가능).
 - 지도 이름 지정: `odom_mapper.py maps/exam/이름` → `raceline.py maps/exam/이름.yaml` → `race_driver.py --map maps/exam/이름.yaml`.
   이름 생략 시 `maps/exam/map.*`(매번 덮어씀). 저장된 지도로 시작하면 매핑 생략 가능(Gazebo world가 지도와 같은 맵이어야 함).
 - 저장해 둔 지도: `maps/exam/q1.yaml`(기본 트랙), `maps/exam/obs6.yaml`(obs6). `maps/exam/`는 gitignore, 컨테이너(root) 소유.
 - 통합 실행(유지): `python3 scripts/race/exam.py [--world W.world]` → Gazebo~드라이버를 한 터미널에서, 매핑 끝·출발 모두 엔터(드라이버에 `--enter`).
   사용자 요청으로 통합본은 남겨두되 주로 단계별 실행을 쓴다.
-- 준비 시간: Gazebo 기동~READY 약 90~140초(매핑 한 바퀴가 대부분).
+- 준비 시간: Q1 Gazebo 기동~READY 약 90~140초(매핑 한 바퀴가 대부분), Q2 1분 이내.
 - 키보드(매퍼): i 전진, u/o 좌/우 전진, , 후진(m/. 좌/우 후진), k 정지, q/z 속도 ±(기본 0.5, 최대 0.8), w/x 조향 ±.
 
 ## 4. 파일 구조 (scripts/race)
@@ -176,6 +195,11 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 
 ## 7. 결과 (sim time, 무충돌)
 - Q1 기본 트랙 42.4 s/랩(처음 Nav2+TEB 92~99 s). 규정형 랜덤 장애물 맵(r1~r6, 박스 4~5개) 44.5~49.4 s, obs5 46.7 s, obs4(0.35 m 강제 게이트 2곳) 약 67 s.
+- **Q2 방식(장애물 없는 지도 + 장애물 world, 매핑 없음, GUI 끔, 2026-10-14)**: 모두 무충돌·탈출기동 0.
+  기본 트랙 q1 지도: 박스 r1~r6·obs5 43.2~47.8 s. 배포 `ifac_roboracer_obstacles_1` 6바퀴 42.8~43.8 s(장애물 최소 여유 0.04 m, 가장 빠듯).
+  생성 트랙(`.sim_tmp/tk`, 장애물 3개 박스/판 혼합, 5바퀴): 복잡 c1 61.8, c2 55.7, c3 55.8(최소 여유 0.08), c4 60.6 / 단순 s1 57.6, s2 52.9 s.
+  새 복잡 트랙 `cx_q1/cx_q2.world`(ws 루트)는 사용자가 직접 확인. Hybrid A* 탈출은 이 테스트들에서 발동 안 해 미검증.
+  사용자가 직접 5바퀴 중 장애물 충돌·Hybrid A* 이상 목격(장애물 찍힌 ifac1 지도 사용 시로 추정, GUI 부하 가능성) — 재현 안 됨, 원인 미확정.
 - 준비 90~140 s. Wi-Fi 끈 상태 완주, 리허설 트랙(~/Downloads/rehearsal_usb, 큰 트랙)에서 사용자 직접 검증.
 - 한계: 위치를 시뮬 정답(odom)에 의존(실차는 위치추정 필요). 0.35 m 틈은 0.2 m/s 통과라 랩 증가. 장애물 9개처럼 촘촘한 배치(obs6)는 가끔 접촉 — 시험은 박스 3개라 대상 외.
 
@@ -204,6 +228,9 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 ## 10. 테스트 하네스 (.sim_tmp/, gitignore)
 - `batch.sh TAG world...`(결과 `.sim_tmp/batch_TAG.txt`), `pipeline_test.sh WORLD TAG RUNSEC MAPPATH`(env: RESET=1 리셋 포함, FV=매핑 속도, RUNSEC, GUI=1).
 - `gt_follow.py`(GT odom으로 매핑 주행 대역), `collide.py WORLD SEC`(정답 위치 기준 충돌/최소 여유), `gtgrid.py`, `map_path.py`, `rand_world.py`(규정형 랜덤 world), `mix_world.py`(가운데/양옆 혼합), `flowB_test.sh`(단계별 실행 + Ctrl+C 정지 검증), `kill.sh`, `dx.sh`(컨테이너 실행, LOCALHOST 설정).
+- Q2 방식: `q2_test.sh WORLD_ABS TAG MAP RUNSEC [드라이버 인자]`(매핑 없이 저장 지도 + 장애물 world, 결과 한 줄).
+  `tk/gen.py NAME SEED complex|simple`(랜덤 트랙 Q1/Q2 world + 매핑 경로, 출발 (0,1)+x), `tk/tk_test.sh NAME`(GT 매핑→raceline→Q2 5바퀴, 결과 `tk/results.txt`).
+  `plate_world.py SEED OUT`(기본 트랙 판 3개 랜덤), `cx/make_worlds.py`(cx 트랙). collide.py는 `*obstacle_N` 판도 판정.
 - 시뮬 동시 실행 금지(같은 localhost 토픽 충돌). 테스트 중 사용자는 Gazebo 켜지 않기.
 
 ## 작업 원칙
@@ -211,10 +238,7 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - 큰 변경 전 커밋/백업, 한 단계씩 검증 후 진행.
 - 시험 준비 시간이 짧다는 것(5분)을 항상 고려: 명령은 짧게, 실패 시 대처가 바로 가능하게.
 
-## 다음 할 일 (2026-10-08 예정)
-- 배경(2026-10-07): 수업 배포 Obstacle Map `ifac_roboracer_obstacles_1.world`(ws 루트, gitignore). 장애물은 정육면체가 아니라 **얇은 판 3개**
-  (0.3×0.8 m 2개, 0.3×1.0 m 1개, 높이 0.6 m; pose (5,−0.09), (−3,3.05), (−8,1.15)). 감속 없음 기본값으로 이 맵 무충돌·랩타임 단축 확인.
-- 할 일: 배포본 크기 판 3개 랜덤 배치 world 6~8개 생성(기본 트랙 + ifac 트랙, 벽-판 0.35 m 틈 배치 포함) →
-  `pipeline_test.sh`로 감속 없음(기본) 테스트, 접촉 나오면 같은 맵 `--slow` 비교 → 맵별 랩타임/충돌/최소 여유(`collide.py`) 표로 정리.
-  예상 40~60분, 테스트 중 사용자는 Gazebo 켜지 않기.
-- 결과에 따라 기본값(감속 없음) 유지 여부 결정.
+## 다음 할 일
+- 조교에게 "컨테이너 다 지운다"의 범위 확인(컨테이너만 / ws까지). 원본 재생성이면 그 전에 `docker commit`(사용자는 지금은 불필요하다고 판단).
+- 사용자가 본 Q2 충돌·Hybrid A* 이상의 재현 조건 확인(지도, world, 바퀴, 로그 문구). 미확인 상태에선 코드 수정 안 함.
+- GitHub push 안 된 커밋 있음(사용자 요청 시 push).
