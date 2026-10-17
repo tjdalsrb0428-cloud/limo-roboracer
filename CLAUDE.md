@@ -249,14 +249,17 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - `--slow`(화면 켬, 사용자 지도): 배포 맵 5바퀴 + r1~r6·p1 무충돌, 44.4~49.6 s → **Q2는 `--slow` 권장**.
 - 충돌 후 탈출 실패: 장애물에 닿은 상태라 시작부터 충돌 판정 → Hybrid A* 즉시 실패, 후진 검사도 "공간 없음". (충돌 시 랩 초기화라 우선순위 낮음)
 - 차체: 배포본 충돌박스 0.19(앞뒤)×0.31(좌우) → Gazebo 차 폭 0.31인데 플래너는 0.265(원 반경 0.1325), collide.py도 0.26으로 판정. 미수정.
-- 시도 후 보류: 회피 방향 유지(장애물 덩어리별 좌/우 고정, W_SIDE 30) — 화면 끔 배포 맵 3바퀴 무충돌, 화면 켬 배포 맵 2바퀴째 충돌.
-  **작업 트리 race_driver.py에 미커밋 상태로 남아 있음**(백업 `.sim_tmp/race_driver_side2.py`). 원래 코드 = `git checkout scripts/race/race_driver.py`.
-  사용자가 이 코드로 새 지도 + 감속 없음 주행 시 무충돌 확인(1회).
+- 회피 방향 유지(장애물 덩어리가 4 m 안에 들어오면 좌/우 기록, 지나갈 때까지 반대쪽 W_SIDE 30 벌점) — 화면 끔 배포 맵 3바퀴 무충돌, 화면 켬 배포 맵 2바퀴째 충돌.
+  사용자가 새 지도 + 감속 없음 주행 무충돌 확인 → **2026-10-17 채택·커밋(39f870f)**. 이전 코드 백업 `.sim_tmp/race_driver_side2.py`는 같은 내용.
 - 실패한 시도(되돌림): 시험형 하드 맵(gate 유형이 트랙을 거의 막아 비현실적) — 규정 밖 배치 만들지 말 것. 넓은 쪽 우선 방향 선택 — 충돌.
-- 연습용 장애물 모델 `models/obstacle_box/{box_040,box_065,plate_08,plate_10,plate_12}.sdf` 미커밋. spawn 은 `export ROS_LOCALHOST_ONLY=1` 필요.
+- 연습용 장애물 모델 `models/obstacle_box/{box_040,box_065,plate_08,plate_10,plate_12}.sdf`(커밋됨). spawn 은 `export ROS_LOCALHOST_ONLY=1` 필요.
 
 ## 다음 할 일
 - 시험 직전 `maps/exam/` 비우기(최종 공지: 기존 매핑 파일 삭제 후 재매핑).
-- race_driver.py 미커밋 수정(회피 방향 유지) 채택/폐기 결정. 시험 전 반드시 작업 트리 정리.
 - 사용자가 본 Q2 충돌·Hybrid A* 이상의 재현 조건 확인(지도, world, 바퀴, 로그 문구). 미확인 상태에선 코드 수정 안 함.
-- GitHub push 안 된 커밋 있음(사용자 요청 시 push).
+
+## 2026-10-17 USB 모의시험
+- 사용자 USB(SME1004, 호스트 `/media/mksung0428/SME1004`)에 `exam/Q1/track.world`(기본 트랙), `exam/Q2/obstacle_1~3.world` 저장(연습용으로 유지).
+  obstacle_1 = 배포 맵, 2·3 = 같은 판 3개를 커브 출구 직후 레이스라인 위에 배치(한쪽 틈 ≥0.33, 다른 쪽 ≥0.45). 사용자가 직접 주행해 정상 확인.
+- 시험장 절차: USB 폴더째 `cp -r`로 ws에 복사 → `world:=$PWD/Q2/파일.world`. world 파일이 ws에 없으면 Gazebo가 오류 없이 빈 세계를 띄움.
+- 시험 명령 정리 PDF: `~/Documents/limo_exam_commands.pdf`(가로, 8 pt, 흑백, git 미포함). 지도 이름 mingyumap.
