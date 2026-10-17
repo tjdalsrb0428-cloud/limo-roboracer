@@ -85,6 +85,10 @@ W_CLR = 40.0
 W_HYST = 1.5
 W_HEAD = 1.0
 W_DO_TIGHT = 80.0
+# 회피 방향 유지: 장애물 덩어리가 SIDE_COMMIT 안에 들어오면 그때 경로의 좌/우를 기록하고,
+# 지나갈 때까지 반대쪽 노드에 W_SIDE 벌점(유한값 -> 정한 쪽이 막히면 바꿀 수 있음). 막판 방향 뒤집기 방지
+SIDE_COMMIT = 4.0
+W_SIDE = 30.0
 # 장애물 인식
 OBS_RANGE = 5.5
 WALL_TOL = 0.22         # 정적맵 벽에서 이 이상 떨어진 스캔점 = 장애물
@@ -180,6 +184,8 @@ class Race(Node):
         self.idx = None            # 레이스라인 진행 인덱스
         self.plan = None           # dict(P, v, s_abs, o)
         self.prev_o = None         # (s_abs array, o array)
+        self.sides = []            # 회피 방향 유지: dict(s0, s1, dc, side) (s = 레이스라인 진행거리)
+        self.obs_P = np.zeros((0, 2))
         self.go = a.go
         self.t_go = None
         self.lap_t0 = None
@@ -386,6 +392,7 @@ class Race(Node):
         self.dyn_origin = (x - LOC_HALF, y - LOC_HALF)
         if not pts:
             self.dyn = None
+            self.obs_P = np.zeros((0, 2))
             return 0
         P = np.vstack(pts)
         ix = ((P[:, 0] - self.dyn_origin[0]) / res).astype(int)
@@ -393,6 +400,7 @@ class Race(Node):
         k = (ix >= 0) & (ix < n) & (iy >= 0) & (iy < n)
         if not k.any():
             self.dyn = None
+            self.obs_P = np.zeros((0, 2))
             return 0
         g = np.ones((n, n), bool)
         g[iy[k], ix[k]] = False
@@ -400,6 +408,7 @@ class Race(Node):
         # 가까운 거리는 실제 점까지 정확히(KD-tree), 1cm 격자로 중복 제거
         Pk = np.unique(np.round(P[k] / 0.01).astype(np.int64), axis=0) * 0.01
         self.kdt = cKDTree(Pk)
+        self.obs_P = Pk
         return int(k.sum())
 
     def clear2(self, P):
@@ -484,6 +493,8 @@ class Race(Node):
         cost[cmin0 < c_hard] = INF
         if not np.isnan(prev_at[0]):
             cost += W_HYST * (O0 - prev_at[0]) ** 2
+        side_pen = self.side_penalty(ist, OFFk)                              # (K,J)
+        cost = cost + side_pen[0]
         costs = [cost]
         lam3 = np.linspace(0.0, 1.0, 5)[1:]
         for k in range(1, N_ST):
@@ -498,7 +509,7 @@ class Race(Node):
             cme = np.minimum(cs, cd).min(2)
             f_t = np.clip((0.25 - cme) / 0.08, 0, 1)
             tot = (costs[-1][:, None] + (W_DO + W_DO_TIGHT * f_t) * dO ** 2 + self.penalty(cs, cd).mean(2)
-                   + (W_DEV * OFFk[k] ** 2)[None, :])
+                   + (W_DEV * OFFk[k] ** 2 + side_pen[k])[None, :])
             if not np.isnan(prev_at[k]):
                 tot = tot + (W_HYST * (OFFk[k] - prev_at[k]) ** 2)[None, :]
             tot[~ok] = INF
@@ -592,9 +603,83 @@ class Race(Node):
         v = speed_profile(kap, dsm, vlim, abs(self.v_meas), v_end=0.0 if blocked else None)
         self.plan = dict(P=P, v=v, tight=tight, t=self.now())
         self.prev_o = (ist[:kk + 1], o_seq)
+        self.update_sides(i0, ist[:kk + 1], o_seq)
         self.pub_path.publish(self.to_path(P))
         self.stat.update(blocked=blocked, kk=kk, nobs=nobs, o0=o0, cmin=float(cP.min()), tight=tight_mode,
                          pt=(time.perf_counter() - t0) * 1000)
+
+    # ---------- 회피 방향 유지 ----------
+    def obs_clusters(self, i0):
+        """장애물 점 -> 레이스라인 기준 (진행 s 범위, 횡 d 범위) 덩어리. 차 앞 -0.5~7.5m만"""
+        P = self.obs_P
+        if len(P) == 0:
+            return []
+        if not hasattr(self, 'rkdt'):
+            self.rkdt = cKDTree(self.R)
+        _, ii = self.rkdt.query(P)
+        d = ((P - self.R[ii]) * self.N[ii]).sum(1)
+        rel = ((ii - i0) % self.n) * self.ds
+        rel = np.where(rel > self.L - 0.5, rel - self.L, rel)
+        k = (rel > -0.5) & (rel < 7.5) & (np.abs(d) < 2.0)
+        if not k.any():
+            return []
+        rel, d = rel[k], d[k]
+        o = np.argsort(rel)
+        rel, d = rel[o], d[o]
+        cut = np.where(np.diff(rel) > 0.5)[0] + 1
+        out = []
+        for a, b in zip(np.r_[0, cut], np.r_[cut, len(rel)]):
+            if b - a < 3:
+                continue
+            s_car = i0 * self.ds
+            out.append(dict(s0=(s_car + rel[a]) % self.L, s1=(s_car + rel[b - 1]) % self.L, rel0=rel[a],
+                            dlo=float(d[a:b].min()), dhi=float(d[a:b].max())))
+        return out
+
+    def cdist(self, a, b):
+        """원형 진행거리 b - a (-L/2 ~ L/2)"""
+        return (b - a + self.L / 2) % self.L - self.L / 2
+
+    def update_sides(self, i0, ist, o_seq):
+        s_car = i0 * self.ds
+        self.sides = [c for c in self.sides if self.cdist(s_car, c['s1'] + 0.5) > 0]   # 지나간 장애물 해제
+        s_st = ist * self.ds
+        for cl in self.obs_clusters(i0):
+            if cl['rel0'] > SIDE_COMMIT:
+                continue
+            inr = np.array([self.cdist(cl['s0'] - 0.2, s) >= 0 and self.cdist(s, cl['s1'] + 0.2) >= 0 for s in s_st])
+            if not inr.any():
+                continue
+            om = float(np.mean(o_seq[inr]))
+            sm = 0.5 * (cl['s0'] + cl['s1'] + (self.L if cl['s1'] < cl['s0'] else 0))
+            for c in self.sides:
+                cm = 0.5 * (c['s0'] + c['s1'] + (self.L if c['s1'] < c['s0'] else 0))
+                if abs(self.cdist(cm, sm)) < 1.0:
+                    # 장애물 가장자리는 보이는 만큼 넓혀 감(한 번 본 면은 유지)
+                    c.update(s0=cl['s0'], s1=cl['s1'], dlo=min(c['dlo'], cl['dlo']), dhi=max(c['dhi'], cl['dhi']))
+                    # 경로가 장애물 반대편 가장자리 너머로 확실히 넘어갔을 때만 변경(= 정한 쪽이 막힘)
+                    flip = om < c['dlo'] if c['side'] > 0 else om > c['dhi']
+                    if flip:
+                        c['side'] = -c['side']
+                        self.get_logger().info(f'회피 방향 변경 s={sm % self.L:.1f} -> {"왼" if c["side"] > 0 else "오른"}')
+                    break
+            else:
+                side = 1 if om > 0.5 * (cl['dlo'] + cl['dhi']) else -1
+                self.sides.append(dict(s0=cl['s0'], s1=cl['s1'], dlo=cl['dlo'], dhi=cl['dhi'], side=side))
+                self.get_logger().info(f'회피 방향 결정 s={sm % self.L:.1f} -> {"왼" if side > 0 else "오른"}')
+
+    def side_penalty(self, ist, OFFk):
+        pen = np.zeros(OFFk.shape)
+        if not self.sides:
+            return pen
+        s_st = ist * self.ds
+        for c in self.sides:
+            for k, s in enumerate(s_st):
+                if self.cdist(c['s0'] - 1.2, s) >= 0 and self.cdist(s, c['s1'] + 0.4) >= 0:
+                    # 왼쪽 통과로 정했으면 장애물 오른쪽 끝(dlo)보다 오른쪽 노드에 벌점, 반대도 같음
+                    wrong = OFFk[k] < c['dlo'] if c['side'] > 0 else OFFk[k] > c['dhi']
+                    pen[k] += W_SIDE * wrong
+        return pen
 
     def path_clear(self, P):
         if len(P) < 2:
