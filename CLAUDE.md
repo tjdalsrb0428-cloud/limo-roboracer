@@ -75,6 +75,8 @@ python3 scripts/race/go.py
 ```
 - 매핑은 반드시 장애물 없는 world에서. 장애물 world에서 매핑하면 장애물이 지도에 벽으로 찍힘(2026-10-14 `ifac1` 지도가 이 상태였음 → RViz에 장애물 표시).
 - Q2 RViz: 회색 지도엔 장애물 없음이 정상. 파란 선(global)은 장애물을 관통, 초록 선(local)이 비켜 감.
+- `race_driver.py --global-only`: local planner(lattice·장애물 인식·Hybrid A*) 끄고 레이스라인만 pure pursuit 추종, 초록 선 없음.
+  "Q1에서는 local 켜지 마라"는 말 대비(2026-10-20). 장애물 회피 없음 → Q1 전용. 기본 트랙 GT 지도 3바퀴 42.2~42.4 s 무충돌. 안 붙이면 기존 동작 그대로.
 - 드라이버는 `--map X.yaml`이면 `X_raceline.csv`(global path), `X_traj.csv`를 자동 로드(`--line`으로 지정 가능).
 - 지도 이름 지정: `odom_mapper.py maps/exam/이름` → `raceline.py maps/exam/이름.yaml` → `race_driver.py --map maps/exam/이름.yaml`.
   이름 생략 시 `maps/exam/map.*`(매번 덮어씀). 저장된 지도로 시작하면 매핑 생략 가능(테스트용, 시험에서는 저장 지도 사용 불가).

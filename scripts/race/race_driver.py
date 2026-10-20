@@ -536,6 +536,9 @@ class Race(Node):
         x, y, yaw = p
         i0, o0 = self.project(x, y)
         self.idx = i0
+        if self.a.global_only:
+            self.plan_global(i0, o0, t0)
+            return
         nobs = self.build_dyn(x, y)
         self.tight_static = False
         c_hard = C_HARD
@@ -606,6 +609,15 @@ class Race(Node):
         self.update_sides(i0, ist[:kk + 1], o_seq)
         self.pub_path.publish(self.to_path(P))
         self.stat.update(blocked=blocked, kk=kk, nobs=nobs, o0=o0, cmin=float(cP.min()), tight=tight_mode,
+                         pt=(time.perf_counter() - t0) * 1000)
+
+    def plan_global(self, i0, o0, t0):
+        # --global-only: local planner 없이 레이스라인(global path) 앞 구간을 그대로 추종
+        idx = (i0 + np.arange(int(N_ST * DS_ST / self.ds) + 1)) % self.n
+        P = self.R[idx]
+        v = speed_profile(self.kap[idx], self.ds, np.full(len(P), V_MAX), abs(self.v_meas))
+        self.plan = dict(P=P, v=v, tight=np.ones(len(P)), t=self.now())
+        self.stat.update(blocked=False, kk=N_ST - 1, nobs=0, o0=o0, cmin=0.0, tight=False,
                          pt=(time.perf_counter() - t0) * 1000)
 
     # ---------- 회피 방향 유지 ----------
@@ -790,7 +802,8 @@ class Race(Node):
             elif tnow - self.stuck_t > 1.2:
                 self.stuck_t = None
                 p = self.pose()
-                if p is not None and self.idx is not None and self.try_maneuver(*p, self.idx, 0):
+                if (p is not None and self.idx is not None and not self.a.global_only
+                        and self.try_maneuver(*p, self.idx, 0)):
                     return
                 pref = math.copysign(1.0, kap) if abs(kap) > 0.1 else 0.0
                 st = self.pick_reverse(pref)
@@ -991,6 +1004,8 @@ def main():
     ap.add_argument('--enter', action='store_true', help='엔터로 출발(exam.py 통합 실행용)')
     ap.add_argument('--odom', action='store_true', help='(호환용) --init 없으면 항상 odom 모드')
     ap.add_argument('--slow', action='store_true', help='좁은 곳 감속 켬(예전 기본 동작)')
+    ap.add_argument('--global-only', action='store_true',
+                    help='local planner 끔: 레이스라인만 추종(장애물 회피 없음, Q1 장애물 없는 맵 전용)')
     a = ap.parse_args()
     global NO_SLOW
     NO_SLOW = not a.slow
