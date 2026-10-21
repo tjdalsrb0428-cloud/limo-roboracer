@@ -87,7 +87,7 @@ W_HEAD = 1.0
 W_DO_TIGHT = 80.0
 # 회피 방향 유지: 장애물 덩어리가 SIDE_COMMIT 안에 들어오면 그때 경로의 좌/우를 기록하고,
 # 지나갈 때까지 반대쪽 노드에 W_SIDE 벌점(유한값 -> 정한 쪽이 막히면 바꿀 수 있음). 막판 방향 뒤집기 방지
-SIDE_COMMIT = 4.0
+SIDE_COMMIT = 5.5         # 라이다 장애물 인식 범위(OBS_RANGE)와 같음 = 보이자마자 방향 결정
 W_SIDE = 30.0
 # 장애물 인식
 OBS_RANGE = 5.5
@@ -181,6 +181,7 @@ class Race(Node):
         self.man = None            # Hybrid A* 탈출 기동 상태
         self.blocked_t = None
         self.obs = []              # (t, Nx2 points in map)
+        self.virt = []             # (만료 t, Nx2) 막혀서 못 움직인 쪽 가상 장애물(붙은 물체는 라이다 최소거리 안이라 안 보임)
         self.idx = None            # 레이스라인 진행 인덱스
         self.plan = None           # dict(P, v, s_abs, o)
         self.prev_o = None         # (s_abs array, o array)
@@ -382,6 +383,9 @@ class Race(Node):
 
     def build_dyn(self, x, y):
         pts = [p for _, p in self.obs if len(p)]
+        tv = self.now()
+        self.virt = [v for v in self.virt if v[0] > tv]
+        pts += [v[1] for v in self.virt]
         if USE_BLOB_PTS and len(self.blob_pts):
             bp = self.blob_pts
             near = (np.abs(bp[:, 0] - x) < LOC_HALF) & (np.abs(bp[:, 1] - y) < LOC_HALF)
@@ -673,12 +677,23 @@ class Race(Node):
                     flip = om < c['dlo'] if c['side'] > 0 else om > c['dhi']
                     if flip:
                         c['side'] = -c['side']
-                        self.get_logger().info(f'회피 방향 변경 s={sm % self.L:.1f} -> {"왼" if c["side"] > 0 else "오른"}')
+                        self.get_logger().info(f'회피 방향 변경 s={sm % self.L:.1f} -> {"왼" if c["side"] > 0 else "오른"} '
+                                               f'(경로 {om:+.2f}, 장애물 {c["dlo"]:+.2f}~{c["dhi"]:+.2f}, 앞 {cl["rel0"]:.1f}m)')
                     break
             else:
-                side = 1 if om > 0.5 * (cl['dlo'] + cl['dhi']) else -1
+                # 이미 옆/뒤에 있는 덩어리(방금 해제한 장애물의 남은 점 등)는 새로 정하지 않음 -> 통과 직후 반대편 벌점 방지
+                if cl['rel0'] < 0.5:
+                    continue
+                # 경로가 덩어리 한쪽 끝 바깥을 확실히 지날 때만 결정(일부만 보인 덩어리 중앙 기준으로 정하면 엉뚱한 쪽 확정)
+                if om > cl['dhi']:
+                    side = 1
+                elif om < cl['dlo']:
+                    side = -1
+                else:
+                    continue
                 self.sides.append(dict(s0=cl['s0'], s1=cl['s1'], dlo=cl['dlo'], dhi=cl['dhi'], side=side))
-                self.get_logger().info(f'회피 방향 결정 s={sm % self.L:.1f} -> {"왼" if side > 0 else "오른"}')
+                self.get_logger().info(f'회피 방향 결정 s={sm % self.L:.1f} -> {"왼" if side > 0 else "오른"} '
+                                       f'(경로 {om:+.2f}, 장애물 {cl["dlo"]:+.2f}~{cl["dhi"]:+.2f}, 앞 {cl["rel0"]:.1f}m)')
 
     def side_penalty(self, ist, OFFk):
         pen = np.zeros(OFFk.shape)
@@ -801,18 +816,13 @@ class Race(Node):
                 self.stuck_t = tnow
             elif tnow - self.stuck_t > 1.2:
                 self.stuck_t = None
+                self.mark_contact(1.0)
                 p = self.pose()
                 if (p is not None and self.idx is not None and not self.a.global_only
                         and self.try_maneuver(*p, self.idx, 0)):
                     return
                 pref = math.copysign(1.0, kap) if abs(kap) > 0.1 else 0.0
-                st = self.pick_reverse(pref)
-                if st is None:
-                    self.get_logger().warn('정지 감지 -> 후진 공간 없음, 대기')
-                    return
-                self.get_logger().warn(f'정지 감지 -> 짧은 후진(조향 {st:+.0f})')
-                self.recover_until = tnow + REV_T
-                self.recover_steer = st
+                self.start_reverse(tnow, pref)
         else:
             self.stuck_t = None
 
@@ -896,8 +906,12 @@ class Race(Node):
             mn['t_move'] = tnow
         if tnow - mn['t0'] > 20.0 or tnow - mn.get('t_move', mn['t0']) > 1.5:
             self.get_logger().warn('탈출 기동 정지/시간초과 -> 해제')
+            S = mn['segs'][mn['k']]
+            self.mark_contact(S[-1, 3] if S[-1, 3] != 0 else 1.0)
             self.man = None
             self.pub.publish(cmd)
+            # 장애물에 닿아 있으면 라이다 최소거리(0.12m) 안이라 안 보이고 기억도 사라져 같은 전진 경로를 반복 -> 일단 후진
+            self.start_reverse(tnow, 0.0)
             return
         S = mn['segs'][mn['k']]
         d = S[-1, 3] if S[-1, 3] != 0 else 1.0
@@ -934,12 +948,43 @@ class Race(Node):
                   f'end_d={math.hypot(*(end - [rx, ry])):.2f} pos=({x:.2f},{y:.2f},{yaw:+.2f}) kap={kap:+.2f} '
                   f'v={self.v_meas:+.2f}', flush=True)
 
+    def mark_contact(self, d):
+        """막혀서 못 움직인 쪽(d=+1 앞코, -1 꽁무니) 바로 앞에 가상 장애물 점 8s"""
+        p = self.pose()
+        if p is None:
+            return
+        x, y, yaw = p
+        u = np.array([math.cos(yaw), math.sin(yaw)])
+        nrm = np.array([-u[1], u[0]])
+        c = np.array([x, y]) + d * 0.27 * u
+        P = c + np.linspace(-0.15, 0.15, 11)[:, None] * nrm
+        self.virt.append((self.now() + 8.0, P))
+        self.get_logger().warn(f'{"앞" if d > 0 else "뒤"} 막힘 -> 가상 장애물 표시')
+
+    def start_reverse(self, tnow, pref):
+        # 연달아 막히면(6s 안) 후진을 점점 길게: 0.9 -> 1.6 -> 2.3s
+        self.n_rev = getattr(self, 'n_rev', 0) + 1 if tnow - getattr(self, 't_rev', -99.0) < 6.0 else 1
+        self.t_rev = tnow
+        rt = REV_T + 0.7 * min(self.n_rev - 1, 2)
+        st = self.pick_reverse(pref)
+        if st is None:
+            # 손 떼고 달려야 하므로 대기하지 않음: 검사 실패해도 가려던 쪽으로 조향하며 후진(앞코 돌리기)
+            st = pref
+            self.get_logger().warn(f'정지 감지 -> 후진 검사 실패, 그래도 후진(조향 {st:+.0f}, {rt:.1f}s)')
+        else:
+            self.get_logger().warn(f'정지 감지 -> 후진(조향 {st:+.0f}, {rt:.1f}s)')
+        self.recover_until = tnow + rt
+        self.recover_steer = st
+        self.stuck_t = None
+
     def pick_reverse(self, pref):
         """후진 궤적(0.3m/s x REV_T) 충돌검사: 선호 조향 -> 직진 -> 반대 순"""
         p = self.pose()
         if p is None:
             return None
         x0, y0, th0 = p
+        cs0, cd0 = self.body_clear(np.array([[x0, y0]]), np.array([th0]))
+        thr = min(C_HARD - 0.03, float(min(cs0.min(), cd0.min())) - 0.005)
         for st in dict.fromkeys([pref, 0.0, -pref, 1.0, -1.0]):
             w = 0.3 * 0.8 * K_MAX * st
             x, y, th = x0, y0, th0
@@ -951,7 +996,7 @@ class Race(Node):
                 P.append((x, y))
                 H.append(th)
             cs, cd = self.body_clear(np.array(P), np.array(H))
-            if np.minimum(cs, cd).min() >= C_HARD - 0.03:
+            if np.minimum(cs, cd).min() >= thr:
                 return st
         return None
 
