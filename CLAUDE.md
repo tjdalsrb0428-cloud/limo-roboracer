@@ -310,4 +310,9 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - 라이다 YDLidar: 8 Hz, **angle ±90°(앞쪽만)**, 0.1~12 m, frame `laser_frame`, URDF상 base_link 앞 0.103 m. 시뮬은 8 Hz, ±120°, 0.2~8 m.
 - 설계: 매핑 = teleop + slam_toolbox/Cartographer → pgm/yaml + _traj.csv → raceline.py 그대로. 위치추정 = 파티클 필터(신규, TF map→odom).
   race_driver 실차 모드 = 항등 map→odom 미발행, 프레임·차량 파라미터 설정화, RACE_REAL=1. 노트북은 RViz와 initial guess만.
+- **실차 흉내 시뮬**: `ros2 launch limo_car roboracer_sim.launch.py real:=true` (기본 false = 중간고사 시뮬, URDF 동일 확인).
+  휠베이스 0.20, max_steer 0.41(중심각), 라이다 188점 ±90° 0.1~12 m σ0.015, IMU `/imu`, 플러그인 정답 위치는 `/odom_gt`(TF 없음),
+  `sim_wheel_odom.py`가 오차(v ×1.03, ω ×0.96, 편향 0.004 rad/s, 잡음)를 넣어 `/odom` + TF odom→base_link 발행.
+  검증(2026-10-25): hello 지도 `--global-only` → 9 m 만에 위치 오차 0.31 m, 첫 커브에서 벽 충돌 → 위치추정 필수.
+  시뮬 정리는 `docker restart limo_gazebo_humble`이 확실하다(`pkill -f gzserver`를 bash -c 안에서 쓰면 자기 셸이 먼저 죽음).
 - 실차 스크립트: `scripts/real/recon.sh`(정찰, 로봇 무변경). 수요일 첫날 = 연결 → recon → 수동 조종 확인 → 트랙 저속 bag 1개 → 정리.

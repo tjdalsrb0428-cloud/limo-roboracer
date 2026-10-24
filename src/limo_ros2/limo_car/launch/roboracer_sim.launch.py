@@ -29,12 +29,22 @@ def generate_launch_description():
     spawn_z = LaunchConfiguration("spawn_z")
     spawn_yaw = LaunchConfiguration("spawn_yaw")
     use_rviz = LaunchConfiguration("rviz")
+    real = LaunchConfiguration("real")
 
     robot_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(limo_share, "launch", "ackermann.launch.py")
         ),
-        launch_arguments={"use_sim_time": "true"}.items(),
+        launch_arguments={"use_sim_time": "true", "real": real}.items(),
+    )
+
+    # real:=true: 플러그인 정답 위치(/odom_gt)에 오차를 넣어 실차 바퀴 오도메트리(/odom, TF odom→base_link) 흉내
+    wheel_odom = Node(
+        package="limo_car",
+        executable="sim_wheel_odom.py",
+        parameters=[{"use_sim_time": True}],
+        condition=IfCondition(real),
+        output="screen",
     )
 
     gazebo = IncludeLaunchDescription(
@@ -83,7 +93,9 @@ def generate_launch_description():
         DeclareLaunchArgument("spawn_yaw", default_value="0.0"),
         DeclareLaunchArgument("rviz", default_value="true"),
         DeclareLaunchArgument("gui", default_value="true"),
+        DeclareLaunchArgument("real", default_value="false"),
         robot_description,
+        wheel_odom,
         gazebo,
         TimerAction(period=2.0, actions=[spawn]),
         TimerAction(period=4.0, actions=[rviz]),

@@ -28,7 +28,7 @@ install(
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(PROGRAMS scripts/ackermann_twist_adapter.py
+install(PROGRAMS scripts/ackermann_twist_adapter.py scripts/sim_wheel_odom.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

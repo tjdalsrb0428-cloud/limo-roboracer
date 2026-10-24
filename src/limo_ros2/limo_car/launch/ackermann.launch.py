@@ -11,21 +11,24 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch_ros.actions import Node
 
 import xacro
 
 
-def generate_launch_description():
+def robot_nodes(context):
 
     # um die Zeit zu simulieren
     use_sim_time = LaunchConfiguration('use_sim_time')
+    # real:=true → 실차 치수·라이다·바퀴 오도메트리 흉내 (xacro 인자로 전달)
+    real = context.launch_configurations.get('real', 'false').lower() == 'true'
 
     # finden path für Modell
     pkg_path = os.path.join(get_package_share_directory('limo_car'))
     xacro_file = os.path.join(pkg_path, 'gazebo', 'ackermann_with_sensor.xacro')
-    robot_description_config = xacro.process_file(xacro_file)
+    robot_description_config = xacro.process_file(
+        xacro_file, mappings={'real': 'true' if real else 'false'})
 
     # Erstellt ein robot_state_publisher Node
     params = {'robot_description': robot_description_config.toxml(),
@@ -37,13 +40,23 @@ def generate_launch_description():
         output='screen',
         parameters=[params]
     )
+    adapter_params = {'use_sim_time': use_sim_time}
+    if real:
+        adapter_params.update(wheelbase=0.20, max_steer=0.41)
 
+    return [
+        node_robot_state_publisher,
+        Node(package='limo_car', executable='ackermann_twist_adapter.py',
+             parameters=[adapter_params], output='screen'),
+    ]
+
+
+def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='false',
             description='Use sim time if true'),
-        node_robot_state_publisher,
-        Node(package='limo_car', executable='ackermann_twist_adapter.py',
-             parameters=[{'use_sim_time': use_sim_time}], output='screen'),
+        DeclareLaunchArgument('real', default_value='false'),
+        OpaqueFunction(function=robot_nodes),
     ])

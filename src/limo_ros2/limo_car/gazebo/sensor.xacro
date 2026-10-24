@@ -9,7 +9,7 @@ realisierbar elektrische Komponente, also Sensoren aus Gazebo-Package. Diese Ant
 <robot name="limo_sensor" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <!-- ******************************* Makrofunktion für Laser-Sensor ***************************** -->
-    <xacro:macro name="gazebo_laser" params="frame_prefix">
+    <xacro:macro name="gazebo_laser" params="frame_prefix samples:=720 half_angle:=2.09439504 rmin:=0.2 rmax:=8.0 stddev:=0.01">
         <link name='${frame_prefix}_link'>
             <inertial>
                 <mass value="0.1"/>
@@ -48,22 +48,22 @@ realisierbar elektrische Komponente, also Sensoren aus Gazebo-Package. Diese Ant
                 <ray>
                     <scan>
                         <horizontal>
-                            <samples>720</samples>
+                            <samples>${samples}</samples>
                             <resolution>1</resolution>
-                            <min_angle>-2.09439504</min_angle> <!-- Einheit in "rad", von Hersteller -->
-                            <max_angle>2.09439504</max_angle>
+                            <min_angle>${-half_angle}</min_angle> <!-- Einheit in "rad", von Hersteller -->
+                            <max_angle>${half_angle}</max_angle>
                         </horizontal>
                     </scan>
                     <range>
-                        <min>0.2</min>
-                        <max>8.0</max>
+                        <min>${rmin}</min>
+                        <max>${rmax}</max>
                         <resolution>0.01</resolution>
                     </range>
                     <!-- um bessere Realität zu simulieren, wird Rauschen auch addiert -->
                     <noise>
                         <type>gaussian</type>
                         <mean>0.0</mean>
-                        <stddev>0.01</stddev>
+                        <stddev>${stddev}</stddev>
                     </noise>
                 </ray>
                 <plugin name="gazebo_ros_laser_sensor" filename="libgazebo_ros_ray_sensor.so">
@@ -161,7 +161,7 @@ realisierbar elektrische Komponente, also Sensoren aus Gazebo-Package. Diese Ant
     </xacro:macro>
 
     <!-- ******************************* Makrofunktion für IMU ***************************** -->
-    <xacro:macro name="gazebo_imu" params="frame_prefix">
+    <xacro:macro name="gazebo_imu" params="frame_prefix topic:=/imu_plugin/out">
         <link name='${frame_prefix}_link'>
             <pose>0 0 0 0 0 0</pose>
             <inertial>
@@ -205,7 +205,7 @@ realisierbar elektrische Komponente, also Sensoren aus Gazebo-Package. Diese Ant
 
                 <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
                     <ros>
-                        <remapping>~/out:=/imu_plugin/out</remapping>
+                        <remapping>~/out:=${topic}</remapping>
                     </ros>
                     <frame_name>${frame_prefix}_link</frame_name>
                     <initial_orientation_as_reference>false</initial_orientation_as_reference>

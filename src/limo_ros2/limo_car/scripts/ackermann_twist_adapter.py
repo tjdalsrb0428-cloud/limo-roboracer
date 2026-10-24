@@ -29,12 +29,15 @@ def convert_twist(speed, yaw_rate, wheelbase=0.24, max_steer=0.42, max_speed=1.0
 class AckermannTwistAdapter(Node):
     def __init__(self):
         super().__init__('ackermann_twist_adapter')
+        self.wheelbase = self.declare_parameter('wheelbase', 0.24).value
+        self.max_steer = self.declare_parameter('max_steer', 0.42).value
         self.publisher = self.create_publisher(Twist, '/ackermann_controller/cmd_vel', 1)
         self.subscription = self.create_subscription(Twist, '/cmd_vel', self.receive, 1)
 
     def receive(self, msg):
         out = Twist()
-        out.linear.x, out.angular.z = convert_twist(msg.linear.x, msg.angular.z)
+        out.linear.x, out.angular.z = convert_twist(msg.linear.x, msg.angular.z,
+                                                    self.wheelbase, self.max_steer)
         self.publisher.publish(out)
 
 
