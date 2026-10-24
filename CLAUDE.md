@@ -301,3 +301,13 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - 일정: 0주차(지금) 수집 스크립트, Dockerfile, Gazebo 실차화(치수, odom 노이즈) → 1주차(수) 정찰: 토픽·TF·소스 수집, 수동 주행 bag, 응답·지연 측정
   → 2주차 SLAM·위치추정, 저속 Q1 → 3주차 Q1 속도 올리기, Q2 → 4주차 Q3, 반복 신뢰성 테스트 → 5주차 2대 주행, 추월 → 이후 코드 동결, 실전 리허설.
 - 로봇 안 소스는 tar로 노트북에 가져와 msg/description만 빌드한다(bag 재생, RViz용). 로봇 이미지는 ARM64라 노트북에서 직접 실행하지 않는다.
+
+## 실차 인터페이스 (공개 소스 기준, Pro에서 같은지 recon으로 확인 필요)
+- 참고 소스: `/home/mksung0428/Downloads/LIMO_GAZEBO/ref/`(ws 밖, git 미포함)에 agilexrobotics/limo_ros2(humble, humble-dev), limo-doc. 구형 LIMO용(2023).
+- `/cmd_vel` Twist(Ackermann): 드라이버가 r = v/ω → 중심 조향각 atan(L/r) → 안쪽 바퀴각으로 변환, 안쪽 28°(0.4887 rad)로 제한 → 최소 회전반경 약 0.46 m.
+  race_driver 출력(ω = v·κ)과 그대로 호환된다. 휠베이스 0.20 m, 윤거 0.172 m(시뮬 ackermann.xacro는 0.24).
+- `/odom`(nav_msgs, 50 Hz 제어), `pub_odom_tf`가 true면 TF odom→base_link. `/imu`(MPU6050), `/limo_status`.
+- 라이다 YDLidar: 8 Hz, **angle ±90°(앞쪽만)**, 0.1~12 m, frame `laser_frame`, URDF상 base_link 앞 0.103 m. 시뮬은 8 Hz, ±120°, 0.2~8 m.
+- 설계: 매핑 = teleop + slam_toolbox/Cartographer → pgm/yaml + _traj.csv → raceline.py 그대로. 위치추정 = 파티클 필터(신규, TF map→odom).
+  race_driver 실차 모드 = 항등 map→odom 미발행, 프레임·차량 파라미터 설정화, RACE_REAL=1. 노트북은 RViz와 initial guess만.
+- 실차 스크립트: `scripts/real/recon.sh`(정찰, 로봇 무변경). 수요일 첫날 = 연결 → recon → 수동 조종 확인 → 트랙 저속 bag 1개 → 정리.
