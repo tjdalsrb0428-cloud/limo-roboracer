@@ -5,7 +5,8 @@
 """
 import os
 import time
-os.environ['ROS_LOCALHOST_ONLY'] = '1'
+if os.environ.get('RACE_REAL') != '1':     # 실차는 RACE_REAL=1 → 네트워크 사용
+    os.environ['ROS_LOCALHOST_ONLY'] = '1'
 import rclpy  # noqa: E402
 from std_msgs.msg import Empty  # noqa: E402
 
