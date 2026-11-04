@@ -386,3 +386,33 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 | 공통 | /scan(laser_link), /odom, /imu, /limo_status, EKF(robot_localization, 설정 거의 같음), 휠베이스 0.20, pub_odom_tf false | |
 | 카메라 | astra dabai | orbbec astra_stereo_u3 |
 - 기존 시뮬 real 모드(±90°, 8 Hz, 188점, 0.1~12 m)는 사실상 LIMO1 사양과 같다 → LIMO1 프로파일로 사용, Pro 프로파일 추가 필요.
+
+## ▶ 기말 다음 할 일 (2026-11-05 정리, 다음 실습 = 다음 주 수요일, 팀당 2시간, LIMO1/Pro 중 무엇일지 모름)
+목표: 실습 날은 "셋업 → 측정 → 매핑 → 저속 주행 시도 → 정리"를 명령 몇 줄로. 개발은 전부 노트북에서 미리.
+기대치: 다음 주 = 셋업·보정·매핑 확실히 + 저속(0.3~0.5 m/s) Q1 시도. 시험 수준은 2~3회차 이후.
+우선순위: **1 → 3 → 4 → 8 (최소 세트, 7~10 h)** → 2 → 5 → 6 → 7 (전체 20~30 h).
+
+1. **로봇 프로파일** `config/robots/limo1.yaml`, `limo_pro.yaml`(0.5 h): 라이다(각도·점수·주기·range·frame), 명령 토픽/형식(Twist|AckermannDrive),
+   휠베이스 0.20, 조향 한계, 차체 크기. 모든 스크립트가 `--robot` 으로 읽음. 스캔은 메시지의 angle_min/increment/len 그대로 해석(고정 점수 가정 금지).
+2. **시뮬 Pro 모드**(2~3 h): `roboracer_sim.launch.py real:=true robot:=limo_pro` → ±110° 10 Hz 248점, `/limo/ack_cmd` 입력(÷1.215, ±0.42 흉내),
+   드라이버 odom 버그 재현 + EKF(limo_ekf.yaml). 기존 real 모드 = LIMO1 사양. 추가로 호스 벽(낮은 원통) 시험형 트랙 world(8×22 m, 폭 ≥1 m), 검은 면 점 누락, 잔디 미끄럼.
+3. **측정 스크립트** `scripts/real/`(2 h, **docker 없이 로봇 호스트 기본 ROS(rclpy)로 실행 가능**, 결과는 숫자만 출력, bag 불필요):
+   `check_sensors.py`(토픽 주기·라이다 사양·배터리), `calib_steer.py`(고정 조향 원 주행 → 반경 → 조향 스케일·좌우 트림),
+   `calib_speed.py`(명령 vs 실제 속도, 지연; 일반 바닥/잔디 따로), `check_hose.py`(거리별 호스 점 수). LIMO1=/cmd_vel, Pro=/limo/ack_cmd 둘 다 지원.
+4. **배포**(3~5 h): `docker/Dockerfile.robot`(ARM64, ros:humble + slam_toolbox, robot_localization, ackermann_msgs, numpy/scipy/skimage, limo_msgs 빌드, **코드는 넣지 않음**)
+   → Docker Hub **`tjdalsrb0428/limo-robot`**(새 public 저장소. 기존 `tjdalsrb0428/limo`의 중간고사 x86 이미지 gazebo_humble_final/backup은 건드리지 않기) + USB 백업 `docker save` tar.
+   노트북 docker는 tjdalsrb0428로 로그인돼 있음. **ARM64 에뮬레이션 미설치** → `docker run --privileged --rm tonistiigi/binfmt --install arm64`(사용자 승인 대기 중, 재부팅 시 재실행). push 전 사용자 확인.
+   `scripts/real/setup.sh`(~/Documents에 git clone → pull → 컨테이너 실행: --network host --privileged, 장치 ttyTHS1/ttyUSB0, ~/Documents 마운트, sudo docker),
+   `scripts/real/teardown.sh`(컨테이너·이미지·코드·Wi-Fi 프로파일 삭제). private 저장소 clone = 사용자가 만든 읽기 전용·단기 GitHub 토큰을 비밀번호 칸에 입력(저장 안 함).
+   네트워크: 노트북 RViz 쓰려면 드라이버를 `ROS_LOCALHOST_ONLY=0` + 팀 고유 `ROS_DOMAIN_ID`로 직접 실행하는 명령 준비(조교 스크립트는 LOCALHOST_ONLY=1).
+5. **SLAM 매핑**(3~4 h): 로봇 컨테이너에서 slam_toolbox(1순위)/Cartographer → `export_map.py`로 pgm/yaml + _traj.csv(SLAM 보정 궤적) → raceline.py 그대로.
+   트랙 밖 먼 점(사람·가구) 무시 옵션. 시뮬 real 모드에서 먼저 검증.
+6. **위치추정** `scripts/real/localizer.py`(4~6 h): 파티클 필터(likelihood field), ±90°/±110° 모두, 초기값 = 출발 pose, TF map→odom, 불확실하면 정지 신호.
+7. **race_driver 실차 모드**(4~6 h): `--robot` 프로파일, 출력 Twist/AckermannDrive, 자체 odom(v + IMU 자이로, 드라이버 odom 위치 미사용), 스캔 필터(0·inf·range),
+   폭 1 m 트랙 여유 재조정, 지연 보상, 속도 상한 옵션(첫 테스트 0.3), 스캔/위치 끊김 시 정지, Jetson Nano용 lite 모드(CPU 1~2코어 제한으로 계획 시간 측정).
+8. **실습 절차서** `docs/practice_next.md`(1~2 h): 시간 배분(셋업 15 / 측정 30 / 매핑 20 / 주행 40 / 정리 15분), 복붙 명령, 문제 대처, 준비물(USB 메모리, 줄자).
+   전날 시뮬로 절차서대로 리허설.
+
+다음 실습에서 현장 확인: 호스 점 누락(0.5/1/2/3 m)·바닥 찍힘·이음매 틈, 로봇 인터넷(Docker Hub pull 속도), 수업 Wi-Fi 사용 가능 여부, 노트북 RViz 토픽 수신,
+Jetson Nano 계획 시간, LIMO1 실제 라이다 사양(공개 저장소 값과 같은지), control_mode(SWB 위=코드 제어) 값.
+기타: `~/limo_pro_src_1104.zip`은 조원 배포용(사용자가 배포 후 삭제 예정). `ref/limo_basic/`(조교 LIMO1 저장소 clone, 194 MB, git 밖).
