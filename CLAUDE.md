@@ -313,6 +313,12 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - 모드: 바퀴의 빨간 노브를 돌려 주황불 = 4륜(차동) 모드 → 쓰면 안 됨. 노브가 올라온 상태(뒷바퀴 고정) = **Ackermann**인지 매번 확인.
 - 조종기: 왼쪽 위 SW 스위치를 **가운데**에 둬야 조종기로 움직인다(위로 올리면 안 먹음). 왼쪽 스틱 전후진, 오른쪽 스틱 조향.
 
+- 매뉴얼(LIMO_Start_Manual.pptx, 구형 LIMO): 전원 버튼 **짧게 누르면 프로그램 일시정지**, 길게 = 켜기. 앞 LED 녹색 = Ackermann, 황색 = 4륜/트랙, 적색 = SW 정지, 적색 점멸 = 배터리 부족.
+  빨간 걸쇠를 올리고 30° 돌려 고정 = Ackermann. 조종기 **SWB 가운데 = 수동, 위 = 코드(/cmd_vel) 제어**(OT의 "SW 가운데"가 이것). SWD = 차동/메카넘.
+  블루투스 앱에 Ackermann 조향 0점 보정 있음. "전진이 안 되면 Steering Gear Calibration". 배터리 12 V 5200 mAh, **주행 약 40분**.
+  구형 치수 322×220 mm, 휠베이스 0.20, 윤거 0.175, 최소 회전반경 0.4 m, 라이다 EAI X2L, Jetson Nano 4 GB(A57 4코어). NoMachine 계정 wego/wego.
+  교재의 ROS1 네트워크 설정은 ~/.bashrc 수정 방식 → 공용 로봇이라 금지, 세션에서 export만.
+
 ## 알고리즘 결정 (2026-11-04)
 - 로봇 안: 조교 드라이버(스캔·odom·cmd_vel) + 우리 컨테이너. 코드는 토픽·프레임·차량 치수를 **로봇 프로파일(yaml)**로 받아 LIMO/Pro 공용.
 - 매핑: 로봇에선 수동 주행 bag(/scan /odom /imu /tf /tf_static)만 기록 → 노트북에서 slam_toolbox(1순위)·Cartographer 오프라인 비교 → pgm/yaml + _traj.csv → raceline.py 그대로.
