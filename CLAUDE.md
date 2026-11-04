@@ -392,11 +392,14 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 기대치: 다음 주 = 셋업·보정·매핑 확실히 + 저속(0.3~0.5 m/s) Q1 시도. 시험 수준은 2~3회차 이후.
 우선순위: **1 → 3 → 4 → 8 (최소 세트, 7~10 h)** → 2 → 5 → 6 → 7 (전체 20~30 h).
 
-1. **로봇 프로파일** `config/robots/limo1.yaml`, `limo_pro.yaml`(0.5 h): 라이다(각도·점수·주기·range·frame), 명령 토픽/형식(Twist|AckermannDrive),
+1. ✅ **(2026-11-05 완료, b7328cc)** **로봇 프로파일** `config/robots/limo1.yaml`, `limo_pro.yaml`(0.5 h): 라이다(각도·점수·주기·range·frame), 명령 토픽/형식(Twist|AckermannDrive),
    휠베이스 0.20, 조향 한계, 차체 크기. 모든 스크립트가 `--robot` 으로 읽음. 스캔은 메시지의 angle_min/increment/len 그대로 해석(고정 점수 가정 금지).
 2. **시뮬 Pro 모드**(2~3 h): `roboracer_sim.launch.py real:=true robot:=limo_pro` → ±110° 10 Hz 248점, `/limo/ack_cmd` 입력(÷1.215, ±0.42 흉내),
    드라이버 odom 버그 재현 + EKF(limo_ekf.yaml). 기존 real 모드 = LIMO1 사양. 추가로 호스 벽(낮은 원통) 시험형 트랙 world(8×22 m, 폭 ≥1 m), 검은 면 점 누락, 잔디 미끄럼.
-3. **측정 스크립트** `scripts/real/`(2 h, **docker 없이 로봇 호스트 기본 ROS(rclpy)로 실행 가능**, 결과는 숫자만 출력, bag 불필요):
+3. ✅ **(2026-11-05 완료)** `rt_common.py`(공용) + `check_sensors.py`·`calib_steer.py`(--mode straight|circle)·`calib_speed.py`·`check_hose.py`. 프로파일 calib에 odom_scale 추가.
+   시뮬 real(limo1) 검증: 센서 점검 정상, 속도 0.3 명령 → 라이다 0.311(GT 0.304, 오차 2 %), 지연 0.15 s, 직진 트림 0, 원 주행 steer_scale 0.84(시뮬 차가 명령보다 덜 꺾임 → 시뮬 특성, 반경 0.77 m @0.3 rad).
+   limo_pro(AckermannDrive)는 시뮬 컨테이너에 ackermann_msgs 없어 미검증(로봇엔 있음). 원래 계획:
+   **측정 스크립트** `scripts/real/`(2 h, **docker 없이 로봇 호스트 기본 ROS(rclpy)로 실행 가능**, 결과는 숫자만 출력, bag 불필요):
    `check_sensors.py`(토픽 주기·라이다 사양·배터리), `calib_steer.py`(고정 조향 원 주행 → 반경 → 조향 스케일·좌우 트림),
    `calib_speed.py`(명령 vs 실제 속도, 지연; 일반 바닥/잔디 따로), `check_hose.py`(거리별 호스 점 수). LIMO1=/cmd_vel, Pro=/limo/ack_cmd 둘 다 지원.
 4. **배포**(3~5 h): `docker/Dockerfile.robot`(ARM64, ros:humble + slam_toolbox, robot_localization, ackermann_msgs, numpy/scipy/skimage, limo_msgs 빌드, **코드는 넣지 않음**)

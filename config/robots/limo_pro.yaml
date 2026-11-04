@@ -50,3 +50,4 @@ calib:
   steer_scale: 1.0            # 실제 조향 = 명령 × scale
   steer_trim: 0.0             # 직진이 되도록 더하는 조향각 rad (+ = 좌)
   speed_scale: 1.0            # 실제 속도 = 명령 × scale
+  odom_scale: 1.0             # 실제 속도 = odom 속도 × scale (바퀴 odom 오차)
