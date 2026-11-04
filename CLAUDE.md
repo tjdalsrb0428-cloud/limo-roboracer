@@ -376,3 +376,13 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - **라이다 높이 < 호스 높이**(사용자 확인) → 라이다 평면이 호스를 맞힌다. 남은 확인: 검은 고무면 반사로 점 누락되는지(거리별),
   라이다가 바닥에 가까워 기울기·잔디 높이로 바닥이 찍히는지, 호스 이음매 틈으로 바깥이 보이는지.
 - 바닥 재질별 미끄럼·바퀴 odom 스케일·조향 응답 차이 → 위치추정은 IMU 자이로·라이다 비중↑, 재질별 보정 필요할 수 있음.
+
+## LIMO1 vs Pro 인터페이스 (조교 공개 저장소 minho0/limo_basic = LIMO1용, `ref/limo_basic/`에 clone, 2026-11-05)
+| 항목 | LIMO1 (limo_basic) | LIMO Pro (11-04 실측·소스) |
+|---|---|---|
+| 베이스 launch | limo_base.launch.py(limo_base, ns limo, ttyTHS1) | limo_base_ackerman.launch.py(limo_ackerman_base, ns limo, ttylimo→ttyTHS1) |
+| 명령 | **`/cmd_vel` Twist**(r=v/ω → 안쪽 바퀴각, 28° 제한) | **`/limo/ack_cmd` AckermannDrive**(steering÷1.215, ±0.42) |
+| 라이다 | YDLIDAR 삼각측량형(lidar_type 1, 115200, 3K), **±90°, 8 Hz, 0.1~12 m** → 약 188점 | Tmini Plus, ±110°, 10 Hz, 0.01~64 m, 248점 |
+| 공통 | /scan(laser_link), /odom, /imu, /limo_status, EKF(robot_localization, 설정 거의 같음), 휠베이스 0.20, pub_odom_tf false | |
+| 카메라 | astra dabai | orbbec astra_stereo_u3 |
+- 기존 시뮬 real 모드(±90°, 8 Hz, 188점, 0.1~12 m)는 사실상 LIMO1 사양과 같다 → LIMO1 프로파일로 사용, Pro 프로파일 추가 필요.
