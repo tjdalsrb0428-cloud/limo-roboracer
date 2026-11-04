@@ -358,3 +358,15 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - bag1(/tmp, 229 s, 32 MB, 수동 주행)은 핫스팟이 너무 느려 못 옮김.
 - **결정(2026-11-04): bag을 노트북으로 옮기지 않는다**(전송이 너무 느림). 매핑·SLAM은 로봇 안 우리 컨테이너에서 실행하고
   결과물(pgm/yaml/_traj.csv, 수백 KB)만 가져온다. SLAM 비교·튜닝은 로봇에서 bag 재생으로 한다. 노트북 개발은 시뮬 real 모드로.
+
+## 기말 실습 공지 (26_스모공실험_기말실습공지.pptx, 2026-11-04)
+- 로봇 7대 중 2대는 시험용 → 실습은 **LIMO1(구형, Jetson Nano) 4대 + LIMO Pro(Jetson Orin Nano) 1대**. Pro는 팀마다 최소 1회.
+  18~20시/20~22시 5팀씩(**팀당 2시간**), 주차마다 1·2분반 교대. F1 트랙은 A room.
+- **날마다 LIMO1 또는 Pro를 쓰게 되고 둘의 라이다가 다르다 → 조교: 두 라이다 모두 고려해서 알고리즘을 짤 것.**
+  Pro = YDLIDAR Tmini Plus(±110°, 248점, 10 Hz). LIMO1 = 매뉴얼상 EAI X2L(조교 이미지 기준 각도·점수·주기 미확인 → 첫 LIMO1 실습에서 확인).
+  → 라이다 각도 범위·점 수·주기·range·frame을 로봇 프로파일 yaml로 받고, 알고리즘은 고정 점 수/각도에 의존하지 않게 작성.
+- 규칙: 코드는 로봇 `~/Documents` 안에만, 의존성 설치는 docker 컨테이너 안에서만. **실습 후 모든 docker 이미지·코드 삭제 → github·Docker Hub로 배포.**
+- bringup: Pro = 호스트 `ros2 launch wego teleop_launch.py`. LIMO1 = 조교 이미지 컨테이너에서 같은 launch:
+  `sudo docker run -it --name limo_humble --network host --privileged --device=/dev/ttyTHS1:/dev/ttyTHS1 --device=/dev/ttyUSB0:/dev/ttyUSB0 -v /dev/bus/usb:/dev/bus/usb -v /home/agilex/Documents:/home/agilex/Documents yspark98/limo1_humble:latest bash`
+  → `cd /home/agilex/Documents/limo_basic_ws; source install/setup.bash; ros2 launch wego teleop_launch.py`. 원본 https://github.com/minho0/limo_basic
+- 토픽(공지): /scan, /imu, /odom, /odom/filtered(Pro 실측은 /odometry/filtered), /tf, /tf_static, /camera/color/image_raw. 카메라는 연산 고려해 빼는 것 권장.
