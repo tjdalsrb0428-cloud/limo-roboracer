@@ -356,3 +356,5 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 - 큰 소스 tar(104 MB gzip) 중 모터보드·라이다 동시 checksum 오류 → 라이다 Device Failed. 드라이버 재시작 후 정상. 주행/기록 중 대용량 작업 금지.
 - 소스: `ref/limo_pro/`(코드·설정만 149 KB: limo_ros2, wego, wego_msgs, ydlidar_ros2_driver, wego_2d_nav, robot_localization). bag은 `ws/bags/real/`(gitignore).
 - bag1(/tmp, 229 s, 32 MB, 수동 주행)은 핫스팟이 너무 느려 못 옮김.
+- **결정(2026-11-04): bag을 노트북으로 옮기지 않는다**(전송이 너무 느림). 매핑·SLAM은 로봇 안 우리 컨테이너에서 실행하고
+  결과물(pgm/yaml/_traj.csv, 수백 KB)만 가져온다. SLAM 비교·튜닝은 로봇에서 bag 재생으로 한다. 노트북 개발은 시뮬 real 모드로.
