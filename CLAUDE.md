@@ -370,3 +370,9 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
   `sudo docker run -it --name limo_humble --network host --privileged --device=/dev/ttyTHS1:/dev/ttyTHS1 --device=/dev/ttyUSB0:/dev/ttyUSB0 -v /dev/bus/usb:/dev/bus/usb -v /home/agilex/Documents:/home/agilex/Documents yspark98/limo1_humble:latest bash`
   → `cd /home/agilex/Documents/limo_basic_ws; source install/setup.bash; ros2 launch wego teleop_launch.py`. 원본 https://github.com/minho0/limo_basic
 - 토픽(공지): /scan, /imu, /odom, /odom/filtered(Pro 실측은 /odometry/filtered), /tf, /tf_static, /camera/color/image_raw. 카메라는 연산 고려해 빼는 것 권장.
+
+## 트랙 환경 (사용자 전달, 2026-11-05)
+- 차선 없음. **벽 = 약간 두꺼운 호스**(바닥에 놓인 낮은 경계), 바닥은 일반 바닥 + 초록 인조잔디 혼합.
+- 확인 필요(다음 실습 1순위): 라이다 높이 vs 호스 높이 → 라이다 평면이 호스를 맞히는지, 검은 고무면 반사 약해 점 누락되는지,
+  호스 너머 방 벽·가구·사람이 보이는지. URDF로는 라이다 높이 판단 불가(프레임 오프셋 이상) → 줄자로 실측.
+- 바닥 재질별 미끄럼·바퀴 odom 스케일·조향 응답 차이 → 위치추정은 IMU 자이로·라이다 비중↑, 재질별 보정 필요할 수 있음.
