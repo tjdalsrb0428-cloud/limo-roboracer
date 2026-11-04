@@ -1,0 +1,52 @@
+# LIMO Pro (Jetson Orin Nano) 프로파일
+# 출처: 2026-11-04 실습 실측 + 로봇 소스(ref/limo_pro). "(추정)"은 실차 측정 전 값.
+name: limo_pro
+
+host:
+  user: wego
+  code_dir: /home/wego/Documents            # 공지: 코드는 ~/Documents 안에만
+  # 드라이버는 로봇 호스트에 설치돼 있음 (수정 금지, 실행만)
+  driver_image: null
+  driver_launch: "source /opt/ros/humble/setup.bash && source /home/wego/wego_ws/install/setup.bash && ros2 launch wego teleop_launch.py"
+
+topics:
+  scan: /scan
+  odom: /odom                 # 바퀴 odom (드라이버 계산식 버그: 회전 시 가짜 linear.y·위치 오차 → 위치는 쓰지 말 것)
+  odom_filtered: /odometry/filtered   # EKF 결과 (실측)
+  imu: /imu
+  status: /limo_status
+  cmd: /limo/ack_cmd
+
+frames:
+  base: base_link
+  laser: laser_link
+  odom: odom
+
+command:
+  type: ackermann             # ackermann_msgs/AckermannDrive: speed(m/s), steering_angle(rad)
+  # 드라이버: 보드값 = steering_angle / 1.215, 보드값 ±0.42 제한
+  #   → 받아들이는 steering_angle 최대 0.42 × 1.215 ≈ 0.51 (추정: 이 값이 중심 조향각 rad라면 최소 회전반경 ≈ 0.36 m)
+  steer_max: 0.51
+  speed_max: 1.0
+
+vehicle:
+  wheelbase: 0.20
+  track: 0.172                # (추정, LIMO1과 동일 가정)
+  length: 0.322               # (추정) 실측 필요
+  width: 0.220                # (추정) 실측 필요
+
+lidar:
+  # YDLIDAR Tmini Plus, 2026-11-04 /scan 실측
+  angle_min_deg: -110.0
+  angle_max_deg: 110.0
+  rate_hz: 10.0
+  points_approx: 248
+  range_min: 0.10             # 드라이버는 0.01~64 m로 내보냄 → 우리 코드에서 0.1~12 m만 사용, 0은 측정 실패
+  range_max: 12.0
+  x_offset: 0.103             # (추정, URDF 오프셋이 이상해 실측 필요)
+
+calib:
+  # 로봇마다 다름 → 실습 때 calib_steer.py / calib_speed.py로 측정해서 덮어쓴다
+  steer_scale: 1.0            # 실제 조향 = 명령 × scale
+  steer_trim: 0.0             # 직진이 되도록 더하는 조향각 rad (+ = 좌)
+  speed_scale: 1.0            # 실제 속도 = 명령 × scale

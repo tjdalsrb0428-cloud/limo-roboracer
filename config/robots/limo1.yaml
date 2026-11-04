@@ -1,0 +1,50 @@
+# LIMO1 (구형, Jetson Nano) 프로파일
+# 출처: 조교 저장소 minho0/limo_basic (ref/limo_basic), 기말 실습 공지. "(추정)"은 실차 측정 전 값.
+name: limo1
+
+host:
+  user: agilex
+  code_dir: /home/agilex/Documents          # 공지: 코드는 ~/Documents 안에만
+  # 드라이버는 조교 이미지 컨테이너 안에서 실행
+  driver_image: yspark98/limo1_humble:latest
+  driver_launch: "cd /home/agilex/Documents/limo_basic_ws && source install/setup.bash && ros2 launch wego teleop_launch.py"
+
+topics:
+  scan: /scan
+  odom: /odom                 # 바퀴 odom (드라이버 계산)
+  odom_filtered: /odom/filtered   # EKF 결과 (공지 표기, 실측 미확인)
+  imu: /imu
+  status: /limo_status
+  cmd: /cmd_vel
+
+frames:
+  base: base_link
+  laser: laser_link
+  odom: odom
+
+command:
+  type: twist                 # geometry_msgs/Twist: 드라이버가 r = v/ω → 중심 조향각 atan(L/r) → 안쪽 바퀴각(28° 제한)
+  steer_max: 0.41             # 중심 조향각 한계 rad (안쪽 28°, 윤거 0.172에서 환산)
+  speed_max: 1.0
+
+vehicle:
+  wheelbase: 0.20
+  track: 0.172
+  length: 0.322               # 매뉴얼 치수 322×220 mm
+  width: 0.220
+
+lidar:
+  # 드라이버 설정값(ydlidar.yaml). 실제 점 수·각도는 코드에서 메시지 값으로 해석한다.
+  angle_min_deg: -90.0
+  angle_max_deg: 90.0
+  rate_hz: 8.0
+  points_approx: 188
+  range_min: 0.10             # 우리 코드에서 쓰는 유효 범위
+  range_max: 12.0
+  x_offset: 0.103             # base_link 기준 앞쪽 거리 (URDF, 추정)
+
+calib:
+  # 로봇마다 다름 → 실습 때 calib_steer.py / calib_speed.py로 측정해서 덮어쓴다
+  steer_scale: 1.0            # 실제 조향 = 명령 × scale
+  steer_trim: 0.0             # 직진이 되도록 더하는 조향각 rad (+ = 좌)
+  speed_scale: 1.0            # 실제 속도 = 명령 × scale
