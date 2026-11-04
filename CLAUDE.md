@@ -341,3 +341,18 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
   검증(2026-10-25): hello 지도 `--global-only` → 9 m 만에 위치 오차 0.31 m, 첫 커브에서 벽 충돌 → 위치추정 필수.
   시뮬 정리는 `docker restart limo_gazebo_humble`이 확실하다(`pkill -f gzserver`를 bash -c 안에서 쓰면 자기 셸이 먼저 죽음).
 - 실차 스크립트: `scripts/real/recon.sh`(정찰, 로봇 무변경). 수요일 첫날 = 연결 → recon → 수동 조종 확인 → 트랙 저속 bag 1개 → 정리.
+
+## 2026-11-04 LIMO Pro 첫 실습 (정찰 결과)
+- 접속: 폰 핫스팟(아이폰 172.20.10.x)에 로봇·노트북 연결 → `ssh wego@IP`(비번 wego). IP는 재연결 때마다 바뀜(.8→.9), 로봇에서 `hostname -I`.
+  로그인 시 환경 메뉴 → `1)` Global(Conda 금지). 비대화 ssh는 `echo 1 | ssh ...`. 핫스팟+USB 동글은 ping 0.3~1.7 s, 전송 1~6 KB/s → 대용량은 USB 메모리로.
+- 로봇: Ubuntu 22.04 aarch64 Jetson(tegra 5.15, 6코어, RAM 7.4 GB), 호스트에 ROS2 humble + `~/wego_ws`. docker 있으나 이미지·컨테이너 없음, wego는 docker 그룹 아님(sudo 필요).
+- 드라이버 실행(조교 방식): `export ROS_LOCALHOST_ONLY=1; source /opt/ros/humble/setup.bash; source ~/wego_ws/install/setup.bash; ros2 launch wego teleop_launch.py`
+  = URDF + limo_base_ackerman(ns limo, pub_odom_tf false) + Orbbec 카메라 + ydlidar + robot_localization EKF(limo_ekf.yaml, 30 Hz, 2D, odom+imu). `~/limo_ros2_start_shortcut/setup.bash`는 chmod 777 → 실행 금지.
+- 토픽: 명령 **`/limo/ack_cmd`(ackermann_msgs/AckermannDrive)**, `/cmd_vel` 없음. 드라이버가 steering_angle/1.215 후 ±0.42 클램프 → 실측 보정 필요.
+  `/scan` 10 Hz, `/imu` 100 Hz, `/odom` 50 Hz, `/odometry/filtered` 30 Hz, `/tf` 50 Hz(bag 기준), `/limo_status`(motion_mode 1=Ackermann, control_mode 3=조종기 추정, 12.4 V), `/set_pose`.
+- 라이다: YDLIDAR **Tmini Plus**, ±110°, 248점(0.89°), 10 Hz, frame laser_link, range 0.01~64(invalid=0 가능 → 직접 필터). 장치 `/dev/ydlidar→ttyUSB0`, 모터보드 `/dev/ttylimo→ttyTHS1`.
+- 드라이버 odom 버그(limo_ackerman_driver.cpp publishOdometry): vx=R·sin(ω), vy=R(1−cos ω)에 각속도 ω를 각도로 사용 → 회전 시 가짜 linear.y·위치 오차. 우리 쪽에서 v + IMU 자이로로 직접 적분할 것.
+- 시작 직후 "Invalid motion mode" 경고 1회는 상태 프레임 수신 전이라 무해.
+- 큰 소스 tar(104 MB gzip) 중 모터보드·라이다 동시 checksum 오류 → 라이다 Device Failed. 드라이버 재시작 후 정상. 주행/기록 중 대용량 작업 금지.
+- 소스: `ref/limo_pro/`(코드·설정만 149 KB: limo_ros2, wego, wego_msgs, ydlidar_ros2_driver, wego_2d_nav, robot_localization). bag은 `ws/bags/real/`(gitignore).
+- bag1(/tmp, 229 s, 32 MB, 수동 주행)은 핫스팟이 너무 느려 못 옮김.
