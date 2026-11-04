@@ -41,17 +41,30 @@ if docker ps >/dev/null 2>&1; then
     run docker/version 'docker version; docker info 2>/dev/null | head -40'
     run docker/images  'docker images --digests'
     run docker/ps      'docker ps -a --no-trunc'
-    for c in $(docker ps --format '{{.Names}}'); do
+    for c in $(docker ps -a --format '{{.Names}}'); do   # 꺼진 컨테이너(조교 ROS2 컨테이너 등)도 설정 기록
         run "docker/inspect_$c" "docker inspect $c"
+    done
+    for c in $(docker ps --format '{{.Names}}'); do
         docker exec "$c" bash -c 'ls -d /opt/ros/*' >/dev/null 2>&1 && CONTAINERS="$CONTAINERS $c"
     done
 else
     run docker/error 'docker ps'   # 권한 없음/미설치 기록 (sudo 는 쓰지 않는다)
 fi
 
-# ---------- 3. ROS (호스트 + ROS 있는 컨테이너) ----------
+# ---------- 2-1. ROS1 (구형 LIMO: 호스트 18.04 melodic, roscore 가 떠 있을 때만) ----------
+if ls /opt/ros/melodic/setup.bash >/dev/null 2>&1; then
+    log "ROS1 host"
+    mkdir -p "$D/ros1"
+    P1='. /opt/ros/melodic/setup.bash; for s in $(find ~ -maxdepth 4 -path "*/devel/setup.bash" 2>/dev/null); do . $s; done;'
+    run ros1/nodes  "$P1 rosnode list"
+    run ros1/topics "$P1 rostopic list -v"
+    run ros1/params "$P1 rosparam list"
+    run ros1/ws     'find ~ -maxdepth 4 -path "*/devel/setup.bash" 2>/dev/null; ls ~/*_ws/src 2>/dev/null'
+fi
+
+# ---------- 3. ROS2 (호스트 + ROS 있는 컨테이너) ----------
 TARGETS=""
-ls -d /opt/ros/* >/dev/null 2>&1 && TARGETS="host"
+ls -d /opt/ros/foxy /opt/ros/humble /opt/ros/jazzy 2>/dev/null | grep -q . && TARGETS="host"
 TARGETS="$TARGETS $CONTAINERS"
 log "ROS targets: ${TARGETS:-없음}"
 

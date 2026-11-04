@@ -302,6 +302,25 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
   → 2주차 SLAM·위치추정, 저속 Q1 → 3주차 Q1 속도 올리기, Q2 → 4주차 Q3, 반복 신뢰성 테스트 → 5주차 2대 주행, 추월 → 이후 코드 동결, 실전 리허설.
 - 로봇 안 소스는 tar로 노트북에 가져와 msg/description만 빌드한다(bag 재생, RViz용). 로봇 이미지는 ARM64라 노트북에서 직접 실행하지 않는다.
 
+## 기말 OT 내용 (2026-10-28) — 실습 플랫폼 2종
+- **시험은 LIMO Pro**(Ubuntu 22.04, ROS2). Pro가 3대뿐이라 실습엔 **구형 LIMO(Jetson Nano, Ubuntu 18.04, ROS1)**도 쓴다.
+  구형은 조교가 ROS2를 쓸 수 있게 만든 docker 컨테이너가 들어 있다. 확보 로봇 7대 / 10개 조, 로봇마다 주행 상태가 다르다.
+- 수업(실습): 수요일 18~22시. 접속은 같은 Wi-Fi에서 SSH 권장(키보드·마우스 USB, HDMI 연결도 가능). 사용법은 첫 실습 때 조교가 설명.
+- 최고속도 1 m/s 고정 → 승부는 조향·경로 생성·장애물 회피.
+- 취급: 반드시 **바닥에서**(책상·의자 위 금지). 전원 버튼은 **살살 길게**(세게 누르면 함몰 → 분해 수리). 끌 때는 `sudo shutdown now` 또는 GUI 종료.
+  배터리 선은 커넥터를 잡고 뺀다(선 당기면 보드에서 빠짐). 충전 완료(파란불) 즉시 분리, **충전하면서 주행 금지**, 잔량 부족하면 조교가 여분 배터리로 교체.
+  구형 LIMO는 전용 충전 어댑터 챙기기. 화면 안 나오면 HDMI 재장착(자주 빠짐). 상자·조종기·로봇 번호(예 1253) 일치 확인. 고장 나면 바로 보고.
+- 모드: 바퀴의 빨간 노브를 돌려 주황불 = 4륜(차동) 모드 → 쓰면 안 됨. 노브가 올라온 상태(뒷바퀴 고정) = **Ackermann**인지 매번 확인.
+- 조종기: 왼쪽 위 SW 스위치를 **가운데**에 둬야 조종기로 움직인다(위로 올리면 안 먹음). 왼쪽 스틱 전후진, 오른쪽 스틱 조향.
+
+## 알고리즘 결정 (2026-11-04)
+- 로봇 안: 조교 드라이버(스캔·odom·cmd_vel) + 우리 컨테이너. 코드는 토픽·프레임·차량 치수를 **로봇 프로파일(yaml)**로 받아 LIMO/Pro 공용.
+- 매핑: 로봇에선 수동 주행 bag(/scan /odom /imu /tf /tf_static)만 기록 → 노트북에서 slam_toolbox(1순위)·Cartographer 오프라인 비교 → pgm/yaml + _traj.csv → raceline.py 그대로.
+- 위치추정: 자체 파티클 필터(likelihood field, ±90° 라이다 대응) → TF map→odom. 백업 nav2_amcl 단독 실행.
+- Global: raceline.py 유지(실차 치수, 트랙 폭 1 m 기준 여유 재조정). Local: lattice 유지. 제어: pure pursuit + 지연 보상(예측 자세) + 로봇별 조향 트림.
+- 연산 위치: 계획이 노트북에서 100~200 ms → Jetson Nano에서 10 Hz 불가 가능성. 첫날 측정해서 로봇 탑재 / 경량화 / 노트북 연산(Wi-Fi 지연) 중 결정.
+- 본선(상대 차)·Q3 고속 모드는 Q1·Q2 안정화 후.
+
 ## 실차 인터페이스 (공개 소스 기준, Pro에서 같은지 recon으로 확인 필요)
 - 참고 소스: `/home/mksung0428/Downloads/LIMO_GAZEBO/ref/`(ws 밖, git 미포함)에 agilexrobotics/limo_ros2(humble, humble-dev), limo-doc. 구형 LIMO용(2023).
 - `/cmd_vel` Twist(Ackermann): 드라이버가 r = v/ω → 중심 조향각 atan(L/r) → 안쪽 바퀴각으로 변환, 안쪽 28°(0.4887 rad)로 제한 → 최소 회전반경 약 0.46 m.
