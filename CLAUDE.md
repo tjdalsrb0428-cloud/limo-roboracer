@@ -434,7 +434,15 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
    원래 계획:
    **SLAM 매핑**(3~4 h): 로봇 컨테이너에서 slam_toolbox(1순위)/Cartographer → `export_map.py`로 pgm/yaml + _traj.csv(SLAM 보정 궤적) → raceline.py 그대로.
    트랙 밖 먼 점(사람·가구) 무시 옵션. 시뮬 real 모드에서 먼저 검증.
-6. **위치추정** `scripts/real/localizer.py`(4~6 h): 파티클 필터(likelihood field), ±90°/±110° 모두, 초기값 = 출발 pose, TF map→odom, 불확실하면 정지 신호.
+6. ✅ **(2026-11-05 완료) `scripts/real/localizer.py`**: 파티클 필터 600개, likelihood field(지도 벽 거리변환, σ 0.08, Z_RAND 0.15, 상한 1 m), 빔 60개(scan_valid: 차체·무효 제외, 메시지 각도 그대로),
+   움직임 = TF odom→base_link 변화량 + 잡음(이동·회전 3 %), 0.03 m/2°마다 갱신, Neff<N/2 재표집, 출력 TF map→odom(스캔 시각) + /pf/pose, /initialpose로 재초기화. 초기값 = `NAME_traj.csv` 마지막 줄 또는 --init.
+   사용: `python3 localizer.py --map maps/real/NAME.yaml --robot limo_pro [--sim] [--a-trans --a-rot]`. 처리 2~3 ms/갱신(노트북).
+   **시뮬 덕트 트랙 한 바퀴(Pro, odom_tf 자체 odom), 정답 지도 기준 오차**: PF 0.5 m/s 평균 0.056/95% 0.18 m·옆방향 0.5 cm·방향 최대 6.9°, 1.0 m/s 평균 0.067·옆 0.7 cm.
+   비교: odom만 평균 0.34 m·옆 0.27 m / **조교 설정 nav2 AMCL 평균 0.39 m·옆 7 cm** → 자체 PF 채택. loop_mapper 지도로는 world 기준 평균 0.23 m(지도 자체 휨 포함, 옆 0.10).
+   교훈: 움직임 잡음 10 %면 U턴(원호 통로: 원 중심 회전은 라이다로 구분 불가)에서 진행방향 0.4 m·11° 흐름 → 3 %. 지도에 없는 점(덕트 틈 너머 방 벽)은 Z_RAND 0.05면 자세를 끌어당김 → 0.15.
+   테스트: `.sim_tmp/loc_lap.sh TAG MAP SPEED "LOC CMD"`(OFF=지도 원점 world 자세), `.sim_tmp/world_map.py`(world→정답 지도 maps/real/gt_duct), `.sim_tmp/amcl_run.sh`(조교 AMCL), `.sim_tmp/loc_eval.py`.
+   원래 계획:
+   **위치추정** `scripts/real/localizer.py`(4~6 h): 파티클 필터(likelihood field), ±90°/±110° 모두, 초기값 = 출발 pose, TF map→odom, 불확실하면 정지 신호.
 7. **race_driver 실차 모드**(4~6 h): `--robot` 프로파일, 출력 Twist/AckermannDrive, 자체 odom(v + IMU 자이로, 드라이버 odom 위치 미사용), 스캔 필터(0·inf·range),
    폭 1 m 트랙 여유 재조정, 지연 보상, 속도 상한 옵션(첫 테스트 0.3), 스캔/위치 끊김 시 정지, Jetson Nano용 lite 모드(CPU 1~2코어 제한으로 계획 시간 측정).
 8. ✅ **(2026-11-05 완료)** `docs/practice_next.md`: 전날 준비(USB tar, GitHub fine-grained 토큰 Contents Read-only 7일), 하드웨어, 학교 Wi-Fi→안 되면 핫스팟,
