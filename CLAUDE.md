@@ -419,7 +419,10 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 6. **위치추정** `scripts/real/localizer.py`(4~6 h): 파티클 필터(likelihood field), ±90°/±110° 모두, 초기값 = 출발 pose, TF map→odom, 불확실하면 정지 신호.
 7. **race_driver 실차 모드**(4~6 h): `--robot` 프로파일, 출력 Twist/AckermannDrive, 자체 odom(v + IMU 자이로, 드라이버 odom 위치 미사용), 스캔 필터(0·inf·range),
    폭 1 m 트랙 여유 재조정, 지연 보상, 속도 상한 옵션(첫 테스트 0.3), 스캔/위치 끊김 시 정지, Jetson Nano용 lite 모드(CPU 1~2코어 제한으로 계획 시간 측정).
-8. **실습 절차서** `docs/practice_next.md`(1~2 h): 시간 배분(셋업 15 / 측정 30 / 매핑 20 / 주행 40 / 정리 15분), 복붙 명령, 문제 대처, 준비물(USB 메모리, 줄자).
+8. ✅ **(2026-11-05 완료)** `docs/practice_next.md`: 전날 준비(USB tar, GitHub fine-grained 토큰 Contents Read-only 7일), 하드웨어, 학교 Wi-Fi→안 되면 핫스팟,
+   드라이버(Pro 호스트 / LIMO1 조교 컨테이너), sparse clone + setup.sh, 측정 순서(check_sensors→check_hose 거리별→줄자→calib_speed 바닥·잔디→calib_steer), 결과 calib_로봇번호.yaml, teardown, 문제 대처표.
+   매핑·주행 단계는 5~7번 완료 시 추가. 원래 계획:
+   **실습 절차서** `docs/practice_next.md`(1~2 h): 시간 배분(셋업 15 / 측정 30 / 매핑 20 / 주행 40 / 정리 15분), 복붙 명령, 문제 대처, 준비물(USB 메모리, 줄자).
    전날 시뮬로 절차서대로 리허설.
 
 다음 실습에서 현장 확인: 호스 점 누락(0.5/1/2/3 m)·바닥 찍힘·이음매 틈, 로봇 인터넷(Docker Hub pull 속도), 수업 Wi-Fi 사용 가능 여부, 노트북 RViz 토픽 수신,
