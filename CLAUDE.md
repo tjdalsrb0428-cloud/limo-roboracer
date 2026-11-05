@@ -407,7 +407,7 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 4. ✅ **(2026-11-05 거의 완료)** `docker/robot/`(Dockerfile, fastdds_udp.xml, limo_msgs), `scripts/real/setup.sh`·`teardown.sh` 커밋·GitHub push 완료(e3d6902까지).
    ARM64 이미지 `tjdalsrb0428/limo-robot:v1` 노트북에 빌드(에뮬레이션 9분, aarch64에서 limo1·limo_pro 명령·limo_msgs·slam_toolbox 확인). x86 테스트 빌드로 UDP 전용 DDS 통신 확인.
    USB 백업 `/home/mksung0428/limo-robot_v1.tar`(536 MB, `sudo docker load -i`). 노트북 qemu-user-static·binfmt-support 설치됨(재부팅 유지).
-   **남은 것: Docker Hub push(사용자가 직접 `docker push tjdalsrb0428/limo-robot:v1`), 로봇에서 setup/teardown 첫 실행 검증.** 원래 계획:
+   Docker Hub push 완료(v1, arm64, 562 MB). **남은 것: 로봇에서 setup/teardown 첫 실행 검증.** 원래 계획:
    **배포**(3~5 h): `docker/Dockerfile.robot`(ARM64, ros:humble + slam_toolbox, robot_localization, ackermann_msgs, numpy/scipy/skimage, limo_msgs 빌드, **코드는 넣지 않음**)
    → Docker Hub **`tjdalsrb0428/limo-robot`**(새 public 저장소. 기존 `tjdalsrb0428/limo`의 중간고사 x86 이미지 gazebo_humble_final/backup은 건드리지 않기) + USB 백업 `docker save` tar.
    노트북 docker는 tjdalsrb0428로 로그인돼 있음. **ARM64 에뮬레이션 미설치** → `docker run --privileged --rm tonistiigi/binfmt --install arm64`(사용자 승인 대기 중, 재부팅 시 재실행). push 전 사용자 확인.
