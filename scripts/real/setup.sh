@@ -32,7 +32,7 @@ echo "[setup] robot=$ROBOT image=$IMAGE code=$CODE ROS_LOCALHOST_ONLY=$LO ROS_DO
 if [ -n "$TAR" ]; then
   echo "[setup] USB 이미지 load: $TAR"; sudo docker load -i "$TAR"
 elif ! sudo docker image inspect "$IMAGE" >/dev/null 2>&1; then
-  echo "[setup] pull $IMAGE (약 1~2 GB)"; sudo docker pull "$IMAGE"
+  echo "[setup] pull $IMAGE (약 0.5 GB)"; sudo docker pull "$IMAGE"
 fi
 sudo docker rm -f limo_race >/dev/null 2>&1 || true
 # --network host: 로봇 드라이버 토픽을 그대로 봄. --ipc host: DDS 통신 안정. 장치 접근은 필요 없음(드라이버는 호스트/조교 컨테이너).

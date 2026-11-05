@@ -404,7 +404,11 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
    **측정 스크립트** `scripts/real/`(2 h, **docker 없이 로봇 호스트 기본 ROS(rclpy)로 실행 가능**, 결과는 숫자만 출력, bag 불필요):
    `check_sensors.py`(토픽 주기·라이다 사양·배터리), `calib_steer.py`(고정 조향 원 주행 → 반경 → 조향 스케일·좌우 트림),
    `calib_speed.py`(명령 vs 실제 속도, 지연; 일반 바닥/잔디 따로), `check_hose.py`(거리별 호스 점 수). LIMO1=/cmd_vel, Pro=/limo/ack_cmd 둘 다 지원.
-4. **배포**(3~5 h): `docker/Dockerfile.robot`(ARM64, ros:humble + slam_toolbox, robot_localization, ackermann_msgs, numpy/scipy/skimage, limo_msgs 빌드, **코드는 넣지 않음**)
+4. ✅ **(2026-11-05 거의 완료)** `docker/robot/`(Dockerfile, fastdds_udp.xml, limo_msgs), `scripts/real/setup.sh`·`teardown.sh` 커밋·GitHub push 완료(e3d6902까지).
+   ARM64 이미지 `tjdalsrb0428/limo-robot:v1` 노트북에 빌드(에뮬레이션 9분, aarch64에서 limo1·limo_pro 명령·limo_msgs·slam_toolbox 확인). x86 테스트 빌드로 UDP 전용 DDS 통신 확인.
+   USB 백업 `/home/mksung0428/limo-robot_v1.tar`(536 MB, `sudo docker load -i`). 노트북 qemu-user-static·binfmt-support 설치됨(재부팅 유지).
+   **남은 것: Docker Hub push(사용자가 직접 `docker push tjdalsrb0428/limo-robot:v1`), 로봇에서 setup/teardown 첫 실행 검증.** 원래 계획:
+   **배포**(3~5 h): `docker/Dockerfile.robot`(ARM64, ros:humble + slam_toolbox, robot_localization, ackermann_msgs, numpy/scipy/skimage, limo_msgs 빌드, **코드는 넣지 않음**)
    → Docker Hub **`tjdalsrb0428/limo-robot`**(새 public 저장소. 기존 `tjdalsrb0428/limo`의 중간고사 x86 이미지 gazebo_humble_final/backup은 건드리지 않기) + USB 백업 `docker save` tar.
    노트북 docker는 tjdalsrb0428로 로그인돼 있음. **ARM64 에뮬레이션 미설치** → `docker run --privileged --rm tonistiigi/binfmt --install arm64`(사용자 승인 대기 중, 재부팅 시 재실행). push 전 사용자 확인.
    `scripts/real/setup.sh`(~/Documents에 git clone → pull → 컨테이너 실행: --network host --privileged, 장치 ttyTHS1/ttyUSB0, ~/Documents 마운트, sudo docker),
