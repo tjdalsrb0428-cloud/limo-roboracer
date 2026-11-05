@@ -87,6 +87,9 @@ ROBOT=limo_pro                                                         # LIMO1�
 python3 check_sensors.py --robot $ROBOT
 ```
    - 라이다 각도·점 수·주기가 프로파일과 다르면 기록. IMU 편향 기록.
+   - EKF 확인(우리 TF와 겹치는지): `timeout 3 ros2 topic echo --once /odometry/filtered | grep -A3 position` → NaN인지,
+     `timeout 5 ros2 run tf2_ros tf2_echo odom base_link` → TF가 나오는지(나오면 EKF가 TF 발행 중) 기록.
+   - 차체가 찍히는지: `check_hose.py --sector 110`에서 0.1~0.2 m 묶음이 ±100° 바깥에 있으면 자기 몸체.
 2. **덕트(벽) 감지** (로봇 정지, 덕트 정면 0.5 / 1 / 2 / 3 m에 차례로 놓고 각각 5초)
 ```bash
 python3 check_hose.py --robot $ROBOT
