@@ -29,6 +29,7 @@ command:
 
 vehicle:
   wheelbase: 0.20
+  max_steer_center: 0.41      # 실제 최대 중심 조향각 rad (race_driver 곡률 한계, calib_steer --steer 0.5로 실측해 갱신)
   track: 0.172
   length: 0.322               # 매뉴얼 치수 322×220 mm
   width: 0.220
@@ -42,6 +43,7 @@ lidar:
   range_min: 0.10             # 우리 코드에서 쓰는 유효 범위
   range_max: 12.0
   x_offset: 0.103             # base_link 기준 앞쪽 거리 (URDF, 추정)
+  self_margin: 0.07            # 차체(vehicle 길이·폭) + 이 여유 안의 점 = 자기 몸체·바퀴 → 버림(시뮬 Pro ±101° 밖 바퀴가 옆 0.165 m까지 찍힘)
 
 calib:
   # 로봇마다 다름 → 실습 때 calib_steer.py / calib_speed.py로 측정해서 덮어쓴다

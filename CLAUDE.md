@@ -443,7 +443,16 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
    테스트: `.sim_tmp/loc_lap.sh TAG MAP SPEED "LOC CMD"`(OFF=지도 원점 world 자세), `.sim_tmp/world_map.py`(world→정답 지도 maps/real/gt_duct), `.sim_tmp/amcl_run.sh`(조교 AMCL), `.sim_tmp/loc_eval.py`.
    원래 계획:
    **위치추정** `scripts/real/localizer.py`(4~6 h): 파티클 필터(likelihood field), ±90°/±110° 모두, 초기값 = 출발 pose, TF map→odom, 불확실하면 정지 신호.
-7. **race_driver 실차 모드**(4~6 h): `--robot` 프로파일, 출력 Twist/AckermannDrive, 자체 odom(v + IMU 자이로, 드라이버 odom 위치 미사용), 스캔 필터(0·inf·range),
+7. ✅ **(2026-11-05 완료) `race_driver.py --robot limo1|limo_pro [--calib] [--sim] [--vmax V] [--lite]`**: 프로파일로 WB·REAR(=WB/2)·K_MAX(tan(0.9·max_steer_center)/WB)·TRACK,
+   명령은 CmdAdapter(Twist ω=v·κ → δ=atan(WB·ω/v) → CmdSender: LIMO1 /cmd_vel, Pro /limo/ack_cmd), 토픽 프로파일, v_meas = odom_speed(Pro 버그 역산)×odom_scale,
+   스캔 = scan_valid(0·inf·범위·**자기 차체**), map→odom은 localizer TF(M2O_TAU 0.5, /initialpose 안 보냄), map→odom 1 s 끊기면 정지, ROS_LOCALHOST_ONLY 강제 안 함.
+   `--lite`: 정거장 12, 횡후보 0.12 m(27개), 능선 3 → 계획 82→36 ms(노트북), 랩 동일. 프로파일에 vehicle.max_steer_center 0.41, lidar.self_margin 0.07 추가.
+   **시뮬 전체 흐름(덕트 트랙, odom_tf + localizer + race_driver, loop_mapper 지도 sim_loop3)**: Pro 1.0 m/s 47.7/47.4/47.4 s 3바퀴 무충돌(덕트 최소 여유 0.22 m, 탈출 0),
+   0.5 m/s 94.1 s, LIMO1 1.0 m/s 47.6/47.4 s, --lite 47.6/47.4 s(계획 36 ms). 중간고사 모드(--robot 없음) 회귀 OK(덕트 정답 지도 47.9 s).
+   버그 수정 기록: 자기 차체 점(바퀴, 옆 0.165 m)이 장애물 150~1600점으로 잡혀 TIGHT·탈출 반복 → self_margin 0.03→0.07로 obs=0.
+   테스트: `.sim_tmp/real_race.sh TAG MAP VMAX RUNSEC [드라이버 인자]`(RB=limo1, OFF, DRVENV="env RACE_DEBUG=1"), `.sim_tmp/duct_clear.py`(GT 덕트 여유).
+   원래 계획:
+   **race_driver 실차 모드**(4~6 h): `--robot` 프로파일, 출력 Twist/AckermannDrive, 자체 odom(v + IMU 자이로, 드라이버 odom 위치 미사용), 스캔 필터(0·inf·range),
    폭 1 m 트랙 여유 재조정, 지연 보상, 속도 상한 옵션(첫 테스트 0.3), 스캔/위치 끊김 시 정지, Jetson Nano용 lite 모드(CPU 1~2코어 제한으로 계획 시간 측정).
 8. ✅ **(2026-11-05 완료)** `docs/practice_next.md`: 전날 준비(USB tar, GitHub fine-grained 토큰 Contents Read-only 7일), 하드웨어, 학교 Wi-Fi→안 되면 핫스팟,
    드라이버(Pro 호스트 / LIMO1 조교 컨테이너), sparse clone + setup.sh, 측정 순서(check_sensors→check_hose 거리별→줄자→calib_speed 바닥·잔디→calib_steer), 결과 calib_로봇번호.yaml, teardown, 문제 대처표.

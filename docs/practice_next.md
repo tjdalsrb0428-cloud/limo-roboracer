@@ -10,7 +10,7 @@
 | 20~25분 | 3. 드라이버 실행 |
 | 25~35분 | 4. 우리 환경(setup.sh) |
 | 35~75분 | 5. 측정 |
-| 75~105분 | 매핑(아래 5-2) → 레이스라인 / (주행 — 준비되면 추가) |
+| 75~105분 | 매핑(5-2) → 레이스라인 → 저속 자율주행(5-3) |
 | 105~120분 | 6. 결과 저장, 7. 정리 |
 
 ---
@@ -124,6 +124,19 @@ python3 ../race/raceline.py ../../maps/real/track1.yaml                 # 레이
 python3 slam_mapper.py ../../maps/real/track1_carto --robot $ROBOT       # (비교용, 시간 남으면) Cartographer, 같은 방법
 ```
 - `ICP 신뢰 낮음`/`출발점에서 멀다`가 나오면 다시 돌기. 결과 파일(수백 KB)은 6단계 scp로 노트북에.
+
+### 5-3. 저속 자율주행 (30분) — 컨테이너 터미널 3개, 조종기 SWB 위(코드 제어), 사람 1명은 조종기 들고 대기
+측정한 보정값은 먼저 `config/robots/calib_now.yaml`에 적어 둔다(아래 형식, 로봇 안에서 `cat > ... <<EOF`로 작성).
+```bash
+# 터미널 2: (EKF TF 없을 때만) python3 odom_tf.py --robot $ROBOT                    ← 시작 후 2초 정지
+# 터미널 3: 위치추정 (차를 매핑 때 출발 위치·방향에 놓고)
+python3 localizer.py --map ../../maps/real/track1.yaml --robot $ROBOT --calib ../../config/robots/calib_now.yaml
+# 터미널 4: 드라이버 (처음엔 0.3, 되면 0.5 → 0.7). LIMO1이면 --lite
+python3 ../race/race_driver.py --robot $ROBOT --calib ../../config/robots/calib_now.yaml --map ../../maps/real/track1.yaml --vmax 0.3
+# READY 뒤 터미널 5: python3 ../race/go.py   / 정지: 드라이버 터미널 Ctrl+C (위험하면 조종기 SWB 가운데)
+```
+- localizer 상태 줄 `점수`가 0.8 이상, `퍼짐`이 0.05 m 이하여야 정상. 틀어지면 Ctrl+C 후 차를 출발 위치에 다시 놓고 localizer 재시작.
+- 기록: 랩 시간(`=== LAP`), 드라이버 상태 줄의 plan(ms)(LIMO1 계산 속도), 벽 접촉 여부.
 
 결과는 노트북에서 `config/robots/calib_로봇번호.yaml`로 저장해 커밋(예):
 ```yaml

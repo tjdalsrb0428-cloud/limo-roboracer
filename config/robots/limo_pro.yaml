@@ -31,6 +31,7 @@ command:
 
 vehicle:
   wheelbase: 0.20
+  max_steer_center: 0.41      # 실제 최대 중심 조향각 rad (race_driver 곡률 한계, calib_steer --steer 0.5로 실측해 갱신)
   track: 0.172                # (추정, LIMO1과 동일 가정)
   length: 0.322               # (추정) 실측 필요
   width: 0.220                # (추정) 실측 필요
@@ -44,6 +45,7 @@ lidar:
   range_min: 0.10             # 드라이버는 0.01~64 m로 내보냄 → 우리 코드에서 0.1~12 m만 사용, 0은 측정 실패
   range_max: 12.0
   x_offset: 0.103             # (추정, URDF 오프셋이 이상해 실측 필요)
+  self_margin: 0.07            # 차체(vehicle 길이·폭) + 이 여유 안의 점 = 자기 몸체·바퀴 → 버림(시뮬 Pro ±101° 밖 바퀴가 옆 0.165 m까지 찍힘)
 
 calib:
   # 로봇마다 다름 → 실습 때 calib_steer.py / calib_speed.py로 측정해서 덮어쓴다

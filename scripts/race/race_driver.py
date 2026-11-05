@@ -24,7 +24,8 @@ from scipy import ndimage
 from scipy.interpolate import CubicSpline
 from scipy.spatial import cKDTree
 
-if os.environ.get('RACE_REAL') != '1':     # 시뮬: localhost 전용(오프라인 통신, 남의 실차에 명령 안 나가게)
+REAL = '--robot' in sys.argv              # 실차 모드(로봇 프로파일): 네트워크 설정은 셸 환경 그대로
+if os.environ.get('RACE_REAL') != '1' and not REAL:     # 시뮬: localhost 전용(오프라인 통신, 남의 실차에 명령 안 나가게)
     os.environ['ROS_LOCALHOST_ONLY'] = '1'  # 실차는 RACE_REAL=1 → 네트워크 사용
 import rclpy  # noqa: E402
 from rclpy.signals import SignalHandlerOptions  # noqa: E402
@@ -43,6 +44,8 @@ import tf2_ros
 sys.path.insert(0, __import__('os').path.dirname(__import__('os').path.abspath(__file__)))
 from raceline import GridMap, curvature  # noqa: E402
 import hybrid_astar  # noqa: E402
+sys.path.insert(0, __import__('os').path.join(__import__('os').path.dirname(__import__('os').path.abspath(__file__)), '..', 'real'))
+PROF = None             # 실차 모드 로봇 프로파일(--robot)
 
 # 차량
 WB = 0.24               # 휠베이스
@@ -97,6 +100,7 @@ OBS_MEM = 3.0
 LOC_HALF = 6.0          # 로컬 장애물 격자 반경(m)
 USE_BLOB_PTS = False    # 지도 박스 셀을 장애물 점으로 추가(래스터 오차로 틈이 좁아져 기본 비활성, 회피는 라이다)
 M2O_TAU = 2.0           # map->odom 평활 시정수(s)
+LOC_TIMEOUT = 1.0       # 실차: map->odom 이 이만큼 안 오면 정지(s)
 STOP_MARGIN = 0.35      # 막혔을 때 정지 여유(m)
 REV_T = 0.9             # 복구 후진 시간(s)
 MAN_TIME = 3.0          # Hybrid A* 탐색 시간 한도(s)
@@ -125,7 +129,7 @@ def speed_profile(kap, ds, vlim, v0, v_end=None):
 class Race(Node):
     def __init__(self, a):
         super().__init__('race_driver', parameter_overrides=[
-            rclpy.parameter.Parameter('use_sim_time', value=True)])
+            rclpy.parameter.Parameter('use_sim_time', value=a.sim_time)])
         self.a = a
         # 지도의 독립 장애물(박스)은 벽이 아니라 '장애물 점'으로 취급: 정밀거리/장애물 여유 적용
         self.m = GridMap(a.map, np.loadtxt(a.traj, delimiter=',', skiprows=1)[:, :2] if a.traj else None,
@@ -161,14 +165,19 @@ class Race(Node):
         cg_ctrl = MutuallyExclusiveCallbackGroup()
         cg_sens = MutuallyExclusiveCallbackGroup()
         cg_plan = MutuallyExclusiveCallbackGroup()
-        self.pub = self.create_publisher(Twist, '/cmd_vel', 1)
+        if PROF is not None:            # 실차: 로봇에 맞는 명령(LIMO1 Twist /cmd_vel, Pro AckermannDrive /limo/ack_cmd)
+            from robot_profile import CmdSender
+            self.pub = CmdAdapter(CmdSender(self, PROF))
+        else:
+            self.pub = self.create_publisher(Twist, '/cmd_vel', 1)
         self.pub_path = self.create_publisher(Path, '/race/local_path', 1)
         qtl = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL,
                          reliability=ReliabilityPolicy.RELIABLE)
         self.pub_line = self.create_publisher(Path, '/race/raceline', qtl)
         self.pub_init = self.create_publisher(PoseWithCovarianceStamped, '/initialpose', 1)
-        self.create_subscription(LaserScan, '/scan', self.on_scan, qos_profile_sensor_data, callback_group=cg_sens)
-        self.create_subscription(Odometry, '/odom', self.on_odom, 10, callback_group=cg_ctrl)
+        T = PROF['topics'] if PROF is not None else {'scan': '/scan', 'odom': '/odom'}
+        self.create_subscription(LaserScan, T['scan'], self.on_scan, qos_profile_sensor_data, callback_group=cg_sens)
+        self.create_subscription(Odometry, T['odom'], self.on_odom, 10, callback_group=cg_ctrl)
         # 출발 신호(/race/go): python3 scripts/race/go.py 또는 ros2 topic pub --once /race/go std_msgs/msg/Empty
         self.create_subscription(Empty, '/race/go', self.on_go, 10, callback_group=cg_ctrl)
         self.pub_line.publish(self.to_path(self.R[::4]))
@@ -253,6 +262,7 @@ class Race(Node):
             t = self.tfb.lookup_transform('map', 'odom', Time())
         except Exception:
             return
+        self.m2o_stamp = Time.from_msg(t.header.stamp).nanoseconds * 1e-9
         tr = t.transform
         z = np.array([tr.translation.x, tr.translation.y, yaw_of(tr.rotation)])
         tn = self.now()
@@ -300,7 +310,11 @@ class Race(Node):
             self.go = True
 
     def on_odom(self, m):
-        self.v_meas = m.twist.twist.linear.x
+        if PROF is not None:            # Pro 드라이버 odom 버그 역산 + 바퀴 배율 보정
+            from rt_common import odom_speed
+            self.v_meas = odom_speed(m) * float(PROF['calib'].get('odom_scale', 1.0))
+        else:
+            self.v_meas = m.twist.twist.linear.x
 
     def on_scan(self, sc):
         if self.m2o is None:
@@ -313,9 +327,14 @@ class Race(Node):
             return
         tr = t.transform
         lx, ly, lyaw = self.to_map(tr.translation.x, tr.translation.y, yaw_of(tr.rotation))
-        r = np.asarray(sc.ranges, dtype=float)
-        ang = sc.angle_min + np.arange(len(r)) * sc.angle_increment
-        ok = np.isfinite(r) & (r > max(sc.range_min, 0.12)) & (r < OBS_RANGE)
+        if PROF is not None:            # 실차: 0·inf·범위 밖·자기 차체 점 제거
+            from robot_profile import scan_valid
+            ang, r = scan_valid(sc, PROF)
+            ok = r < OBS_RANGE
+        else:
+            r = np.asarray(sc.ranges, dtype=float)
+            ang = sc.angle_min + np.arange(len(r)) * sc.angle_increment
+            ok = np.isfinite(r) & (r > max(sc.range_min, 0.12)) & (r < OBS_RANGE)
         r, ang = r[ok], ang[ok]
         P = np.stack([lx + r * np.cos(ang + lyaw), ly + r * np.sin(ang + lyaw)], 1)
         if len(P) == 0:
@@ -756,6 +775,13 @@ class Race(Node):
         self.update_m2o()
         p = self.pose()
         cmd = Twist()
+        if PROF is not None and self.go and tnow - getattr(self, 'm2o_stamp', tnow) > LOC_TIMEOUT:
+            if not getattr(self, 'loc_warned', False):          # 위치추정 끊김 → 정지(재개되면 다시 달림)
+                self.get_logger().warn(f'위치추정(map→odom) {tnow - self.m2o_stamp:.1f} s 끊김 → 정지')
+                self.loc_warned = True
+            self.pub.publish(cmd)
+            return
+        self.loc_warned = False
         if p is None or not self.go:
             self.pub.publish(cmd)
             return
@@ -1027,6 +1053,22 @@ def curvature_open(P):
     return ndimage.uniform_filter1d(k, 5)
 
 
+class CmdAdapter:
+    """Twist(속도, 회전속도 ω = v·κ)를 받아 로봇 명령(CmdSender: 속도 + 조향각 δ = atan(L·κ))으로 발행."""
+
+    def __init__(self, sender):
+        self.s = sender
+        self.steer = 0.0
+
+    def publish(self, tw):
+        v, w = tw.linear.x, tw.angular.z
+        if abs(v) > 1e-3:
+            self.steer = math.atan(WB * w / v)
+        elif abs(w) < 1e-6:
+            self.steer = 0.0
+        self.s.send(v, self.steer)
+
+
 def stop_car(node, n=10):
     """정지 명령(속도 0) 반복 발행: Gazebo 플러그인은 마지막 명령을 유지하므로 종료 전에 반드시 필요"""
     node.go = False
@@ -1050,6 +1092,11 @@ def main():
     ap.add_argument('--enter', action='store_true', help='엔터로 출발(exam.py 통합 실행용)')
     ap.add_argument('--odom', action='store_true', help='(호환용) --init 없으면 항상 odom 모드')
     ap.add_argument('--slow', action='store_true', help='좁은 곳 감속 켬(예전 기본 동작)')
+    ap.add_argument('--robot', default=None, help='실차 모드: limo1 | limo_pro (프로파일). 위치는 localizer.py의 TF map→odom')
+    ap.add_argument('--calib', default=None, help='로봇별 보정 yaml')
+    ap.add_argument('--sim', action='store_true', help='--robot 과 함께: 시뮬 시간 사용(실차 흉내 시뮬)')
+    ap.add_argument('--vmax', type=float, default=None, help='최고 속도 m/s (첫 실차 시험은 0.3~0.5)')
+    ap.add_argument('--lite', action='store_true', help='계산 줄이기(Jetson Nano): 정거장 12개, 횡후보 0.12 m, 능선 3')
     ap.add_argument('--global-only', action='store_true',
                     help='local planner 끔: 레이스라인만 추종(장애물 회피 없음, Q1 장애물 없는 맵 전용)')
     a = ap.parse_args()
@@ -1061,6 +1108,28 @@ def main():
     if a.traj is None and os.path.exists(stem + '_traj.csv'):
         a.traj = stem + '_traj.csv'
     a.odom = a.init is None
+    a.sim_time = True
+    global PROF, WB, REAR, K_MAX, TRACK_RATIO, V_MAX, M2O_TAU, N_ST, OFFS, N_RIDGE
+    if a.lite:
+        N_ST, N_RIDGE = 12, 3
+        OFFS = np.round(np.arange(-1.56, 1.5601, 0.12), 3)
+        print(f'[lite] 정거장 {N_ST}개({N_ST * DS_ST:.1f} m), 횡후보 {len(OFFS)}개, 능선 {N_RIDGE}', flush=True)
+    if a.vmax is not None:
+        V_MAX = a.vmax
+    if a.robot:
+        from robot_profile import load_profile
+        PROF = load_profile(a.robot, a.calib)
+        veh = PROF['vehicle']
+        WB = float(veh['wheelbase'])
+        REAR = WB / 2                                   # LIMO base_link = 앞뒤 바퀴 가운데
+        K_MAX = math.tan(0.9 * float(veh.get('max_steer_center', 0.41))) / WB
+        TRACK_RATIO = float(veh.get('track', 0.172)) / (2 * WB)
+        a.odom = False                                  # map→odom 은 localizer.py 가 발행
+        a.init = None                                   # localizer 가 _traj.csv 출발 pose 로 초기화(/initialpose 안 보냄)
+        a.sim_time = a.sim
+        M2O_TAU = 0.5                                   # 자체 PF는 AMCL보다 매끄러움 → 보정을 빨리 따라감
+        print(f'[실차 모드] {PROF["name"]}: 명령 {PROF["topics"]["cmd"]}, WB {WB}, K_MAX {K_MAX:.2f}, V_MAX {V_MAX}, '
+              f'sim_time {a.sim_time}', flush=True)
     # Ctrl+C 를 rclpy 가 가로채 통신을 먼저 끊지 않게: KeyboardInterrupt 로 받아 정지 명령을 보낸 뒤 종료
     rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
     node = Race(a)
