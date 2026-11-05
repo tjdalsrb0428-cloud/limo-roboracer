@@ -396,7 +396,15 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 
 1. ✅ **(2026-11-05 완료, b7328cc)** **로봇 프로파일** `config/robots/limo1.yaml`, `limo_pro.yaml`(0.5 h): 라이다(각도·점수·주기·range·frame), 명령 토픽/형식(Twist|AckermannDrive),
    휠베이스 0.20, 조향 한계, 차체 크기. 모든 스크립트가 `--robot` 으로 읽음. 스캔은 메시지의 angle_min/increment/len 그대로 해석(고정 점수 가정 금지).
-2. **시뮬 Pro 모드**(2~3 h): `roboracer_sim.launch.py real:=true robot:=limo_pro` → ±110° 10 Hz 248점, `/limo/ack_cmd` 입력(÷1.215, ±0.42 흉내),
+2. ✅ **(2026-11-05 완료)** `roboracer_sim.launch.py real:=true robot:=limo1|limo_pro [ekf:=true]`. Pro: 라이다 ±110° 10 Hz 248점, `/limo/ack_cmd`만(sim_pro_ack.py:
+   ÷1.215·±0.42, 실제 중심각=보드값×1.215 가정, 0.5 s 명령 끊기면 정지), sim_wheel_odom model=limo_pro(드라이버 odom 버그 재현, 회전 시 linear.y), IMU는 /imu_sim→/imu로 실차 공분산 넣어 중계.
+   EKF(ekf:=true, 로봇 yaml 원본 config/ekf_limo1|limo_pro.yaml)는 시뮬에서 NaN(원인 미확정) → 기본 끔, TF는 sim_wheel_odom. **실차에서 /odometry/filtered 값이 NaN 아닌지·EKF가 odom→base_link TF를 내는지 확인 필요(우리 TF와 충돌)**.
+   측정 스크립트 `rt_common.odom_speed`: Pro 버그 역산 v = |(vx,vy)|·ω/(2 sin(ω/2)) (검증 0.3188 vs 기대 0.318). 시뮬 Pro: speed_scale 0.99, odom_scale 0.96, steer_scale 0.86.
+   시뮬 Pro 라이다가 ±101° 밖에서 자기 차체를 0.10~0.17 m로 찍음 → `scan_valid`에 차체 안 점 제거(프로파일 vehicle 크기 + self_margin 0.03). 실차도 확인할 것.
+   덕트 트랙 `src/limo_ros2/limo_car/worlds/duct/make_duct_track.py` → `duct_track.world`(+png): 중심선 48.7 m, 폭 0.97~1.7 m(오른쪽 위 좁은 S자 1.0 m),
+   덕트 지름 0.35 m 주름(0.175/0.163, 0.125 m 마디 762개), 6 m마다 3 cm 틈, 바깥 3 m 방 벽, 출발 (0,1)+x. RTF 0.97. 실행: `world:=$PWD/src/limo_ros2/limo_car/worlds/duct/duct_track.world`.
+   원래 계획:
+   **시뮬 Pro 모드**(2~3 h): `roboracer_sim.launch.py real:=true robot:=limo_pro` → ±110° 10 Hz 248점, `/limo/ack_cmd` 입력(÷1.215, ±0.42 흉내),
    드라이버 odom 버그 재현 + EKF(limo_ekf.yaml). 기존 real 모드 = LIMO1 사양. 추가로 호스 벽(낮은 원통) 시험형 트랙 world(8×22 m, 폭 ≥1 m), 검은 면 점 누락, 잔디 미끄럼.
 3. ✅ **(2026-11-05 완료)** `rt_common.py`(공용) + `check_sensors.py`·`calib_steer.py`(--mode straight|circle)·`calib_speed.py`·`check_hose.py`. 프로파일 calib에 odom_scale 추가.
    시뮬 real(limo1) 검증: 센서 점검 정상, 속도 0.3 명령 → 라이다 0.311(GT 0.304, 오차 2 %), 지연 0.15 s, 직진 트림 0, 원 주행 steer_scale 0.84(시뮬 차가 명령보다 덜 꺾임 → 시뮬 특성, 반경 0.77 m @0.3 rad).

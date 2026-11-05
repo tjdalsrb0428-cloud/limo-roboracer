@@ -120,7 +120,7 @@ def scan_valid(msg, prof):
     """LaserScan에서 유효한 점만 (각도 배열, 거리 배열)로 반환.
 
     각도는 메시지의 angle_min/angle_increment/ranges 길이로 계산한다(점 수·범위를 가정하지 않음).
-    0, inf, nan, 프로파일 range 밖은 버린다.
+    0, inf, nan, 프로파일 range 밖, 차체 안(넓은 각도에서 자기 바퀴·몸체가 찍힘, 시뮬 Pro ±101° 밖)은 버린다.
     """
     import numpy as np
     r = np.asarray(msg.ranges, dtype=float)
@@ -128,6 +128,12 @@ def scan_valid(msg, prof):
     lo = max(float(prof['lidar']['range_min']), float(msg.range_min))
     hi = min(float(prof['lidar']['range_max']), float(msg.range_max))
     ok = np.isfinite(r) & (r >= lo) & (r <= hi)
+    v = prof['vehicle']
+    m = float(prof['lidar'].get('self_margin', 0.03))
+    xb = float(prof['lidar'].get('x_offset', 0.0)) + r * np.cos(a)       # base_link 기준
+    yb = r * np.sin(a)
+    body = (np.abs(xb) <= v['length'] / 2 + m) & (np.abs(yb) <= v['width'] / 2 + m)
+    ok &= ~body
     return a[ok], r[ok]
 
 
