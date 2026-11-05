@@ -117,6 +117,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('out', nargs='?', default=os.path.join(HERE, 'duct_track.world'))
     ap.add_argument('--png', default=os.path.join(HERE, 'duct_track.png'))
+    ap.add_argument('--csv', default=os.path.join(HERE, 'duct_track_center.csv'), help='중심선(x,y,폭) — 시뮬 테스트 주행용')
     a = ap.parse_args()
     xs, ys, ws, nx, ny, L = centerline()
     m, i, j = check(xs, ys, ws)
@@ -124,6 +125,9 @@ def main():
     print(f'구간 간 덕트 여유 최소 {m:+.2f} m ({xs[i]:.1f},{ys[i]:.1f})~({xs[j]:.1f},{ys[j]:.1f})' + ('  ← 겹침! CTRL 수정' if m < 0 else ''))
     k0 = int(np.argmin(np.hypot(xs - 0, ys - 1)))
     print(f'출발 (0,1) 근처 중심선 방향 {math.degrees(math.atan2(-nx[k0], ny[k0])):.1f}° (≈0 이어야 함), 폭 {ws[k0]:.2f}')
+    if a.csv:
+        k = np.roll(np.arange(len(xs)), -k0)               # 출발점부터
+        np.savetxt(a.csv, np.stack([xs[k], ys[k], ws[k]], 1), delimiter=',', header='x,y,w', comments='', fmt='%.4f')
     cyl = []
     for side in (+1, -1):
         cyl += ducts(*boundary(xs, ys, ws, nx, ny, side))

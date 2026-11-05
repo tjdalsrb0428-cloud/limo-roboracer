@@ -1,0 +1,64 @@
+# slam_toolbox (online async) — 덕트 트랙(폭 1~1.7 m, 약 22×8 m) 매핑용. slam_mapper.py가 사용.
+# 기본값(mapper_params_online_async.yaml)에서 바꾼 것만 주석.
+slam_toolbox:
+  ros__parameters:
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_link            # 기본 base_footprint → LIMO는 base_link
+    scan_topic: /scan
+    use_map_saver: false             # 저장은 slam_mapper.py가 /map을 직접 저장
+    mode: mapping
+
+    debug_logging: false
+    throttle_scans: 1
+    transform_publish_period: 0.02
+    map_update_interval: 1.0         # 5.0 → 1.0 (진행 확인, 저장 직전 최신 지도)
+    resolution: 0.025                # 0.05 → 0.025 (raceline.py 기존 지도와 같은 해상도, 폭 1 m 트랙)
+    min_laser_range: 0.25             # 라이다가 넓은 각도에서 자기 차체(0.1~0.17 m)를 찍음 → 매칭이 "안 움직임"으로 끌려감(2026-11-05 시뮬)
+    max_laser_range: 8.0             # 20 → 8 (방 밖 먼 물체·사람 덜 찍히게)
+    minimum_time_interval: 0.5       # 기본값 유지: 0.1로 줄이면 매칭이 이동을 작게 잡아 누적(2026-11-05 시뮬, 회전 과소)
+    transform_timeout: 0.2
+    tf_buffer_duration: 30.
+    stack_size_to_use: 40000000
+    enable_interactive_mode: false
+
+    use_scan_matching: true
+    use_scan_barycenter: true
+    minimum_travel_distance: 0.5     # 기본값 유지 (0.2면 위와 같은 누적 오차)
+    minimum_travel_heading: 0.5      # 기본값 유지
+    scan_buffer_size: 10
+    scan_buffer_maximum_scan_distance: 10.0
+    link_match_minimum_response_fine: 0.1
+    link_scan_maximum_distance: 1.5
+    loop_search_maximum_distance: 3.0
+    do_loop_closing: true
+    loop_match_minimum_chain_size: 10
+    loop_match_maximum_variance_coarse: 3.0
+    loop_match_minimum_response_coarse: 0.35
+    loop_match_minimum_response_fine: 0.45
+
+    correlation_search_space_dimension: 0.5
+    correlation_search_space_resolution: 0.01
+    correlation_search_space_smear_deviation: 0.1
+
+    loop_search_space_dimension: 8.0
+    loop_search_space_resolution: 0.05
+    loop_search_space_smear_deviation: 0.03
+
+    distance_variance_penalty: 0.5
+    angle_variance_penalty: 1.0
+    fine_search_angle_offset: 0.00349
+    coarse_search_angle_offset: 0.349
+    coarse_angle_resolution: 0.0349
+    minimum_angle_penalty: 0.9
+    minimum_distance_penalty: 0.5
+    use_response_expansion: true
+    min_pass_through: 2
+    occupancy_threshold: 0.1

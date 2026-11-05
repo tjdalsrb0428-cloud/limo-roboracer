@@ -11,3 +11,4 @@ archive/old_logs/*.log
 archive/old_logs/*.txt
 /*.world
 bags/
+maps/real/

@@ -46,8 +46,10 @@ def generate_launch_description():
     def real_nodes(context):
         rb = context.launch_configurations.get("robot", "limo1")
         use_ekf = context.launch_configurations.get("ekf", "false").lower() == "true"
+        # odom_tf:=false → 아무도 odom→base_link TF를 안 냄(실차에 EKF TF가 없을 때 흉내, scripts/real/odom_tf.py로 채움)
+        wheel_tf = context.launch_configurations.get("odom_tf", "true").lower() == "true"
         nodes = [Node(package="limo_car", executable="sim_wheel_odom.py", output="screen",
-                      parameters=[{"use_sim_time": True, "publish_tf": not use_ekf,
+                      parameters=[{"use_sim_time": True, "publish_tf": wheel_tf and not use_ekf,
                                    "model": "limo_pro" if rb == "limo_pro" else "ideal"}])]
         if use_ekf:
             nodes.append(Node(package="robot_localization", executable="ekf_node", name="ekf_filter_node_odom",
@@ -106,6 +108,7 @@ def generate_launch_description():
         DeclareLaunchArgument("real", default_value="false"),
         DeclareLaunchArgument("robot", default_value="limo1"),
         DeclareLaunchArgument("ekf", default_value="false"),
+        DeclareLaunchArgument("odom_tf", default_value="true"),
         robot_description,
         wheel_odom,
         gazebo,
