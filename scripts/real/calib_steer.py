@@ -35,7 +35,7 @@ def drive(node, v, steer, sec, gz, vs, settle=1.0, stop_dist=0.35):
             if 'imu' in node.msgs:
                 gz.append(node.msgs['imu'].angular_velocity.z)
             if 'odom' in node.msgs:
-                vs.append(node.msgs['odom'].twist.twist.linear.x)
+                vs.append(rc.odom_speed(node.msgs['odom']))
         return True
     ok = node.spin_for(sec, every=dt, fn=tick)
     node.cmd.stop()

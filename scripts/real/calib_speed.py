@@ -43,7 +43,7 @@ def main():
         log = []   # (t, 정면 거리, odom v) - 스캔마다
         t0 = time.monotonic()
         node.cb['scan'] = lambda m: log.append((time.monotonic() - t0, node.front_range(3.0),
-                                                 node.msgs['odom'].twist.twist.linear.x))
+                                                 rc.odom_speed(node.msgs['odom'])))
 
         def tick():
             fr = node.front_range(3.0)

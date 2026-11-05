@@ -5,6 +5,11 @@ Gazebo 플러그인 정답 위치 /odom_gt 의 매 스텝 이동량을 차체 �
 속도 배율·회전 배율 오차, 회전 편향, 잡음을 넣어 적분한다 → /odom + TF odom→base_link.
 오차는 누적되므로 map 프레임 위치는 위치추정(파티클 필터 등)으로 보정해야 한다.
 정답 비교는 /odom_gt (같은 odom 프레임 원점에서 시작).
+
+model:=limo_pro → Pro 드라이버(limo_ackerman_driver.cpp publishOdometry)의 계산 버그까지 재현:
+  R = v/ω, vx = R·sin(ω), vy = R·(1−cos ω) (ω를 각도처럼 씀) → twist.linear.x/y 가 틀리고 위치도 그만큼 틀어진다.
+  역산: |(vx,vy)| = 2R·sin(ω/2) → v = ω·|(vx,vy)| / (2·sin(ω/2)).
+publish_tf:=false → TF는 EKF(robot_localization)가 낸다(실차와 같음, 시뮬은 ekf:=true일 때. 현재 시뮬 EKF는 NaN → 기본 끔).
 """
 import math
 
@@ -12,6 +17,7 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import Imu
 from geometry_msgs.msg import TransformStamped
 from tf2_ros import TransformBroadcaster
 
@@ -30,11 +36,16 @@ class SimWheelOdom(Node):
         self.v_noise = p('v_noise', 0.02)      # 이동량 상대 잡음(표준편차)
         self.w_noise = p('w_noise', 0.02)      # rad/s 잡음(표준편차)
         self.rate = p('rate', 50.0)            # /odom 발행 Hz
+        self.model = p('model', 'ideal')       # ideal | limo_pro (드라이버 계산 버그 재현)
+        self.publish_tf = p('publish_tf', True)
         self.rng = np.random.default_rng(p('seed', 0))
 
         self.pub = self.create_publisher(Odometry, '/odom', 50)
         self.tfb = TransformBroadcaster(self)
         self.create_subscription(Odometry, '/odom_gt', self.on_gt, 100)
+        # Gazebo IMU(/imu_sim) → 실차 드라이버와 같은 공분산을 넣어 /imu 로 (Gazebo는 방향 공분산 0 → EKF NaN)
+        self.imu_pub = self.create_publisher(Imu, '/imu', 50)
+        self.create_subscription(Imu, '/imu_sim', self.on_imu, 50)
         self.prev = None          # (t, x, y, yaw) 직전 정답
         self.pose = None          # [x, y, yaw] 오도메트리
         self.last_pub = -1.0
@@ -71,17 +82,37 @@ class SimWheelOdom(Node):
         if moving:
             dyaw += (self.w_bias + self.w_noise * self.rng.standard_normal()) * dt
         ox, oy, oyaw = self.pose
-        mid = oyaw + dyaw / 2
-        ox += math.cos(mid) * dfx - math.sin(mid) * dlat
-        oy += math.sin(mid) * dfx + math.cos(mid) * dlat
-        oyaw = math.atan2(math.sin(oyaw + dyaw), math.cos(oyaw + dyaw))
+        if self.model == 'limo_pro':
+            # 드라이버: theta += ω·dt 후, 몸체 속도 (vx, vy)를 새 theta로 돌려 적분
+            v, w = dfx / dt, dyaw / dt
+            if abs(w) < 1e-6:
+                vx, vy = v, 0.0
+            else:
+                R = v / w
+                vx, vy = R * math.sin(w), R * (1 - math.cos(w))
+            oyaw = math.atan2(math.sin(oyaw + dyaw), math.cos(oyaw + dyaw))
+            ox += (math.cos(oyaw) * vx - math.sin(oyaw) * vy) * dt
+            oy += (math.sin(oyaw) * vx + math.cos(oyaw) * vy) * dt
+            self.vy = 0.8 * getattr(self, 'vy', 0.0) + 0.2 * vy
+            self.v = 0.8 * self.v + 0.2 * vx
+        else:
+            mid = oyaw + dyaw / 2
+            ox += math.cos(mid) * dfx - math.sin(mid) * dlat
+            oy += math.sin(mid) * dfx + math.cos(mid) * dlat
+            oyaw = math.atan2(math.sin(oyaw + dyaw), math.cos(oyaw + dyaw))
+            self.v = 0.8 * self.v + 0.2 * dfx / dt
         self.pose = [ox, oy, oyaw]
-        self.v = 0.8 * self.v + 0.2 * dfx / dt
         self.w = 0.8 * self.w + 0.2 * dyaw / dt
         self.prev = (t, x, y, yaw)
         if t - self.last_pub >= 1.0 / self.rate - 1e-4:
             self.last_pub = t
             self.publish(m.header.stamp)
+
+    def on_imu(self, m):
+        for c, v in ((m.orientation_covariance, 1e-6), (m.angular_velocity_covariance, 1e-6),
+                     (m.linear_acceleration_covariance, 1.0)):
+            c[0] = c[4] = c[8] = v
+        self.imu_pub.publish(m)
 
     def publish(self, stamp):
         x, y, yaw = self.pose
@@ -93,7 +124,13 @@ class SimWheelOdom(Node):
         o.pose.pose.position.x, o.pose.pose.position.y = x, y
         o.pose.pose.orientation.z, o.pose.pose.orientation.w = qz, qw
         o.twist.twist.linear.x, o.twist.twist.angular.z = self.v, self.w
+        o.twist.twist.linear.y = getattr(self, 'vy', 0.0)
+        # 실차 드라이버와 같은 공분산(EKF 입력용)
+        for i, c in zip((0, 7, 14, 21, 28, 35), (0.1, 0.1, 0.1, 1.0, 1.0, 1.0)):
+            o.pose.covariance[i] = c
         self.pub.publish(o)
+        if not self.publish_tf:
+            return
         tf = TransformStamped()
         tf.header = o.header
         tf.child_frame_id = 'base_link'

@@ -9,14 +9,20 @@ andere Sensoren zusammengebaut werden und laden sie das Modell in Gazebo.-->
 <robot name="limo_ackermann" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
     <xacro:arg name="real" default="false"/>
+    <xacro:arg name="robot" default="limo1"/>  <!-- real:=true 일 때 limo1 | limo_pro -->
     <xacro:include filename="$(find limo_car)/gazebo/ackermann.xacro" />
     <xacro:limo_ackermann />
     <xacro:include filename="$(find limo_car)/gazebo/sensor.xacro" />
 
 
     <!-- ************************* Laser ****************************** -->
-    <xacro:if value="$(arg real)">
-        <!-- 실차 YDLidar 설정(limo_bringup ydlidar.yaml): 앞쪽 ±90°, 8 Hz, 0.1~12 m, 약 1° 간격 -->
+    <xacro:property name="robot_name" value="$(arg robot)"/>
+    <xacro:if value="${real_mode and robot_name == 'limo_pro'}">
+        <!-- LIMO Pro YDLIDAR Tmini Plus (2026-11-04 실측): ±110°, 10 Hz, 248점 -->
+        <xacro:gazebo_laser frame_prefix="laser" samples="248" half_angle="${110*pi/180}" rmin="0.1" rmax="12.0" stddev="0.015" rate="10"/>
+    </xacro:if>
+    <xacro:if value="${real_mode and robot_name != 'limo_pro'}">
+        <!-- LIMO1 YDLidar (limo_basic ydlidar.yaml): 앞쪽 ±90°, 8 Hz, 0.1~12 m, 약 1° 간격 -->
         <xacro:gazebo_laser frame_prefix="laser" samples="188" half_angle="${pi/2}" rmin="0.1" rmax="12.0" stddev="0.015"/>
     </xacro:if>
     <xacro:unless value="$(arg real)">
@@ -37,7 +43,7 @@ andere Sensoren zusammengebaut werden und laden sie das Modell in Gazebo.-->
         <child link="depth_camera_link"/>
     </joint>
     <!-- ************************* IMU ******************************** -->
-    <xacro:gazebo_imu frame_prefix="imu" topic="${'/imu' if real_mode else '/imu_plugin/out'}"/>
+    <xacro:gazebo_imu frame_prefix="imu" topic="${'/imu_sim' if real_mode else '/imu_plugin/out'}" gyro_std="${0.001 if real_mode else 0.0}" acc_std="${0.05 if real_mode else 0.0}"/>
 
     <joint name="imu_joint" type="fixed">
         <origin xyz="0.0 0 -0.1" rpy="0 0 0"/>

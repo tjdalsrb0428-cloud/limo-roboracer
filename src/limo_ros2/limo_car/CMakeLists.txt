@@ -24,11 +24,11 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY launch gazebo meshes rviz urdf worlds
+  DIRECTORY config launch gazebo meshes rviz urdf worlds
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(PROGRAMS scripts/ackermann_twist_adapter.py scripts/sim_wheel_odom.py
+install(PROGRAMS scripts/ackermann_twist_adapter.py scripts/sim_wheel_odom.py scripts/sim_pro_ack.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

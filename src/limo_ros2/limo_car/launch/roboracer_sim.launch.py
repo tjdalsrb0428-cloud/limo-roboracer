@@ -4,7 +4,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable, TimerAction
+from launch.actions import DeclareLaunchArgument, GroupAction, IncludeLaunchDescription, OpaqueFunction, SetEnvironmentVariable, TimerAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -35,17 +35,27 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(limo_share, "launch", "ackermann.launch.py")
         ),
-        launch_arguments={"use_sim_time": "true", "real": real}.items(),
+        launch_arguments={"use_sim_time": "true", "real": real,
+                          "robot": LaunchConfiguration("robot")}.items(),
     )
 
     # real:=true: 플러그인 정답 위치(/odom_gt)에 오차를 넣어 실차 바퀴 오도메트리(/odom, TF odom→base_link) 흉내
-    wheel_odom = Node(
-        package="limo_car",
-        executable="sim_wheel_odom.py",
-        parameters=[{"use_sim_time": True}],
-        condition=IfCondition(real),
-        output="screen",
-    )
+    # robot:=limo_pro → Pro 드라이버 odom 계산 버그 재현, 라이다 ±110° 10 Hz, /limo/ack_cmd 입력
+    # ekf:=true → 실차처럼 robot_localization EKF(로봇 설정 원본)가 TF odom→base_link 를 낸다.
+    #   (2026-11-05: 시뮬에서는 EKF 출력이 NaN — 원인 미확정 → 기본 false, 바퀴 odom 흉내가 TF 발행)
+    def real_nodes(context):
+        rb = context.launch_configurations.get("robot", "limo1")
+        use_ekf = context.launch_configurations.get("ekf", "false").lower() == "true"
+        nodes = [Node(package="limo_car", executable="sim_wheel_odom.py", output="screen",
+                      parameters=[{"use_sim_time": True, "publish_tf": not use_ekf,
+                                   "model": "limo_pro" if rb == "limo_pro" else "ideal"}])]
+        if use_ekf:
+            nodes.append(Node(package="robot_localization", executable="ekf_node", name="ekf_filter_node_odom",
+                              output="screen", arguments=["--ros-args", "--log-level", "warn"],
+                              parameters=[os.path.join(limo_share, "config", f"ekf_{rb}.yaml"),
+                                          {"use_sim_time": True}]))
+        return nodes
+    wheel_odom = GroupAction([OpaqueFunction(function=real_nodes)], condition=IfCondition(real))
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -94,6 +104,8 @@ def generate_launch_description():
         DeclareLaunchArgument("rviz", default_value="true"),
         DeclareLaunchArgument("gui", default_value="true"),
         DeclareLaunchArgument("real", default_value="false"),
+        DeclareLaunchArgument("robot", default_value="limo1"),
+        DeclareLaunchArgument("ekf", default_value="false"),
         robot_description,
         wheel_odom,
         gazebo,

@@ -20,6 +20,16 @@ def yaw_of(q):
     return math.atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z))
 
 
+def odom_speed(m):
+    """odom 메시지에서 실제 전진 속도 복원.
+    LIMO Pro 드라이버 버그: vx = R·sin(ω), vy = R·(1−cos ω) (R = v/ω) → |(vx,vy)| = 2R·sin(ω/2)
+    → v = |(vx,vy)| · ω / (2·sin(ω/2)). 버그 없는 드라이버(vy = 0)는 vx 그대로."""
+    vx, vy, w = m.twist.twist.linear.x, m.twist.twist.linear.y, m.twist.twist.angular.z
+    if abs(vy) < 1e-6 or abs(w) < 1e-3:
+        return vx
+    return math.copysign(math.hypot(vx, vy) * abs(w) / (2.0 * math.sin(abs(w) / 2.0)), vx)
+
+
 def wrap(a):
     return (a + math.pi) % (2.0 * math.pi) - math.pi
 
