@@ -10,7 +10,7 @@
 | 20~25분 | 3. 드라이버 실행 |
 | 25~35분 | 4. 우리 환경(setup.sh) |
 | 35~75분 | 5. 측정 |
-| 75~105분 | (매핑·주행 — 준비되면 추가) / 측정 반복·재확인 |
+| 75~105분 | 매핑(아래 5-2) → 레이스라인 / (주행 — 준비되면 추가) |
 | 105~120분 | 6. 결과 저장, 7. 정리 |
 
 ---
@@ -114,6 +114,16 @@ python3 calib_steer.py --robot $ROBOT --mode circle --steer 0.45 --time 6
 ```
    - 기록: steer_scale(좌/우), 0점 치우침, 최소 회전반경. 직진 트림은 steer_trim 넣고 다시 돌려 확인.
 8. 남는 시간: 드라이버의 계산 속도 확인(LIMO1 Jetson Nano) — 할 일 7번 lite 모드 준비되면 추가.
+
+### 5-2. 매핑 (20분) — 컨테이너 안, 조종기 SWB 가운데(수동)
+먼저 5-1에서 본 EKF TF 여부로 odom 결정: `tf2_echo odom base_link`가 나오면 그대로, 안 나오면 `--own-odom`.
+```bash
+python3 loop_mapper.py ../../maps/real/track1 --robot $ROBOT            # (+ --own-odom), 시작 후 3초 정지
+# 조종기로 0.3~0.5 m/s 한 바퀴 → 출발 위치·방향에 세움 → Ctrl+C ("루프 ICP ... 보정" 줄 확인)
+python3 ../race/raceline.py ../../maps/real/track1.yaml                 # 레이스라인 생성
+python3 slam_mapper.py ../../maps/real/track1_carto --robot $ROBOT       # (비교용, 시간 남으면) Cartographer, 같은 방법
+```
+- `ICP 신뢰 낮음`/`출발점에서 멀다`가 나오면 다시 돌기. 결과 파일(수백 KB)은 6단계 scp로 노트북에.
 
 결과는 노트북에서 `config/robots/calib_로봇번호.yaml`로 저장해 커밋(예):
 ```yaml

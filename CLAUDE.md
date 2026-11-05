@@ -422,12 +422,15 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
    `scripts/real/setup.sh`(~/Documents에 git clone → pull → 컨테이너 실행: --network host --privileged, 장치 ttyTHS1/ttyUSB0, ~/Documents 마운트, sudo docker),
    `scripts/real/teardown.sh`(컨테이너·이미지·코드·Wi-Fi 프로파일 삭제). private 저장소 clone = 사용자가 만든 읽기 전용·단기 GitHub 토큰을 비밀번호 칸에 입력(저장 안 함).
    네트워크: 노트북 RViz 쓰려면 드라이버를 `ROS_LOCALHOST_ONLY=0` + 팀 고유 `ROS_DOMAIN_ID`로 직접 실행하는 명령 준비(조교 스크립트는 LOCALHOST_ONLY=1).
-5. 🔶 **(2026-11-05 진행 중)** `scripts/real/slam_mapper.py`(slam_toolbox 실행 + Ctrl+C 시 /map→pgm/yaml(trinary, 0.025) + map→base_link 궤적 _traj.csv, --keys 키보드, --own-odom, --slam-cfg),
-   `scripts/real/odom_tf.py`(자체 odom: 바퀴 속도(Pro 버그 역산·odom_scale) + IMU 자이로(시작 2 s 편향) → TF odom→base_link, /odom_race), `config/slam/slam_toolbox.yaml`.
-   시뮬 launch `odom_tf:=false`(odom TF 없는 실차 흉내). 테스트: `.sim_tmp/gt_lap.py`(GT로 중심선 한 바퀴, robot_profile 명령), `.sim_tmp/slam_lap.sh TAG CFG`, `.sim_tmp/map_vs_gt.py`(지도 벽↔정답 덕트 오차).
-   **결과: 덕트 트랙에서 slam_toolbox가 위치를 망침.** odom_tf(바퀴+IMU)만으로 한 바퀴 끝 오차 0.25 m·3° vs slam_toolbox 0.9 m·20°(기본 설정·해상도 0.05·IMU odom 모두 같음, 루프 닫힘 안 됨, 좁은 S자 이후 회전 틀어짐).
-   minimum_travel 0.2/time 0.1로 줄이면 더 나빠짐(매칭마다 이동 과소 누적) → 기본 0.5 유지. 원인 미확정(시뮬 특성 가능성).
-   다음 방향(사용자 확인 대기): 자체 매퍼 = odom_tf 자세로 점유격자(odom_mapper 방식) + 끝에서 출발 구간과 ICP 정렬해 루프 오차를 궤적에 분배 후 재작성.
+5. ✅ **(2026-11-05 완료) 매핑 = 자체 `scripts/real/loop_mapper.py`** (odom 자세로 스캔 키프레임(0.1 m/5°) 수집, TF는 스캔 시각까지 대기 처리 →
+   끝에서 마지막 2 m 스캔을 처음 4 m 스캔에 ICP(인라이어≥0.5, 오차≤5 cm) → 회전 보정은 누적 회전각 비율, 위치 보정은 거리 비율로 궤적에 분배 → log-odds 지도 재작성, 0.025 m).
+   사용: `python3 loop_mapper.py maps/real/NAME --robot limo_pro [--own-odom] [--sim]` → 한 바퀴 후 출발점 근처(2.5 m 안) 정지 → Ctrl+C → `raceline.py maps/real/NAME.yaml`.
+   odom: `odom_tf.py`(바퀴 속도(Pro 버그 역산·odom_scale) + IMU 자이로, 시작 2 s 편향) → TF odom→base_link, /odom_race. 로봇 EKF TF가 있으면 --own-odom 쓰지 말 것(TF 충돌).
+   **시뮬 덕트 트랙 비교(정답 덕트까지 벽 칸 오차 중앙값/90 %)**: loop_mapper 0.09/0.17 m(루프 닫힘 OK) > Cartographer 0.12/0.46 m(최선 설정, 루프 미닫힘) ≫ slam_toolbox 0.5 m+(20° 틀어짐).
+   odom_tf만 한 바퀴 끝 오차 0.25 m·3° — SLAM 둘 다 odom보다 나빴음(원인 미확정, 주름 없는 덕트도 같음). raceline.py는 이 지도로 47.4 m, 최대곡률 0.90, 최소벽거리 0.34 m 생성 OK(방 벽 잡점은 '독립 장애물'로 제외됨).
+   대안 유지: `slam_mapper.py --backend cartographer`(config/cartographer/limo_race_2d.lua: tracking_frame imu_link 필수, IMU+/odom_race, online correlative off, ceres 가중 100/400, min_score 0.65 — 0.5면 엉뚱한 루프 닫힘)
+   / `--backend slam_toolbox`(minimum_travel/time을 줄이면 이동 과소 누적). 실차에서 loop_mapper와 비교.
+   테스트: `MAPPER=loop_mapper.py OFF="0 1 0" LX="odom_tf:=false" EXTRA="--own-odom" .sim_tmp/map_lap.sh TAG ""` → maps/real/sim_TAG + 정답 비교 한 줄.
    원래 계획:
    **SLAM 매핑**(3~4 h): 로봇 컨테이너에서 slam_toolbox(1순위)/Cartographer → `export_map.py`로 pgm/yaml + _traj.csv(SLAM 보정 궤적) → raceline.py 그대로.
    트랙 밖 먼 점(사람·가구) 무시 옵션. 시뮬 real 모드에서 먼저 검증.
