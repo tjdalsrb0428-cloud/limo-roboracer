@@ -463,3 +463,17 @@ go.py ─/race/go─▶ race_driver ─/map, /race/raceline, /race/local_path, T
 다음 실습에서 현장 확인: 호스 점 누락(0.5/1/2/3 m)·바닥 찍힘·이음매 틈, 로봇 인터넷(Docker Hub pull 속도), 수업 Wi-Fi 사용 가능 여부, 노트북 RViz 토픽 수신,
 Jetson Nano 계획 시간, LIMO1 실제 라이다 사양(공개 저장소 값과 같은지), control_mode(SWB 위=코드 제어) 값.
 기타: `~/limo_pro_src_1104.zip`은 조원 배포용(사용자가 배포 후 삭제 예정). `ref/limo_basic/`(조교 LIMO1 저장소 clone, 194 MB, git 밖).
+
+## 2026-11-18 LIMO Pro 두 번째 실습 (우리 컨테이너 첫 실행)
+- 저장소 public 전환(토큰 불필요). 로봇: `git clone --depth 1 --filter=blob:none --sparse ...` → `git sparse-checkout set scripts config docker docs` → `setup.sh limo_pro`.
+- **컨테이너를 root로 돌리면 호스트(wego) 드라이버 토픽이 목록만 보이고 데이터 0 Hz** → uid 1000으로 실행하면 10 Hz(UDP 127.0.0.1 설정·기본 설정 둘 다 OK).
+  setup.sh가 Pro는 호스트 uid(+HOME=/tmp, docker/robot/bashrc를 /etc/bash.bashrc로 마운트), LIMO1은 root(조교 드라이버 컨테이너가 root라 추정, 미검증). 프롬프트 `(limo_race)`.
+- 센서: /scan 10 Hz ±110° 248점(프로파일 일치), /odom 47, /odometry/filtered 30, /imu 101 Hz(편향 0.0001), /limo_status 2 Hz.
+  `/limo/ack_cmd`는 처음 `ros2 topic info`에서 Unknown(탐색 지연), 잠시 후 정상. control_mode 0=대기, 1=코드 명령 중. 조종기 없이 코드 명령으로 주행 가능.
+- **조교 EKF가 TF odom→base_link 발행**(NaN 아님, 정지 10 s 드리프트 0.1 mm) → 매핑은 `--own-odom` 없이, 주행 때 odom_tf.py 켜지 말 것.
+- 보정(`config/robots/calib_pro_1118.yaml`, 로봇 번호 미기록): steer_scale 0.725(좌 0.737/우 0.713), steer_trim −0.0065, speed_scale 0.99, odom_scale 1.0, 지연 0.14 s, 최소 회전반경 약 0.52 m.
+  calib_speed 0.3 m/s 장거리는 쏠림으로 라이다 기울기 무효. calib_steer circle은 원 두 개가 나란히 → 가로 4 m × 세로 2.5 m 필요(좁으면 충돌, 옆 충돌 방지 없음).
+- 매핑(예시 트랙 = 열린 방 + 가운데 섬, 대회 맵 아직 없음): loop_mapper ICP 인라이어 0.68, 오차 1.7 cm, 보정 0.57 m·1.9°(EKF odom 누적오차 큼). 결과 `maps/real_1118/`.
+  raceline이 열린 방에서 직선·각진 꺾임 다각형으로 나옴 + 작은 물체(blob)에 거의 닿음 → 노트북에서 원인 확인 필요. 자율주행은 시간 부족으로 미시도.
+- 실수 주의: `scp`는 노트북 셸(`mksung0428@`)에서. 컨테이너에서 치면 `unknown user 1000`.
+- 다음 할 일: raceline 열린 공간 처리, calib_steer 옆 충돌 방지·좌우 배율 분리, localizer·race_driver 실차 첫 주행(0.3 m/s), RViz 원격 보기, `teleop_key.py`(미검증) 확인.
