@@ -63,6 +63,26 @@ cd /home/agilex/Documents/limo_basic_ws && source install/setup.bash && ros2 lau
 ```
 - `Now lidar is scanning...` 나오면 정상. `Check Sum` 오류가 계속되면 Ctrl+C 후 다시 실행.
 
+## 3-1. 코드로 움직이는지 확인 (5분) — SSH 터미널 2, 우리 컨테이너 띄우기 전
+로봇 바닥, 앞 1 m 이상 비움, Ackermann 모드, **조종기 SWB 위(코드 제어)**, 한 명은 조종기 들고 대기(이상하면 SWB 가운데).
+**Pro** (호스트):
+```bash
+export ROS_LOCALHOST_ONLY=1; source /opt/ros/humble/setup.bash; source /home/wego/wego_ws/install/setup.bash
+ros2 topic info /limo/ack_cmd                      # Subscription count 1 이상
+ros2 topic pub -r 10 -t 20 /limo/ack_cmd ackermann_msgs/msg/AckermannDrive "{speed: 0.2, steering_angle: 0.0}"
+ros2 topic pub -r 10 -t 20 /limo/ack_cmd ackermann_msgs/msg/AckermannDrive "{speed: 0.2, steering_angle: 0.3}"
+ros2 topic pub -t 5 /limo/ack_cmd ackermann_msgs/msg/AckermannDrive "{speed: 0.0}"
+```
+**LIMO1** (조교 컨테이너 안):
+```bash
+export ROS_LOCALHOST_ONLY=1
+ros2 topic pub -r 10 -t 20 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}}"
+ros2 topic pub -r 10 -t 20 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z: 0.5}}"
+ros2 topic pub -t 5 /cmd_vel geometry_msgs/msg/Twist "{}"
+```
+- 각 2초(약 0.4 m) 직진 → 좌회전 → 정지. 확인: 전진 방향, **양수 조향 = 왼쪽**, 명령 끝나면 멈추는지.
+- 안 움직이면: SWB 위치 → `ros2 topic echo --once /limo_status`의 control_mode 기록.
+
 ## 4. 우리 환경 (10분) — SSH 터미널 2
 ```bash
 export ROS_LOCALHOST_ONLY=1
