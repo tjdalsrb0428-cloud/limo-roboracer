@@ -19,6 +19,6 @@ read -r -p "진행? (y/N) " ans
 sudo docker rm -f limo_race 2>/dev/null
 for img in $(sudo docker images --format '{{.Repository}}:{{.Tag}}' | grep "^$IMAGE_REPO:"); do sudo docker rmi "$img"; done
 rm -rf /tmp/bag* 2>/dev/null
-case "$CODE" in "$HOME"/Documents/*) rm -rf "$CODE";; *) echo "코드 폴더가 ~/Documents 밖이라 지우지 않음: $CODE";; esac
+case "$CODE" in "$HOME"/Documents/*) rm -rf "$CODE" 2>/dev/null || sudo rm -rf "$CODE";; *) echo "코드 폴더가 ~/Documents 밖이라 지우지 않음: $CODE";; esac
 [ -n "$WIFI" ] && sudo nmcli con delete "$WIFI"
 echo "정리 끝. 남은 docker:"; sudo docker ps -a; sudo docker images

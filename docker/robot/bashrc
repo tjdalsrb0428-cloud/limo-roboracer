@@ -1,0 +1,4 @@
+# 컨테이너를 호스트 계정(uid)으로 실행할 때 쓰는 bash 설정(/etc/bash.bashrc로 마운트).
+source /opt/ros/humble/setup.bash
+source /opt/limo_ws/install/setup.bash
+PS1='(limo_race) \w\$ '

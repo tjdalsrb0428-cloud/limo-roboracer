@@ -14,10 +14,12 @@ ROBOT=${1:?사용법: setup.sh limo1|limo_pro [--tar 파일] [--image 이름]}
 shift
 IMAGE=tjdalsrb0428/limo-robot:v1
 TAR=""
+UID_RUN=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --tar) TAR=$2; shift 2;;
     --image) IMAGE=$2; shift 2;;
+    --uid) UID_RUN=$2; shift 2;;
     *) echo "모르는 옵션: $1"; exit 1;;
   esac
 done
@@ -37,10 +39,16 @@ fi
 # LOCALHOST_ONLY=1이면 DDS를 127.0.0.1로 제한(안 하면 토픽 목록만 보이고 데이터가 안 옴, 2026-11-18 Pro)
 DDS=""
 [ "$LO" = 1 ] && DDS="-e FASTRTPS_DEFAULT_PROFILES_FILE=$CODE/docker/robot/fastdds_udp_local.xml"
+# 실행 계정: 드라이버와 같은 uid여야 DDS 데이터가 온다(Pro: 호스트 wego 드라이버 ↔ root 컨테이너면 토픽 목록만 보이고 0 Hz, 2026-11-18).
+# LIMO1은 드라이버가 조교 컨테이너(root) → root(0). 바꾸려면 --uid N.
+[ -z "$UID_RUN" ] && { [ "$ROBOT" = limo1 ] && UID_RUN=0 || UID_RUN=$(id -u); }
+USER_OPT=""
+[ "$UID_RUN" != 0 ] && USER_OPT="--user $UID_RUN:$UID_RUN -e HOME=/tmp -v $CODE/docker/robot/bashrc:/etc/bash.bashrc:ro"
+echo "[setup] 컨테이너 실행 uid=$UID_RUN"
 sudo docker rm -f limo_race >/dev/null 2>&1 || true
 # --network host: 로봇 드라이버 토픽을 그대로 봄. --ipc host: DDS 통신 안정. 장치 접근은 필요 없음(드라이버는 호스트/조교 컨테이너).
 sudo docker run -d --name limo_race --network host --ipc host \
-  -e ROS_LOCALHOST_ONLY="$LO" -e ROS_DOMAIN_ID="$DOM" -e LIMO_ROBOT="$ROBOT" $DDS \
+  -e ROS_LOCALHOST_ONLY="$LO" -e ROS_DOMAIN_ID="$DOM" -e LIMO_ROBOT="$ROBOT" $DDS $USER_OPT \
   -v "$DOCS":"$DOCS" -w "$CODE" "$IMAGE" >/dev/null
 echo "[setup] 컨테이너 limo_race 실행됨"
 echo
