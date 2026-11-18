@@ -1,9 +1,9 @@
 #!/bin/bash
 # 로봇에서 우리 실행 환경(docker 컨테이너 limo_race)을 띄운다. 로봇 호스트 설정은 건드리지 않는다.
 #
-# 0) 코드 받기 (처음 한 번, 로봇 터미널. Password 칸에 GitHub 토큰 붙여넣기 → 저장되지 않음)
-#   git -c credential.helper= clone --depth 1 --filter=blob:none --sparse https://github.com/tjdalsrb0428-cloud/limo-roboracer.git ~/Documents/limo-roboracer
-#   cd ~/Documents/limo-roboracer && git sparse-checkout set scripts config docker
+# 0) 코드 받기 (처음 한 번, 로봇 터미널. 저장소 public → 인증 없음)
+#   git clone --depth 1 --filter=blob:none --sparse https://github.com/tjdalsrb0428-cloud/limo-roboracer.git ~/Documents/limo-roboracer
+#   cd ~/Documents/limo-roboracer && git sparse-checkout set scripts config docker docs
 # 1) 실행
 #   bash ~/Documents/limo-roboracer/scripts/real/setup.sh limo_pro            # Docker Hub에서 pull
 #   bash ~/Documents/limo-roboracer/scripts/real/setup.sh limo1 --tar /media/USB/limo-robot.tar   # USB에서 load
