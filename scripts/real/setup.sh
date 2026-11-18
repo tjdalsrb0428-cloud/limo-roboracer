@@ -34,10 +34,13 @@ if [ -n "$TAR" ]; then
 elif ! sudo docker image inspect "$IMAGE" >/dev/null 2>&1; then
   echo "[setup] pull $IMAGE (약 0.5 GB)"; sudo docker pull "$IMAGE"
 fi
+# LOCALHOST_ONLY=1이면 DDS를 127.0.0.1로 제한(안 하면 토픽 목록만 보이고 데이터가 안 옴, 2026-11-18 Pro)
+DDS=""
+[ "$LO" = 1 ] && DDS="-e FASTRTPS_DEFAULT_PROFILES_FILE=$CODE/docker/robot/fastdds_udp_local.xml"
 sudo docker rm -f limo_race >/dev/null 2>&1 || true
 # --network host: 로봇 드라이버 토픽을 그대로 봄. --ipc host: DDS 통신 안정. 장치 접근은 필요 없음(드라이버는 호스트/조교 컨테이너).
 sudo docker run -d --name limo_race --network host --ipc host \
-  -e ROS_LOCALHOST_ONLY="$LO" -e ROS_DOMAIN_ID="$DOM" -e LIMO_ROBOT="$ROBOT" \
+  -e ROS_LOCALHOST_ONLY="$LO" -e ROS_DOMAIN_ID="$DOM" -e LIMO_ROBOT="$ROBOT" $DDS \
   -v "$DOCS":"$DOCS" -w "$CODE" "$IMAGE" >/dev/null
 echo "[setup] 컨테이너 limo_race 실행됨"
 echo
