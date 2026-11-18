@@ -19,12 +19,6 @@
 - [ ] USB 메모리에 이미지 백업 복사: `cp /home/mksung0428/limo-robot_v1.tar /media/mksung0428/USB이름/`
 - [ ] 줄자, 노트북 충전기, USB Wi-Fi 동글, 폰(핫스팟 대비) 충전
 - [ ] 코드 최신 push 확인: `cd /home/mksung0428/Downloads/LIMO_GAZEBO/ws_limo_humble && git status && git log origin/main -1 --oneline`
-- [ ] **GitHub 토큰 만들기** (로봇에서 private 저장소 받을 때 비밀번호 대신 사용, 1주 유효·읽기 전용)
-  1. github.com → 오른쪽 위 프로필 → Settings → 맨 아래 Developer settings
-  2. Personal access tokens → **Fine-grained tokens** → Generate new token
-  3. Expiration: 7 days / Repository access: **Only select repositories → limo-roboracer**
-  4. Permissions → Repository permissions → **Contents: Read-only** (나머지 그대로) → Generate
-  5. `github_pat_...` 토큰을 노트북 메모에 임시 보관(실습 끝나면 지워도 됨, 만료되면 자동 무효)
 
 ## 1. 하드웨어 확인 (5분)
 - [ ] 바닥에 놓기, 상자·조종기·로봇 번호 일치 → **로봇 번호 기록**: ______
@@ -86,9 +80,8 @@ ros2 topic pub -t 5 /cmd_vel geometry_msgs/msg/Twist "{}"
 ## 4. 우리 환경 (10분) — SSH 터미널 2
 ```bash
 export ROS_LOCALHOST_ONLY=1
-git -c credential.helper= clone --depth 1 --filter=blob:none --sparse https://github.com/tjdalsrb0428-cloud/limo-roboracer.git ~/Documents/limo-roboracer
-#   Username: tjdalsrb0428-cloud   Password: 토큰 붙여넣기 (화면에 안 보임)
-cd ~/Documents/limo-roboracer && git sparse-checkout set scripts config docker
+git clone --depth 1 --filter=blob:none --sparse https://github.com/tjdalsrb0428-cloud/limo-roboracer.git ~/Documents/limo-roboracer
+cd ~/Documents/limo-roboracer && git sparse-checkout set scripts config docker docs
 bash scripts/real/setup.sh limo_pro                                   # LIMO1이면 limo1
 #   인터넷 느리면: bash scripts/real/setup.sh limo_pro --tar /media/계정/USB이름/limo-robot_v1.tar
 sudo docker exec -it limo_race bash
@@ -192,5 +185,5 @@ bash ~/Documents/limo-roboracer/scripts/real/teardown.sh                  # 핫�
 | 로봇이 명령에 안 움직임 | 조종기 SWB 위, Ackermann 모드, `check_sensors`의 control_mode·motion_mode. Pro는 `/limo/ack_cmd`, LIMO1은 `/cmd_vel` |
 | 라이다 `Check Sum` 오류·`Device Failed` | 로봇 부하(큰 복사 등) 중단 → 드라이버 재시작 |
 | docker pull 매우 느림 | Ctrl+C → `setup.sh ... --tar USB파일` |
-| git clone 인증 실패 | Username은 `tjdalsrb0428-cloud`, Password는 토큰(계정 비번 아님), 토큰 권한 Contents Read-only·저장소 선택 확인 |
+| git clone이 아이디/비번을 물음 | 저장소가 public인지 확인(GitHub 저장소 Settings → Danger Zone). Ctrl+C 후 재시도 |
 | 측정 중 위험 | Ctrl+C = 정지 명령 10회 후 종료. 조종기 SWB 가운데 = 수동 |
