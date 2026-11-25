@@ -25,6 +25,8 @@ TOPICS = [
     ('/race/raceline', 'nav_msgs.msg', 'Path', True),
     ('/race/local_path', 'nav_msgs.msg', 'Path', False),
     ('/pf/pose', 'geometry_msgs.msg', 'PoseWithCovarianceStamped', False),
+    ('/mapping/trajectory', 'nav_msgs.msg', 'Path', False),      # limo_race mapper: 매핑 중 지나온 길
+    ('/race/car_pose', 'geometry_msgs.msg', 'PoseStamped', False),  # limo_race mapper/controller: 차 위치
 ]
 
 

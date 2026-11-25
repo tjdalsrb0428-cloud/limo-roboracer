@@ -81,7 +81,7 @@ ros2 topic pub -t 5 /cmd_vel geometry_msgs/msg/Twist "{}"
 ```bash
 export ROS_LOCALHOST_ONLY=1
 git clone --depth 1 --filter=blob:none --sparse https://github.com/tjdalsrb0428-cloud/limo-roboracer.git ~/Documents/limo-roboracer
-cd ~/Documents/limo-roboracer && git sparse-checkout set scripts config docker docs
+cd ~/Documents/limo-roboracer && git sparse-checkout set scripts config docker docs src/limo_race src/limo_race_msgs
 bash scripts/real/setup.sh limo_pro                                   # LIMO1이면 limo1
 #   인터넷 느리면: bash scripts/real/setup.sh limo_pro --tar /media/계정/USB이름/limo-robot_v1.tar
 sudo docker exec -it limo_race bash
@@ -159,6 +159,23 @@ calib:
   speed_scale: 1.02
   odom_scale: 0.98
 ```
+
+### 5-4. ros2 명령 버전 (python3 대신, 같은 알고리즘) — 자세한 내용 `docs/ros2_commands.md`
+setup.sh 가 컨테이너 안에 `limo_race` 패키지를 빌드해 둔다(약 1분). 컨테이너에 들어가면 자동 source.
+```bash
+# 매핑 (터미널 A) → 한 바퀴 후 출발점에 세우고 터미널 B 에서 저장 → A 에서 Ctrl+C
+ros2 launch limo_race mapping.launch.py robot:=limo_pro map:=track1        # EKF TF 없으면 own_odom:=true
+ros2 service call /map_saver/save std_srvs/srv/Trigger
+# global path (A): 지도 + 파란 선 확인 후 Ctrl+C
+ros2 launch limo_race raceline.launch.py map:=track1
+# 주행 (A): READY 뒤 B 에서 go, 정지는 A 에서 Ctrl+C
+ros2 launch limo_race race.launch.py robot:=limo_pro map:=track1 vmax:=0.3
+ros2 run limo_race go
+# 통합본(한 터미널): 매핑 → Ctrl+C(저장·레이스라인·주행 준비) → 다른 터미널 go → Ctrl+C(정지)
+ros2 run limo_race bringup robot:=limo_pro map:=track1 vmax:=0.3
+```
+- 보정 파일은 자동(그 로봇의 최근 `config/robots/calib_*.yaml`). 바꾸려면 `calib:=calib_now.yaml`, 끄려면 `calib:=none`.
+- launch 는 노트북 RViz 중계(viz_relay)도 같이 켠다(`viz:=false` 로 끔).
 
 ## 6. 결과 저장 (5분)
 - 측정 출력은 SSH 화면에서 복사해 노트북 메모로. 파일이 생겼으면(지도 등, 수백 KB) 노트북 터미널에서:

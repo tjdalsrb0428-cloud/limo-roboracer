@@ -495,3 +495,25 @@ Jetson Nano 계획 시간, LIMO1 실제 라이다 사양(공개 저장소 값과
   노트북: 컨테이너에서 `ROS_LOCALHOST_ONLY=0 ROS_DOMAIN_ID=42 rviz2 -d config/rviz/real.rviz`. 로봇 쪽 송출 확인(/tf 50 Hz, /scan 3.4 Hz), **노트북 RViz 표시는 미확인**.
   /scan은 best effort라 reliable 구독이면 0개. 컨테이너 HOME=/tmp라 `~` 대신 절대경로.
 - 다음 할 일: 노트북 RViz 표시 확인, loop_mapper 매핑 중 /map 발행, raceline 출발점 보완, 속도 0.5→1.0 + 랩·plan ms 기록, 움직이는 사람/정지 장애물 회피 로그 확인, tmux/nohup 실행, 손으로 옮긴 뒤 재위치 절차.
+
+## 2026-11-25 ROS2 명령 버전 (limo_race 패키지) — python3 버전과 별개로 추가
+- 이유: 조교 지적 "ROS 수업인데 python 파일 하나로 통합해 python3 로 실행". python3 버전은 그대로 유지, 둘 다 사용 가능. 명령 정리 `docs/ros2_commands.md`.
+- 패키지: `src/limo_race`(ament_python, 기존 scripts 모듈을 import 해 재사용 — 알고리즘 코드 복제 없음), `src/limo_race_msgs`(RacePlan, ControlEvent).
+  빌드: `colcon build --symlink-install --base-paths src/limo_race src/limo_race_msgs`(setup.sh 가 컨테이너에서 자동, ARM64 이미지에서 1분 확인). sparse-checkout 에 `src/limo_race src/limo_race_msgs` 추가.
+- 노드: mapper(/map 1 Hz 실시간 + /mapping/trajectory, 서비스 /mapper/finalize) → map_saver(서비스 /map_saver/save → 파일) → map_server(/map, /map_traj)
+  → raceline_generator(/map → csv + /race/raceline) / global_path(csv → /race/raceline) → localizer → local_planner(/race/plan, /race/local_path) → controller(모터 명령).
+  파라미터는 ROS 파라미터(`--ros-args -p`), launch 는 `robot:= map:= vmax:=`, calib 기본 auto(그 로봇 최근 calib_*.yaml, `calib:=none` 끔).
+  노드끼리는 지도·경로를 토픽(transient local)으로 받는다(내부에서 임시 pgm/yaml 로 바꿔 기존 클래스에 넣음, 왕복 바이트 동일 확인).
+- 단계별: `ros2 launch limo_race mapping.launch.py robot:=limo_pro map:=NAME` → `ros2 service call /map_saver/save std_srvs/srv/Trigger`(Ctrl+C 는 저장 안 함)
+  → `ros2 launch limo_race raceline.launch.py map:=NAME` → `ros2 launch limo_race race.launch.py robot:=limo_pro map:=NAME vmax:=0.5` → `ros2 run limo_race go`.
+  통합본: `ros2 run limo_race bringup robot:=limo_pro map:=NAME`(첫 Ctrl+C = 매핑 끝·저장·레이스라인·주행 준비, 다음 Ctrl+C = 정지·종료. launch 는 Ctrl+C 에 전부 꺼져서 run 노드가 단계별로 launch 를 띄움).
+- 막힘 대처 분리: controller 가 /race/control_event(STUCK / MANEUVER_DONE / MANEUVER_STALLED) → local_planner 가 가상 장애물·Hybrid A*(RacePlan MANEUVER)·조향 후진(REVERSE) 결정.
+  controller 는 STUCK 알린 뒤 응답까지 정지(최대 5 s). 계획 타이머와 이벤트 처리는 같은 콜백 그룹(섞이지 않게).
+- 루프 보정 생략(짧음/출발점에서 멂/ICP 신뢰 낮음)이면 저장은 하되 매핑을 멈추지 않는다 → 출발점 근처에서 다시 저장하면 덮어씀(bringup 은 Ctrl+C 재저장, 3초 안 두 번 = 그 지도로 진행).
+- 시뮬 검증(덕트 트랙, Pro, 자체 odom, calib none): 같은 지도 ros2 47.8/47.3/47.4 s vs python3 48.2/47.4/47.4 s(덕트 여유 0.199/0.203), 박스 2개 world 48.2/48.0/47.9 vs 48.1/47.9/47.9(박스 여유 0.236/0.200),
+  plan 중앙값 77/82 ms(박스 142/143). STUCK·STALLED 주입 → 가상 장애물·Hybrid A*·후진·완료 보고 정상. bringup 전체 흐름 2바퀴 47.8/47.4 s, 남는 프로세스 없음.
+- 고친 문제: TF 전용 스레드가 rclpy 종료 후에도 대기 → launch 가 SIGTERM(stop_tf 로 명시 종료). go 가 구독자 1개(planner)만 보고 보내 controller 가 못 받음 → 2개 대기.
+  odom_tf 는 시작 2초 정지 상태로 자이로 편향 측정 → `go:=true` 즉시 출발 금지(편향 0.045 rad/s 로 잘못 재서 위치 2.7 m 틀어짐).
+  백그라운드 셸에서 띄운 프로세스는 SIGINT 가 무시 상태로 상속됨(시험 스크립트 주의, controller 는 직접 신호 처리 등록).
+- 시험: `.sim_tmp/r2_full.sh TAG RUNSEC [VMAX]`(SKIPMAP=1, M=지도, WORLD, BOXES, INJECT=1 ITYPE IVAL), `.sim_tmp/r2_bringup.sh`, `.sim_tmp/r2_warn.sh`, `.sim_tmp/r2_offline.sh`, `.sim_tmp/duct_obs.world`(박스 2개)+`box_clear.py`.
+- 실차 미검증: 노트북 RViz 표시(viz_relay 에 /mapping/trajectory, /race/car_pose 추가), Jetson 에서 노드 분리 후 계획·제어 지연.
