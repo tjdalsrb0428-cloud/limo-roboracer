@@ -33,12 +33,15 @@ def msg_type(mod, name):
     return getattr(importlib.import_module(mod), name)
 
 
-def qos(latched):
+def qos(latched, best=False):
+    """latched = transient_local(지도·레이스라인). best = best effort
+    (구독: 어떤 발행자와도 호환 — 라이다 드라이버 /scan 이 best effort, 발행: Wi-Fi 에서 /scan 재전송 안 함)"""
     from rclpy.qos import QoSProfile, DurabilityPolicy, ReliabilityPolicy, HistoryPolicy
     if latched:
         return QoSProfile(depth=1, history=HistoryPolicy.KEEP_LAST,
                           durability=DurabilityPolicy.TRANSIENT_LOCAL, reliability=ReliabilityPolicy.RELIABLE)
-    return QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST, reliability=ReliabilityPolicy.RELIABLE)
+    rel = ReliabilityPolicy.BEST_EFFORT if best else ReliabilityPolicy.RELIABLE
+    return QoSProfile(depth=5, history=HistoryPolicy.KEEP_LAST, reliability=rel)
 
 
 def sender():
@@ -48,7 +51,7 @@ def sender():
     rclpy.init()
     n = rclpy.create_node('viz_relay_out')
     types = [msg_type(m, t) for _, m, t, _ in TOPICS]
-    pubs = [n.create_publisher(ty, tp, qos(l)) for ty, (tp, _, _, l) in zip(types, TOPICS)]
+    pubs = [n.create_publisher(ty, tp, qos(l, tp == '/scan')) for ty, (tp, _, _, l) in zip(types, TOPICS)]
     inp = sys.stdin.buffer
     while True:
         h = inp.read(5)
@@ -106,7 +109,7 @@ def main():
         return cb
 
     for i, (tp, mod, name, latched) in enumerate(TOPICS):
-        n.create_subscription(msg_type(mod, name), tp, make_cb(i), qos(latched))
+        n.create_subscription(msg_type(mod, name), tp, make_cb(i), qos(latched, True))
     print(f'[relay] 도메인 0(로봇 안) → 도메인 {a.domain}(Wi-Fi). 노트북: '
           f'ROS_LOCALHOST_ONLY=0 ROS_DOMAIN_ID={a.domain} rviz2 -d config/rviz/real.rviz', flush=True)
     t_log = time.time()

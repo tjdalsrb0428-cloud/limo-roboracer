@@ -38,7 +38,7 @@ Visualization Manager:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
+        Reliability Policy: Best Effort
     - Class: rviz_default_plugins/Path
       Name: Raceline
       Enabled: true
