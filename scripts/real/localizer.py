@@ -149,8 +149,18 @@ class Localizer(Node):
                 except Exception:
                     keep.append(m)
                     continue
+            t = None
             if self.buf.can_transform(self.fo, self.fb, st):
                 t = self.buf.lookup_transform(self.fo, self.fb, st)
+            else:
+                # 실차 EKF TF(30 Hz)가 스캔 시각보다 늦게 오면 정확한 시각 TF가 없다 → 최신 TF가 0.2 s 이내면 사용
+                try:
+                    tl = self.buf.lookup_transform(self.fo, self.fb, Time())
+                    if abs((Time.from_msg(tl.header.stamp) - st).nanoseconds) < 2e8:
+                        t = tl
+                except Exception:
+                    pass
+            if t is not None:
                 self.step(m, (t.transform.translation.x, t.transform.translation.y, yaw_of(t.transform.rotation)))
             elif (self.get_clock().now() - st).nanoseconds < 5e8:
                 keep.append(m)

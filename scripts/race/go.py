@@ -19,9 +19,10 @@ while pub.get_subscription_count() == 0 and time.time() - t0 < 5.0:   # 드라�
 if pub.get_subscription_count() == 0:
     print('드라이버(race_driver.py)가 실행 중이 아님 - READY 확인 후 다시 실행')
 else:
-    for _ in range(3):
+    t1 = time.time()                    # 연결 직후 몇 개는 유실될 수 있다(실차 망) → 0.3 s 동안 반복
+    while time.time() - t1 < 0.3:
         pub.publish(Empty())
-        time.sleep(0.02)
+        rclpy.spin_once(n, timeout_sec=0.03)
     print('출발!')
 n.destroy_node()
 rclpy.shutdown()
