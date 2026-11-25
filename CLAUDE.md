@@ -477,3 +477,21 @@ Jetson Nano 계획 시간, LIMO1 실제 라이다 사양(공개 저장소 값과
   raceline이 열린 방에서 직선·각진 꺾임 다각형으로 나옴 + 작은 물체(blob)에 거의 닿음 → 노트북에서 원인 확인 필요. 자율주행은 시간 부족으로 미시도.
 - 실수 주의: `scp`는 노트북 셸(`mksung0428@`)에서. 컨테이너에서 치면 `unknown user 1000`.
 - 다음 할 일: raceline 열린 공간 처리, calib_steer 옆 충돌 방지·좌우 배율 분리, localizer·race_driver 실차 첫 주행(0.3 m/s), RViz 원격 보기, `teleop_key.py`(미검증) 확인.
+  (정정 2026-11-25: 11-18 "각진 다각형"은 png의 파란 선 = 추출 루프. 실제 레이스라인(빨강)은 매끄러웠고, 물체는 사람이었음)
+
+## 2026-11-25 LIMO Pro 세 번째 실습 — 실차 첫 자율주행 성공
+- 망: 학교 KT_GiGA_1D78(172.30.1.x, 로봇 .121, 노트북 동글 .68). 노트북이 iptime_ring으로 혼자 넘어가고 로봇 Wi-Fi가 15 s+ 끊겨 SSH가 자주 끊김
+  → SSH 창이 닫혀도 컨테이너 안 프로그램은 살아 있다(옛 race_driver가 go를 받아 혼자 주행함). 재접속 시 `pgrep -af "race_driver|localizer"` 먼저, 비상정지는 조종기 SWB 가운데.
+  다음엔 로봇 호스트 tmux(설치 여부 미확인) 또는 nohup으로 실행 검토.
+- 보정은 calib_pro_1118 재사용(실습용 Pro 1대). EKF TF odom→base_link 있음 → --own-odom/odom_tf 안 씀.
+- 매핑(loop_mapper): t1125 인라이어 0.89·오차 1.8 cm·보정 3 cm/0.6°, t1125b도 정상(독립 장애물 119개 = 사람·물건). 지도 사본 `maps/real_1125/`(커밋).
+  **두 지도 모두 raceline 루프 추출 실패**: 출발 pose(매핑 끝 자세)가 섬 끝 바로 옆이라 출발점 수직선이 섬을 못 맞혀 트랙이 안 잘림 → Hybrid A* 폴백으로 생성(13.4 m, 최대곡률 2.0).
+  매핑은 섬 옆 직선 구간 가운데서 끝낼 것. 코드 보완 필요(수직선이 내벽 못 맞히면 출발점을 앞으로 옮겨 재시도).
+- **localizer 버그 수정(81deb17)**: 스캔 시각 TF가 EKF(30 Hz) 지연으로 없으면 스캔을 버려 map→odom이 첫 1회만 발행 → 드라이버가 pose 없음으로 무음 정지(READY는 30 s 후 그냥 뜸).
+  최신 TF가 0.2 s 이내면 사용. go.py는 연결 직후 유실 → 0.3 s 반복 발행.
+- 주행: `--vmax 0.3`, 이어서 0.5로 레이스라인대로 완주(랩타임·plan ms 기록 못 함). 사람이 장애물 흉내로 끼어들자 이상한 방향으로 가서 벽 충돌(로그 없음).
+  손으로 옮긴 뒤엔 localizer가 옛 위치 유지 → localizer 재시작 필요(또는 /initialpose).
+- RViz 원격(ef3377b, ea437d6): `scripts/real/viz_relay.py`(컨테이너에서 `python3 viz_relay.py > /tmp/relay.log 2>&1 &`) = 도메인 0 localhost 토픽을 도메인 42 Wi-Fi로 재발행(/scan 5 Hz best effort, tf_static 병합).
+  노트북: 컨테이너에서 `ROS_LOCALHOST_ONLY=0 ROS_DOMAIN_ID=42 rviz2 -d config/rviz/real.rviz`. 로봇 쪽 송출 확인(/tf 50 Hz, /scan 3.4 Hz), **노트북 RViz 표시는 미확인**.
+  /scan은 best effort라 reliable 구독이면 0개. 컨테이너 HOME=/tmp라 `~` 대신 절대경로.
+- 다음 할 일: 노트북 RViz 표시 확인, loop_mapper 매핑 중 /map 발행, raceline 출발점 보완, 속도 0.5→1.0 + 랩·plan ms 기록, 움직이는 사람/정지 장애물 회피 로그 확인, tmux/nohup 실행, 손으로 옮긴 뒤 재위치 절차.
